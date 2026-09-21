@@ -11,6 +11,6 @@ window.ANTIN_CONFIG = {
   PRICE_MULTIPLIER: 1000,
 
   // Liên hệ - điền sau.
-  ZALO_PHONE: "",
-  FACEBOOK_URL: ""
+  ZALO_PHONE: "0905561550",
+  FACEBOOK_URL: "https://www.facebook.com/profile.php?id=61594629503087"
 };
