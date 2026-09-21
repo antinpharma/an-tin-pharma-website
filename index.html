@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ea5a2a">
+  <meta name="description" content="Danh mục sản phẩm An Tín Pharma - tìm kiếm sản phẩm, xem giá, hoạt chất và liên hệ tư vấn.">
+  <title>An Tín Pharma | Danh mục sản phẩm</title>
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="header">
+  <div class="wrap nav">
+    <a class="logo" href="#top" aria-label="An Tín Pharma">
+      <img src="logo.svg" alt="Logo An Tín Pharma">
+      <div class="brand"><strong>An Tín Pharma</strong><span>An Tâm - Uy Tín</span></div>
+    </a>
+    <div class="search">
+      <input id="searchInput" type="search" autocomplete="off" placeholder="Tìm tên thuốc, hoạt chất, hãng..." aria-label="Tìm sản phẩm">
+      <button id="searchButton" type="button">Tìm</button>
+    </div>
+    <nav class="links" aria-label="Điều hướng chính">
+      <a href="#top">Trang chủ</a>
+      <a href="#products">Sản phẩm</a>
+      <a href="#about">Giới thiệu</a>
+      <a href="#contact">Liên hệ</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <div>
+        <div class="eyebrow">VÌ SỨC KHỎE CỘNG ĐỒNG VIỆT</div>
+        <h1><span>An Tín Pharma</span><br>Danh mục sản phẩm dễ tìm, dễ hỏi</h1>
+        <p>Tìm nhanh sản phẩm, xem giá, hoạt chất và thông tin tham khảo. Khi cần thêm thông tin, khách hàng có thể liên hệ trực tiếp với An Tín Pharma để được hỗ trợ.</p>
+        <a class="hero-cta" href="#products">Xem sản phẩm</a>
+      </div>
+      <aside class="hero-card" id="about">
+        <h2>Đồng hành cùng khách hàng</h2>
+        <div class="trust-grid">
+          <div><b>01</b><span>Tìm sản phẩm nhanh</span></div>
+          <div><b>02</b><span>Thông tin dễ xem</span></div>
+          <div><b>03</b><span>Liên hệ thuận tiện</span></div>
+          <div><b>04</b><span>Hiển thị tốt trên mobile</span></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="wrap" id="products">
+    <div class="categories" id="categories" aria-label="Danh mục sản phẩm"></div>
+    <div class="section-title">
+      <div><h2>Sản phẩm</h2><p>Tìm theo tên sản phẩm, hoạt chất hoặc quy cách.</p></div>
+      <small id="count"></small>
+    </div>
+    <section class="grid" id="productGrid" aria-live="polite"></section>
+    <div class="note">Thông tin sản phẩm trên website dùng để tham khảo. Vui lòng liên hệ An Tín Pharma để được hỗ trợ thêm về sản phẩm và giá tại thời điểm đặt hàng.</div>
+  </section>
+</main>
+
+<footer class="footer" id="contact">
+  <div class="wrap footer-inner">
+    <div class="footer-brand"><img src="logo.svg" alt=""><div><strong>An Tín Pharma</strong><small>An Tâm - Uy Tín</small></div></div>
+    <div><strong>Liên hệ tư vấn</strong><small>Chọn Zalo hoặc Facebook tại từng sản phẩm.</small></div>
+    <small>© <span id="year"></span> An Tín Pharma</small>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
