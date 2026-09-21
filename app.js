@@ -69,7 +69,9 @@ function normalizeImage(url){
 function rowToProduct(r){
   const visibleRaw = pick(r,'Hiển thị','hien_thi','visible','show');
   return {
-    name: pick(r,'Tên sản phẩm','ten_san_pham','Tên','name'),
+    productId: pick(r,'Product ID','product_id','Mã sản phẩm','ma_san_pham','id'),
+    name: pick(r,'Tên sản phẩm','ten_san_pham','Tên','name','product_name'),
+    brand: pick(r,'Brand','brand','Hãng','hang'),
     category: pick(r,'Danh mục','danh_muc','category') || 'Khác',
     spec: pick(r,'Quy cách','quy_cach','spec'),
     price: normalizePrice(pick(r,'Giá','gia','price')),
@@ -133,6 +135,78 @@ function contact(name,channel){
   }
   alert(`Kênh ${channel} chưa được cấu hình. Sản phẩm đang hỏi: “${name}”.`);
 }
+function normMatch(s=''){
+  return stripAccents(String(s)).toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+}
+
+function buildPriceIndex(rows){
+  const regionWanted = normMatch(CONFIG.PRICE_REGION || 'MIENNAM').replace(/\s+/g,'');
+  const multiplier = Number(CONFIG.PRICE_MULTIPLIER || 1000);
+  const byId = new Map();
+  const list = [];
+
+  rows.forEach(r=>{
+    const region = pick(r,'sales region','sales_region','sales_region_code','Sales Region');
+    const regionNorm = normMatch(region).replace(/\s+/g,'');
+    if(regionNorm !== regionWanted) return;
+
+    const productId = pick(r,'Product ID','product_id','product id');
+    const productName = pick(r,'product_name','Product Name','Tên sản phẩm','ten_san_pham');
+    const brand = pick(r,'brand','Brand','Hãng','hang');
+    const rawPrice = pick(r,'retail_price_value','Retail Price Value','retail price value');
+    const num = Number(String(rawPrice).replace(',','.').replace(/[^0-9.\-]/g,''));
+    if(!Number.isFinite(num)) return;
+
+    const price = Math.round(num * multiplier);
+    const item = {
+      productId: String(productId||'').trim(),
+      nameNorm: normMatch(productName),
+      brandNorm: normMatch(brand),
+      price
+    };
+    if(item.productId) byId.set(item.productId,item);
+    list.push(item);
+  });
+
+  return {byId,list};
+}
+
+function applyPriceIndex(index){
+  products = products.map(p=>{
+    let hit = null;
+
+    if(p.productId && index.byId.has(String(p.productId).trim())){
+      hit = index.byId.get(String(p.productId).trim());
+    }
+
+    if(!hit){
+      const pn = normMatch(p.name);
+      const pb = normMatch(p.brand);
+      hit = index.list.find(x=>{
+        if(!x.nameNorm || !pn) return false;
+        const sameName = x.nameNorm === pn || x.nameNorm.includes(pn) || pn.includes(x.nameNorm);
+        const sameBrand = !pb || !x.brandNorm || pb === x.brandNorm || pb.includes(x.brandNorm) || x.brandNorm.includes(pb);
+        return sameName && sameBrand;
+      }) || null;
+    }
+
+    return hit ? {...p, price: hit.price.toLocaleString('vi-VN')+'đ'} : p;
+  });
+}
+
+async function loadPrices(){
+  const url = sheetCsvUrl(CONFIG.PRICE_SHEET_URL, CONFIG.PRICE_SHEET_NAME || 'check');
+  if(!url) return;
+  try{
+    const res = await fetch(url,{cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const rows = parseCSV(await res.text());
+    applyPriceIndex(buildPriceIndex(rows));
+  }catch(err){
+    console.error('Không đọc được nguồn giá:',err);
+  }
+}
+
 async function loadProducts(){
   const url=sheetCsvUrl(CONFIG.GOOGLE_SHEET_URL,CONFIG.SHEET_NAME);
   if(!url){
@@ -151,6 +225,7 @@ async function loadProducts(){
     console.error('Không đọc được Google Sheet:',err);
     products=[...FALLBACK_PRODUCTS];
   }
+  await loadPrices();
   rebuildCategories(); renderCategories(); renderProducts();
 }
 document.getElementById('searchInput').addEventListener('input',renderProducts);
