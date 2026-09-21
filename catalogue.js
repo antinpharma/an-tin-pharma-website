@@ -7,7 +7,7 @@ window.ANTIN_PRODUCTS = [
     spec: "Tuýp 15g",
     price: "108.400đ",
     active: "Adapalene 1 mg/g + Clindamycin 10 mg/g",
-    indication: "Thông tin tham khảo về sản phẩm. Vui lòng dùng theo hướng dẫn chuyên môn.",
+    indication: "Điều trị tại chỗ mụn trứng cá.",
     image: "images/klenzit-c-15g.jpg",
     visible: true
   },
@@ -19,7 +19,7 @@ window.ANTIN_PRODUCTS = [
     spec: "Hộp 14 viên",
     price: "322.000đ",
     active: "Esomeprazole 40mg",
-    indication: "Thông tin tham khảo về sản phẩm. Vui lòng dùng theo hướng dẫn chuyên môn.",
+    indication: "Điều trị viêm thực quản do trào ngược; điều trị hội chứng Zollinger–Ellison; điều trị kéo dài sau dự phòng tái xuất huyết loét dạ dày–tá tràng bằng đường tĩnh mạch.",
     image: "images/nexium-mups-40mg.jpg",
     visible: true
   }
