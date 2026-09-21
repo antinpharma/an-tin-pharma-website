@@ -1,9 +1,11 @@
 const CONFIG = window.ANTIN_CONFIG || {};
 
-const FALLBACK_PRODUCTS = [
-  {name:'Nexium 40mg',category:'Thuốc',spec:'Hộp 28 viên',price:'Liên hệ',active:'Esomeprazole 40mg',indication:'Thông tin tham khảo. Vui lòng liên hệ An Tín Pharma để được tư vấn thêm.',image:'',visible:true},
-  {name:'Xatral XL 10mg',category:'Thuốc',spec:'Hộp 30 viên',price:'Liên hệ',active:'Alfuzosin hydrochloride 10mg',indication:'Thông tin tham khảo. Vui lòng liên hệ An Tín Pharma để được tư vấn thêm.',image:'',visible:true}
-];
+const FALLBACK_PRODUCTS = (Array.isArray(window.ANTIN_PRODUCTS) && window.ANTIN_PRODUCTS.length)
+  ? window.ANTIN_PRODUCTS.map(p => ({...p}))
+  : [
+      {name:'Nexium 40mg',category:'Thuốc',spec:'Hộp 28 viên',price:'Liên hệ',active:'Esomeprazole 40mg',indication:'Thông tin tham khảo. Vui lòng liên hệ An Tín Pharma để được tư vấn thêm.',image:'',visible:true},
+      {name:'Xatral XL 10mg',category:'Thuốc',spec:'Hộp 30 viên',price:'Liên hệ',active:'Alfuzosin hydrochloride 10mg',indication:'Thông tin tham khảo. Vui lòng liên hệ An Tín Pharma để được tư vấn thêm.',image:'',visible:true}
+    ];
 
 let products = [...FALLBACK_PRODUCTS];
 let categories = ['Tất cả'];
@@ -208,6 +210,12 @@ async function loadPrices(){
 }
 
 async function loadProducts(){
+  if(Array.isArray(window.ANTIN_PRODUCTS) && window.ANTIN_PRODUCTS.length){
+    products=window.ANTIN_PRODUCTS.map(p=>({...p}));
+    rebuildCategories(); renderCategories(); renderProducts();
+    return;
+  }
+
   const url=sheetCsvUrl(CONFIG.GOOGLE_SHEET_URL,CONFIG.SHEET_NAME);
   if(!url){
     products=[...FALLBACK_PRODUCTS];
