@@ -118,7 +118,7 @@ function renderProducts(){
       <div class="meta"><b>Quy cách:</b> ${esc(p.spec||'Đang cập nhật')}</div>
       <div class="price">${esc(p.price)}</div>
       <div class="meta"><b>Hoạt chất:</b> ${esc(p.active||'Đang cập nhật')}</div>
-      <div class="indication"><b>Thông tin:</b> ${esc(p.indication||'Đang cập nhật')}</div>
+      <div class="indication"><b>Chỉ định:</b> ${esc(p.indication||'Đang cập nhật')}</div>
       <div class="actions">
         <button class="btn zalo" onclick='contact(${JSON.stringify(p.name)},"Zalo")'>Zalo</button>
         <button class="btn fb" onclick='contact(${JSON.stringify(p.name)},"Facebook")'>Facebook</button>
