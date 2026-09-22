@@ -5,7 +5,7 @@ window.ANTIN_PRODUCTS = [
     brand: "Glenmark",
     category: "Thuốc da liễu",
     spec: "Tuýp 15g",
-    price: "113.000đ",
+    price: "108.400đ",
     active: "Adapalene 1 mg/g + Clindamycin 10 mg/g",
     indication: "Điều trị tại chỗ mụn trứng cá.",
     image: "images/klenzit-c-15g.jpg",
