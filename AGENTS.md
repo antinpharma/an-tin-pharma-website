@@ -18,7 +18,11 @@ Khách hàng xem sản phẩm, giá, hoạt chất, chỉ định và liên hệ
    - Chỉ cập nhật giá.
 4. Nếu sản phẩm mới:
    - Tìm tên chuẩn, hoạt chất, quy cách, brand và chỉ định.
-5. Giá lấy từ file Check Daily.
+5. Giá lấy từ Google Sheet "Data sàn": https://docs.google.com/spreadsheets/d/1TEOQde1O0JoikDJJnIbe6sdpGl3GL76kJf1hQ_MapCU/edit
+   - Tab `check`: dòng 1 là thời điểm cập nhật, dòng 2 là tiêu đề cột.
+   - Đọc bằng tài khoản được cấp quyền; không yêu cầu công khai bảng nguồn.
+   - Ghép chính xác `product_id` với Product ID trong catalogue, đọc giá dạng số gốc (UNFORMATTED_VALUE).
+   - Cập nhật giá vào `catalogue.js`; website dùng catalogue đã mirror, không tự đồng bộ khi Sheet thay đổi.
 6. Chỉ dùng sales_region_code = MIENNAM.
 7. retail_price_value x 1000 = giá hiển thị website.
 8. Nếu không chắc giá, dùng "Liên hệ", không đoán.
