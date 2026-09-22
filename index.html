@@ -7,7 +7,7 @@
   <meta name="description" content="Danh mục sản phẩm An Tín Pharma - tìm kiếm sản phẩm, xem giá, hoạt chất và liên hệ tư vấn.">
   <title>An Tín Pharma | Danh mục sản phẩm</title>
   <link rel="icon" href="logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20260921-2355">
+  <link rel="stylesheet" href="style.css?v=20260922-cart-1">
 </head>
 <body>
 <header class="header">
@@ -26,6 +26,10 @@
       <a href="#about">Giới thiệu</a>
       <a href="#contact">Liên hệ</a>
     </nav>
+    <button class="cart-toggle" id="cartToggle" type="button" aria-haspopup="dialog" aria-controls="cartDialog" aria-label="Giỏ hàng, 0 sản phẩm">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 3h2l2.4 12h11.2L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+      <span>Giỏ hàng</span><span class="cart-badge" id="cartBadge">0</span>
+    </button>
   </div>
 </header>
 
@@ -53,7 +57,7 @@
   <section class="wrap" id="products">
     <div class="categories" id="categories" aria-label="Danh mục sản phẩm"></div>
     <div class="section-title">
-      <div><h2>Sản phẩm</h2><p>Tìm theo tên sản phẩm, hoạt chất hoặc quy cách.</p></div>
+      <div><h2>Sản phẩm</h2><p>Chọn số lượng bằng nút − / +, rồi mở giỏ hàng để liên hệ Zalo.</p></div>
       <small id="count"></small>
     </div>
     <section class="grid" id="productGrid" aria-live="polite"></section>
@@ -69,8 +73,49 @@
   </div>
 </footer>
 
+<section class="cart-bar" id="cartBar" aria-label="Tóm tắt giỏ hàng" hidden>
+  <div class="wrap cart-bar-inner">
+    <div><strong id="cartBarCount">0 sản phẩm</strong><small id="cartBarNote">Đã thêm vào giỏ hàng</small></div>
+    <div class="cart-bar-total"><span>Tạm tính</span><strong id="cartBarTotal">0đ</strong></div>
+    <button class="btn primary" id="viewCart" type="button">Xem giỏ hàng <span aria-hidden="true">→</span></button>
+  </div>
+</section>
+
+<dialog class="cart-dialog" id="cartDialog" aria-labelledby="cartTitle">
+  <div class="cart-heading">
+    <div><h2 id="cartTitle">Giỏ hàng</h2><p id="cartSubtitle">Các sản phẩm bạn đã chọn</p></div>
+    <button class="icon-button" id="closeCart" type="button" aria-label="Đóng giỏ hàng" autofocus>×</button>
+  </div>
+  <div class="cart-layout">
+    <section class="cart-products" aria-label="Sản phẩm trong giỏ hàng">
+      <label class="select-all"><input id="selectAll" type="checkbox"> Chọn tất cả <span id="cartLineCount"></span></label>
+      <div id="cartItems"></div>
+      <button class="continue-shopping" id="continueShopping" type="button">← Tiếp tục chọn sản phẩm</button>
+    </section>
+    <aside class="cart-summary" aria-label="Tóm tắt sản phẩm đã chọn">
+      <h3>Thông tin lựa chọn</h3>
+      <div class="summary-row"><span>Số loại đã chọn</span><strong id="selectedLines">0</strong></div>
+      <div class="summary-row"><span>Tổng số lượng</span><strong id="selectedQuantity">0</strong></div>
+      <div class="summary-row summary-total"><span>Tạm tính</span><strong id="selectedTotal">0đ</strong></div>
+      <p class="price-note" id="cartPriceNote">Giá được xác nhận khi liên hệ.</p>
+      <div class="cart-buttons">
+        <button class="btn delete-button" id="deleteCart" type="button" disabled>Xoá hàng</button>
+        <button class="btn zalo-checkout" id="checkoutCart" type="button" disabled>Liên hệ Zalo</button>
+      </div>
+      <p class="checkout-help">Chọn “Liên hệ Zalo” để sao chép danh sách và mở Zalo. Dán nội dung vào cuộc trò chuyện với An Tín Pharma để gửi yêu cầu.</p>
+      <details id="orderPreview">
+        <summary>Xem nội dung gửi Zalo</summary>
+        <textarea id="orderMessage" rows="7" readonly aria-label="Nội dung gửi Zalo"></textarea>
+        <button class="copy-order" id="copyOrder" type="button" disabled>Sao chép danh sách</button>
+      </details>
+      <p class="cart-feedback" id="cartFeedback" role="status"></p>
+    </aside>
+  </div>
+</dialog>
+<div class="sr-only" id="cartAnnouncement" role="status" aria-live="polite"></div>
+
 <script src="config.js?v=20260922-data-san-1"></script>
 <script src="catalogue.js?v=4b4d714f38ac"></script>
-<script src="app.js?v=20260922-0010"></script>
+<script src="app.js?v=20260922-cart-1"></script>
 </body>
 </html>

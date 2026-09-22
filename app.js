@@ -10,6 +10,9 @@ const FALLBACK_PRODUCTS = (Array.isArray(window.ANTIN_PRODUCTS) && window.ANTIN_
 let products = [...FALLBACK_PRODUCTS];
 let categories = ['Tất cả'];
 let activeCategory = 'Tất cả';
+const CART_STORAGE_KEY = 'antin-cart-v1';
+const MAX_QUANTITY = 9999;
+let cart = new Map();
 
 function stripAccents(s=''){
   return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D');
@@ -95,33 +98,215 @@ function renderCategories(){
   document.getElementById('categories').innerHTML=categories.map(c=>`<button class="chip ${c===activeCategory?'active':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
   document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{activeCategory=b.dataset.cat;renderCategories();renderProducts();}));
 }
+function productKey(p){
+  return p.productId ? `id:${p.productId}` : `item:${JSON.stringify([p.name,p.spec,p.brand])}`;
+}
+function findProduct(key){
+  return products.find(p=>p.visible && productKey(p)===key);
+}
+function money(value){
+  return value.toLocaleString('vi-VN')+'đ';
+}
+function unitPrice(p){
+  // Only accept an unambiguous whole-dong catalogue price. Never guess a price.
+  const value=String(p.price ?? '').trim();
+  if(!/^(?:\d+|\d{1,3}(?:\.\d{3})+)\s*(?:đ|₫|VND)$/i.test(value)) return null;
+  const number=Number(value.replace(/\D/g,''));
+  return Number.isSafeInteger(number) && number>0 && Number.isSafeInteger(number*MAX_QUANTITY) ? number : null;
+}
+function restoreCart(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+    if(!Array.isArray(saved)) return new Map();
+    return new Map(saved.filter(item=>item && typeof item.key==='string' && findProduct(item.key)
+      && Number.isInteger(item.quantity) && item.quantity>0 && item.quantity<=MAX_QUANTITY)
+      .map(item=>[item.key,{quantity:item.quantity,selected:item.selected!==false}]));
+  }catch{ return new Map(); }
+}
+function saveCart(){
+  try{
+    localStorage.setItem(CART_STORAGE_KEY,JSON.stringify([...cart].map(([key,item])=>({key,...item}))));
+  }catch{
+    document.getElementById('cartAnnouncement').textContent='Trình duyệt không lưu được giỏ hàng. Lựa chọn vẫn được giữ trong lần mở trang này.';
+  }
+}
+function cartRows(selectedOnly=false){
+  return [...cart].flatMap(([key,item])=>{
+    const product=findProduct(key);
+    return product && (!selectedOnly || item.selected) ? [{key,...item,product}] : [];
+  });
+}
+function totals(rows){
+  return rows.reduce((result,row)=>{
+    const price=unitPrice(row.product);
+    result.quantity+=row.quantity;
+    if(price===null) result.unknown++;
+    else result.amount+=price*row.quantity;
+    return result;
+  },{quantity:0,amount:0,unknown:0});
+}
+function totalLabel(rows){
+  const summary=totals(rows);
+  return summary.unknown===rows.length && rows.length ? 'Liên hệ' : money(summary.amount);
+}
+function productImage(p){
+  return p.image ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">`
+    : '<span class="image-placeholder">Ảnh sản phẩm</span>';
+}
+function quantityControl(p){
+  const key=productKey(p), quantity=cart.get(key)?.quantity || 0;
+  return `<div class="quantity-control" data-quantity-key="${esc(key)}">
+    <button type="button" data-cart-action="decrease" data-key="${esc(key)}" aria-label="Giảm số lượng ${esc(p.name)}" ${quantity===0?'disabled':''}>−</button>
+    <input type="number" min="0" max="${MAX_QUANTITY}" step="1" inputmode="numeric" value="${quantity}" data-cart-action="quantity" data-key="${esc(key)}" aria-label="Số lượng ${esc(p.name)}">
+    <button type="button" data-cart-action="increase" data-key="${esc(key)}" aria-label="Tăng số lượng ${esc(p.name)}" ${quantity===MAX_QUANTITY?'disabled':''}>+</button>
+  </div>`;
+}
+function syncQuantityControls(){
+  document.querySelectorAll('[data-quantity-key]').forEach(control=>{
+    const quantity=cart.get(control.dataset.quantityKey)?.quantity || 0;
+    control.querySelector('input').value=quantity;
+    control.querySelector('[data-cart-action="decrease"]').disabled=quantity===0;
+    control.querySelector('[data-cart-action="increase"]').disabled=quantity===MAX_QUANTITY;
+    control.closest('.card')?.classList.toggle('in-cart',quantity>0);
+  });
+}
+function setQuantity(key,quantity){
+  const product=findProduct(key);
+  if(!product) return;
+  const existed=cart.has(key);
+  if(!Number.isInteger(quantity) || quantity<0 || quantity>MAX_QUANTITY){
+    syncQuantityControls();
+    document.getElementById('cartAnnouncement').textContent=`Nhập số lượng nguyên từ 0 đến ${MAX_QUANTITY}.`;
+    return;
+  }
+  if(quantity===0) cart.delete(key);
+  else cart.set(key,{quantity,selected:cart.get(key)?.selected ?? true});
+  document.getElementById('cartAnnouncement').textContent=`${product.name}: ${quantity===0?'đã xoá khỏi giỏ hàng':`số lượng ${quantity}`}.`;
+  saveCart();
+  renderCart(!existed || quantity===0);
+}
+function orderText(rows){
+  if(!rows.length) return '';
+  const lines=rows.map((row,index)=>{
+    const p=row.product, price=unitPrice(p);
+    return `${index+1}. ${p.name}${p.productId?` (Mã: ${p.productId})`:''}\n   Quy cách: ${p.spec||'Cần xác nhận'}\n   Số lượng: ${row.quantity} | Đơn giá: ${price===null?'Liên hệ':money(price)} | Thành tiền: ${price===null?'Liên hệ':money(price*row.quantity)}`;
+  });
+  const summary=totals(rows);
+  return `Chào An Tín Pharma, tôi muốn hỏi đặt các sản phẩm sau:\n\n${lines.join('\n\n')}\n\nSố loại: ${rows.length} | Tổng số lượng: ${summary.quantity}\nTạm tính${summary.unknown?' (chỉ sản phẩm có giá)':''}: ${totalLabel(rows)}${summary.unknown?`\nCó ${summary.unknown} sản phẩm cần báo giá.`:''}\nVui lòng xác nhận giá và tình trạng hàng. Cảm ơn!`;
+}
+function renderCart(refreshItems=true){
+  const rows=cartRows(), selected=rows.filter(row=>row.selected), summary=totals(selected), allTotals=totals(rows);
+  const active=document.activeElement;
+  const focus=refreshItems && active?.closest('#cartItems') ? {key:active.dataset.key,action:active.dataset.cartAction} : null;
+  document.getElementById('cartBadge').textContent=allTotals.quantity;
+  document.getElementById('cartToggle').setAttribute('aria-label',`Giỏ hàng, tổng số lượng ${allTotals.quantity}`);
+  document.getElementById('cartBar').hidden=!rows.length;
+  document.body.classList.toggle('has-cart',rows.length>0);
+  document.getElementById('cartBarCount').textContent=`${rows.length} loại · Số lượng: ${allTotals.quantity}`;
+  document.getElementById('cartBarTotal').textContent=totalLabel(rows);
+  document.getElementById('cartBarNote').textContent=allTotals.unknown?`${allTotals.unknown} sản phẩm cần báo giá`:'Đã thêm vào giỏ hàng';
+  document.getElementById('cartSubtitle').textContent=`${rows.length} loại sản phẩm trong giỏ hàng`;
+  document.getElementById('cartLineCount').textContent=`(${rows.length})`;
+  const selectAll=document.getElementById('selectAll');
+  selectAll.checked=rows.length>0 && selected.length===rows.length;
+  selectAll.indeterminate=selected.length>0 && selected.length<rows.length;
+  selectAll.disabled=!rows.length;
+  const groups=new Map();
+  rows.forEach(row=>{
+    const brand=row.product.brand || 'Sản phẩm khác';
+    if(!groups.has(brand)) groups.set(brand,[]);
+    groups.get(brand).push(row);
+  });
+  if(refreshItems) document.getElementById('cartItems').innerHTML=rows.length?[...groups].map(([brand,items])=>`
+    <section class="cart-group"><h3>${esc(brand)}</h3>${items.map(row=>`
+      <article class="cart-item" data-row-key="${esc(row.key)}">
+        <input class="item-check" type="checkbox" data-cart-action="select" data-key="${esc(row.key)}" aria-label="Chọn ${esc(row.product.name)}" ${row.selected?'checked':''}>
+        <div class="cart-image">${productImage(row.product)}</div>
+        <div class="cart-item-info"><h4>${esc(row.product.name)}</h4><p>${esc(row.product.spec||'Quy cách đang cập nhật')}</p>
+          <div class="cart-item-price">${esc(row.product.price)}</div>
+          <div class="cart-item-bottom">${quantityControl(row.product)}<button class="remove-item" type="button" data-cart-action="remove" data-key="${esc(row.key)}" aria-label="Xoá ${esc(row.product.name)} khỏi giỏ hàng">Xoá</button></div>
+          <small class="line-total">Thành tiền: <b>${unitPrice(row.product)===null?'Liên hệ':money(unitPrice(row.product)*row.quantity)}</b></small>
+        </div>
+      </article>`).join('')}</section>`).join('')
+    : '<div class="cart-empty"><span aria-hidden="true">＋</span><h3>Giỏ hàng đang trống</h3><p>Chọn sản phẩm bằng nút + để thêm vào giỏ hàng.</p></div>';
+  document.getElementById('selectedLines').textContent=selected.length;
+  document.getElementById('selectedQuantity').textContent=summary.quantity;
+  document.getElementById('selectedTotal').textContent=totalLabel(selected);
+  document.getElementById('cartPriceNote').textContent=summary.unknown
+    ? `Có ${summary.unknown} sản phẩm cần báo giá. Tạm tính chỉ cộng các sản phẩm có giá; liên hệ để xác nhận tổng tiền.`
+    : 'Giá được xác nhận khi liên hệ.';
+  ['deleteCart','checkoutCart','copyOrder'].forEach(id=>document.getElementById(id).disabled=!selected.length);
+  document.getElementById('orderMessage').value=orderText(selected);
+  document.getElementById('cartFeedback').textContent='';
+  syncQuantityControls();
+  document.querySelectorAll('[data-row-key]').forEach(element=>{
+    const row=rows.find(item=>item.key===element.dataset.rowKey);
+    if(!row) return;
+    element.querySelector('.item-check').checked=row.selected;
+    const price=unitPrice(row.product);
+    element.querySelector('.line-total b').textContent=price===null?'Liên hệ':money(price*row.quantity);
+  });
+  if(focus){
+    const replacement=[...document.querySelectorAll('#cartItems [data-cart-action]')].find(el=>el.dataset.key===focus.key && el.dataset.cartAction===focus.action);
+    (replacement && !replacement.disabled ? replacement : document.getElementById('continueShopping')).focus({preventScroll:true});
+  }
+}
+function openCart(){
+  renderCart();
+  document.getElementById('cartDialog').showModal();
+  document.body.classList.add('cart-open');
+}
+function closeCart(){
+  document.getElementById('cartDialog').close();
+}
+async function copyOrder(){
+  const text=orderText(cartRows(true));
+  if(!text) return false;
+  let copied=false;
+  try{
+    if(navigator.clipboard?.writeText){
+      await navigator.clipboard.writeText(text);
+      copied=true;
+    }
+  }catch{ /* Keep a selectable preview when clipboard access is unavailable. */ }
+  if(!copied){
+    document.getElementById('orderPreview').open=true;
+    const field=document.getElementById('orderMessage');
+    field.focus(); field.select();
+    try{ copied=document.execCommand('copy'); }catch{ /* Manual copy remains available. */ }
+  }
+  document.getElementById('cartFeedback').textContent=copied
+    ? 'Đã sao chép danh sách. Hãy dán vào Zalo và gửi cho An Tín Pharma.'
+    : 'Chưa sao chép được tự động. Hãy sao chép nội dung trong ô phía trên rồi dán vào Zalo.';
+  return copied;
+}
 function renderProducts(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
   const filtered=products.filter(p=>{
     if(!p.visible) return false;
     const inCat=activeCategory==='Tất cả'||p.category===activeCategory;
-    const hay=stripAccents([p.name,p.active,p.spec,p.indication,p.category].join(' ')).toLowerCase();
+    const hay=stripAccents([p.name,p.brand,p.productId,p.active,p.spec,p.indication,p.category].join(' ')).toLowerCase();
     const needle=stripAccents(q).toLowerCase();
     return inCat&&(!needle||hay.includes(needle));
   });
   document.getElementById('count').textContent=`${filtered.length} sản phẩm`;
   const grid=document.getElementById('productGrid');
   if(!filtered.length){grid.innerHTML='<div class="empty">Không tìm thấy sản phẩm phù hợp.</div>';return}
-  grid.innerHTML=filtered.map(p=>`<article class="card">
+  grid.innerHTML=filtered.map(p=>`<article class="card ${cart.has(productKey(p))?'in-cart':''}">
     <div class="product-img">
-      ${p.image
-        ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" style="max-width:100%;max-height:100%;object-fit:contain" onerror="this.outerHTML='<div class=&quot;fake-box&quot;>${esc(p.name)}<br><small>Ảnh sản phẩm</small></div>'">`
-        : `<div class="fake-box">${esc(p.name)}<br><small>Ảnh sản phẩm</small></div>`}
+      ${productImage(p)}
     </div>
     <div class="card-body">
       <h3>${esc(p.name)}</h3>
+      ${p.brand?`<div class="meta"><b>Hãng:</b> ${esc(p.brand)}</div>`:''}
       <div class="meta"><b>Quy cách:</b> ${esc(p.spec||'Đang cập nhật')}</div>
       <div class="price">${esc(p.price)}</div>
       <div class="meta"><b>Hoạt chất:</b> ${esc(p.active||'Đang cập nhật')}</div>
       <div class="indication"><b>Chỉ định:</b> ${esc(p.indication||'Đang cập nhật')}</div>
+      <div class="product-quantity"><span>Số lượng</span>${quantityControl(p)}</div>
       <div class="actions">
-        <button class="btn zalo" onclick='contact(${JSON.stringify(p.name)},"Zalo")'>Zalo</button>
-        <button class="btn fb" onclick='contact(${JSON.stringify(p.name)},"Facebook")'>Facebook</button>
+        <button class="btn zalo" data-contact="Zalo" data-key="${esc(productKey(p))}">Zalo</button>
+        <button class="btn fb" data-contact="Facebook" data-key="${esc(productKey(p))}">Facebook</button>
       </div>
     </div>
   </article>`).join('');
@@ -239,4 +424,60 @@ async function loadProducts(){
 document.getElementById('searchInput').addEventListener('input',renderProducts);
 document.getElementById('searchButton').addEventListener('click',renderProducts);
 document.getElementById('year').textContent=new Date().getFullYear();
-loadProducts();
+document.addEventListener('error',event=>{
+  if(event.target.matches?.('.product-img img, .cart-image img')){
+    const placeholder=document.createElement('span');
+    placeholder.className='image-placeholder';
+    placeholder.textContent='Ảnh đang cập nhật';
+    event.target.replaceWith(placeholder);
+  }
+},true);
+document.addEventListener('click',event=>{
+  const button=event.target.closest('button');
+  if(!button) return;
+  const key=button.dataset.key, action=button.dataset.cartAction;
+  if(action==='increase') setQuantity(key,(cart.get(key)?.quantity||0)+1);
+  if(action==='decrease') setQuantity(key,(cart.get(key)?.quantity||0)-1);
+  if(action==='remove') setQuantity(key,0);
+  if(button.dataset.contact) contact(findProduct(key)?.name||'',button.dataset.contact);
+});
+document.addEventListener('change',event=>{
+  const {key,cartAction}=event.target.dataset;
+  if(cartAction==='quantity'){
+    const value=event.target.value.trim();
+    setQuantity(key,value===''?NaN:Number(value));
+  }
+  if(cartAction==='select' && cart.has(key)){
+    cart.get(key).selected=event.target.checked;
+    saveCart(); renderCart(false);
+  }
+});
+document.getElementById('cartToggle').addEventListener('click',openCart);
+document.getElementById('viewCart').addEventListener('click',openCart);
+document.getElementById('closeCart').addEventListener('click',closeCart);
+document.getElementById('continueShopping').addEventListener('click',closeCart);
+document.getElementById('cartDialog').addEventListener('close',()=>document.body.classList.remove('cart-open'));
+document.getElementById('selectAll').addEventListener('change',event=>{
+  cart.forEach(item=>item.selected=event.target.checked);
+  saveCart(); renderCart(false);
+});
+document.getElementById('deleteCart').addEventListener('click',()=>{
+  cartRows(true).forEach(row=>cart.delete(row.key));
+  saveCart(); renderCart();
+  document.getElementById('cartFeedback').textContent='Đã xoá các sản phẩm được chọn khỏi giỏ hàng.';
+});
+document.getElementById('copyOrder').addEventListener('click',copyOrder);
+document.getElementById('checkoutCart').addEventListener('click',()=>{
+  if(!cartRows(true).length) return;
+  if(!CONFIG.ZALO_PHONE){
+    document.getElementById('cartFeedback').textContent='Kênh Zalo chưa được cấu hình.';
+    return;
+  }
+  // Open during the click gesture so browsers do not block the new tab after an await.
+  void copyOrder();
+  window.open(`https://zalo.me/${CONFIG.ZALO_PHONE}`,'_blank','noopener,noreferrer');
+});
+loadProducts().then(()=>{
+  cart=restoreCart();
+  renderProducts(); renderCart();
+});
