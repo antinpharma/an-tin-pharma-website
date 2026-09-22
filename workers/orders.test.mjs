@@ -49,6 +49,7 @@ const request=(data=body())=>new Request('https://internal/orders',{method:'POST
 test('concurrent duplicate submission sends only once and reports confirmed delivery',async t=>{
   let calls=0;
   t.mock.method(globalThis,'fetch',async(url,options)=>{
+    assert.equal(options.redirect,'manual');
     if(url===env.CATALOGUE_URL) return new Response('window.ANTIN_PRODUCTS = '+JSON.stringify(products)+';');
     calls++;
     const payload=JSON.parse(options.body);
@@ -87,15 +88,15 @@ test('requests from other origins and unauthenticated admin calls are rejected b
 
 test('pairing requires the selected bot and exact code in a private chat; cannot replace an owner',async t=>{
   const code='ANTIN-0123456789AB',storage=state(null);
-  let botId='wrong-bot',message={text:code,chat:{id:'owner',type:'private'}};
+  let botId='wrong-bot',message={text:code,chat:{id:'owner',chat_type:'PRIVATE'}};
   t.mock.method(globalThis,'fetch',async url=>Response.json({ok:true,result:url.endsWith('/getMe')?{id:botId}:{message}}));
   const receiver=new OrderReceiver(storage,{...env,EXPECTED_BOT_ID:'576169620734670481'});
   const pair=()=>receiver.fetch(new Request('https://internal/admin/pair',{method:'POST',body:JSON.stringify({code})}));
   assert.equal((await pair()).status,409);
   assert.equal(await storage.storage.get('owner'),undefined);
-  botId='576169620734670481';message.chat.type='group';
+  botId='576169620734670481';message.chat.chat_type='GROUP';
   assert.equal((await pair()).status,409);
-  message.chat.type='private';message.text='a different code';
+  message.chat.chat_type='PRIVATE';message.text='a different code';
   assert.equal((await pair()).status,409);
   message.text=code;
   assert.deepEqual(await (await pair()).json(),{ok:true,paired:true});

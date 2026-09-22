@@ -84,15 +84,12 @@ async function zalo(env,method,data){
   const token=String(env.ZALO_BOT_TOKEN).trim();
   if(/^https?:/i.test(token)) throw new OrderError('Secret đang chứa đường dẫn. Cần thay bằng giá trị Bot Token trong tin nhắn Zalo Bot Manager.',503);
   if(/[\s\u0080-\uffff]/.test(token)) throw new OrderError('Secret chứa khoảng trắng hoặc chữ có dấu. Chỉ sao chép mã Bot Token, không kèm nội dung tin nhắn.',503);
-  if(!/^[0-9]+:/.test(token)) throw new OrderError('Secret chưa có phần ID số và dấu hai chấm ở đầu Bot Token. Cần sao chép đầy đủ mã trong tin nhắn Zalo Bot Manager.',503);
-  // Accept printable token characters; URL-encode the secret portion instead of
-  // assuming an undocumented alphabet for it. Never expose the value in errors.
-  const separator=token.indexOf(':');
-  if(separator===token.length-1) throw new OrderError('Bot Token còn thiếu phần mã sau dấu hai chấm.',503);
-  const tokenPath=token.slice(0,separator+1)+encodeURIComponent(token.slice(separator+1));
+  // Let Zalo validate the credential instead of assuming a token format.
+  // Encode path delimiters so a malformed value cannot change the destination.
+  const tokenPath=encodeURIComponent(token).replace(/%3A/gi,':');
   try{
     const res=await fetch(`https://bot-api.zaloplatforms.com/bot${tokenPath}/${method}`,{
-      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),signal:AbortSignal.timeout(8000),redirect:'error'
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),signal:AbortSignal.timeout(8000),redirect:'manual'
     });
     let result;
     try{result=await res.json();}catch{throw new OrderError(`Zalo chưa trả dữ liệu hợp lệ (HTTP ${res.status}).`,502);}
@@ -152,7 +149,7 @@ export class OrderReceiver {
         if(String(bot.id)!==this.env.EXPECTED_BOT_ID) throw new OrderError('Sai bot.',409);
         const result=await zalo(this.env,'getUpdates',{timeout:'5'});
         const updates=Array.isArray(result)?result:[result];
-        const message=updates.map(update=>update?.message).find(message=>message?.text?.trim()===body.code && message.chat?.id && message.chat?.type==='private');
+        const message=updates.map(update=>update?.message).find(message=>message?.text?.trim()===body.code && message.chat?.id && message.chat?.chat_type==='PRIVATE');
         if(!message) return json({ok:false,error:'Chưa thấy mã xác minh trong tin nhắn riêng gửi cho bot.'},409);
         await this.state.blockConcurrencyWhile(async()=>{
           if(await this.state.storage.get('owner')) throw new OrderError('Bot đã có tài khoản nhận đơn.',409);
@@ -179,7 +176,7 @@ export class OrderReceiver {
     if(rate && now-rate.time<60000 && rate.count>=3) throw new OrderError('Bạn đã gửi nhiều yêu cầu. Vui lòng chờ một phút.',429);
     await this.state.storage.put(rateKey,{time:rate && now-rate.time<60000?rate.time:now,count:rate && now-rate.time<60000?rate.count+1:1});
     if(!await this.state.storage.getAlarm()) await this.state.storage.setAlarm(now+DAY);
-    const res=await fetch(this.env.CATALOGUE_URL,{signal:AbortSignal.timeout(5000),redirect:'error',cache:'no-store'});
+    const res=await fetch(this.env.CATALOGUE_URL,{signal:AbortSignal.timeout(5000),redirect:'manual',cache:'no-store'});
     if(!res.ok) throw new OrderError('Chưa kiểm tra được danh mục hiện hành.',503);
     const messages=buildMessages(order,readCatalogue(await res.text()));
     // Keep provider calls inside the Durable Object's 30-second critical section.
