@@ -7,7 +7,7 @@
   <meta name="description" content="Danh mục sản phẩm An Tín Pharma - tìm kiếm sản phẩm, xem giá, hoạt chất và liên hệ tư vấn.">
   <title>An Tín Pharma | Danh mục sản phẩm</title>
   <link rel="icon" href="logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20260922-cart-1">
+  <link rel="stylesheet" href="style.css?v=20260922-orders-1">
 </head>
 <body>
 <header class="header">
@@ -98,6 +98,16 @@
       <div class="summary-row"><span>Tổng số lượng</span><strong id="selectedQuantity">0</strong></div>
       <div class="summary-row summary-total"><span>Tạm tính</span><strong id="selectedTotal">0đ</strong></div>
       <p class="price-note" id="cartPriceNote">Giá được xác nhận khi liên hệ.</p>
+      <form id="directOrderForm" class="direct-order" hidden>
+        <h3>Thông tin liên hệ</h3>
+        <label for="customerName">Tên khách hàng</label>
+        <input id="customerName" name="name" autocomplete="name" required minlength="2" maxlength="80" placeholder="Nhập họ và tên">
+        <label for="customerPhone">Số điện thoại</label>
+        <input id="customerPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="20" placeholder="Ví dụ: 0901234567">
+        <p>Tên, số điện thoại và danh sách sản phẩm sẽ được gửi đến An Tín Pharma để liên hệ xác nhận yêu cầu.</p>
+        <button class="btn zalo-checkout" id="sendOrder" type="submit" disabled>Gửi yêu cầu đặt hàng</button>
+        <div id="orderFeedback" class="order-feedback" role="status" aria-live="polite"></div>
+      </form>
       <div class="cart-buttons">
         <button class="btn delete-button" id="deleteCart" type="button" disabled>Xoá hàng</button>
         <button class="btn zalo-checkout" id="checkoutCart" type="button" disabled>Liên hệ Zalo</button>
@@ -114,8 +124,8 @@
 </dialog>
 <div class="sr-only" id="cartAnnouncement" role="status" aria-live="polite"></div>
 
-<script src="config.js?v=20260922-data-san-1"></script>
+<script src="config.js?v=20260922-orders-1"></script>
 <script src="catalogue.js?v=4b4d714f38ac"></script>
-<script src="app.js?v=20260922-cart-1"></script>
+<script src="app.js?v=20260922-orders-1"></script>
 </body>
 </html>

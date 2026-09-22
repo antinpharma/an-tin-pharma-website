@@ -1,2 +1,9 @@
 _site/
 gha-creds-*.json
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+.wrangler/
+node_modules/

@@ -15,5 +15,7 @@ window.ANTIN_CONFIG = {
 
   // Liên hệ - điền sau.
   ZALO_PHONE: "0905561550",
+  // Chỉ bật sau khi Worker đã ghép đúng tài khoản nhận đơn. Không đặt Bot Token ở đây.
+  ORDER_API_URL: "",
   FACEBOOK_URL: "https://www.facebook.com/profile.php?id=61594629503087"
 };

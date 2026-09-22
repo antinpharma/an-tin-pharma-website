@@ -1,0 +1,19 @@
+{
+  "name": "antin-orders",
+  "main": "orders.mjs",
+  "compatibility_date": "2026-09-22",
+  "account_id": "d7c35715d5034b094edd71e3699b0800",
+  "workers_dev": true,
+  "preview_urls": false,
+  "keep_vars": true,
+  "observability": { "enabled": false },
+  "vars": {
+    "ALLOWED_ORIGIN": "https://minhtran123hehe-png.github.io",
+    "CATALOGUE_URL": "https://minhtran123hehe-png.github.io/an-tin-pharma-website/catalogue.js",
+    "EXPECTED_BOT_ID": "576169620734670481"
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "ORDERS", "class_name": "OrderReceiver" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["OrderReceiver"] }]
+}

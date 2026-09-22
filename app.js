@@ -13,6 +13,9 @@ let activeCategory = 'Tất cả';
 const CART_STORAGE_KEY = 'antin-cart-v1';
 const MAX_QUANTITY = 9999;
 let cart = new Map();
+let orderSending=false;
+let orderSubmitted=false;
+let memoryOrderAttempt=null;
 
 function stripAccents(s=''){
   return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D');
@@ -171,6 +174,7 @@ function syncQuantityControls(){
   });
 }
 function setQuantity(key,quantity){
+  if(orderSending) return;
   const product=findProduct(key);
   if(!product) return;
   const existed=cart.has(key);
@@ -181,6 +185,7 @@ function setQuantity(key,quantity){
   }
   if(quantity===0) cart.delete(key);
   else cart.set(key,{quantity,selected:cart.get(key)?.selected ?? true});
+  resetOrderFeedback();
   document.getElementById('cartAnnouncement').textContent=`${product.name}: ${quantity===0?'đã xoá khỏi giỏ hàng':`số lượng ${quantity}`}.`;
   saveCart();
   renderCart(!existed || quantity===0);
@@ -249,6 +254,75 @@ function renderCart(refreshItems=true){
   if(focus){
     const replacement=[...document.querySelectorAll('#cartItems [data-cart-action]')].find(el=>el.dataset.key===focus.key && el.dataset.cartAction===focus.action);
     (replacement && !replacement.disabled ? replacement : document.getElementById('continueShopping')).focus({preventScroll:true});
+  }
+  refreshOrderForm();
+}
+function refreshOrderForm(){
+  const enabled=Boolean(CONFIG.ORDER_API_URL);
+  document.getElementById('directOrderForm').hidden=!enabled;
+  document.querySelector('.cart-summary').classList.toggle('has-direct-order',enabled);
+  document.getElementById('sendOrder').disabled=orderSending || orderSubmitted || !cartRows(true).length;
+  document.getElementById('sendOrder').textContent=orderSending?'Đang gửi yêu cầu…':orderSubmitted?'Đã gửi yêu cầu':'Gửi yêu cầu đặt hàng';
+  document.querySelector('.cart-products').inert=orderSending;
+  document.getElementById('customerName').disabled=orderSending;
+  document.getElementById('customerPhone').disabled=orderSending;
+  if(orderSending){
+    document.getElementById('deleteCart').disabled=true;
+    document.getElementById('checkoutCart').disabled=true;
+  }
+  if(enabled) document.getElementById('checkoutCart').textContent='Liên hệ Zalo';
+}
+function resetOrderFeedback(){
+  if(orderSending) return;
+  orderSubmitted=false;
+  document.getElementById('orderFeedback').textContent='';
+  refreshOrderForm();
+}
+async function orderAttempt(payload){
+  const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(payload)));
+  const fingerprint=[...new Uint8Array(bytes)].map(n=>n.toString(16).padStart(2,'0')).join('');
+  let saved=memoryOrderAttempt;
+  try{saved=JSON.parse(sessionStorage.getItem('antin-order-attempt-v1'))||saved;}catch{ /* In-memory retry protection remains available. */ }
+  if(saved?.fingerprint!==fingerprint || !/^[a-f0-9-]{36}$/i.test(saved?.requestId||'')) saved={fingerprint,requestId:crypto.randomUUID()};
+  memoryOrderAttempt=saved;
+  try{sessionStorage.setItem('antin-order-attempt-v1',JSON.stringify(saved));}catch{ /* Do not store customer data in the browser. */ }
+  return saved.requestId;
+}
+async function sendDirectOrder(event){
+  event.preventDefault();
+  if(orderSending || orderSubmitted || !CONFIG.ORDER_API_URL) return;
+  const rows=cartRows(true),feedback=document.getElementById('orderFeedback');
+  if(!rows.length) return;
+  const customer={name:document.getElementById('customerName').value.trim(),phone:document.getElementById('customerPhone').value.replace(/[\s().-]/g,'')};
+  feedback.dataset.error='true';
+  if(customer.name.length<2 || !/^(?:0|\+84)[0-9]{9}$/.test(customer.phone)){
+    feedback.textContent='Vui lòng nhập tên và số điện thoại Việt Nam hợp lệ.';return;
+  }
+  if(rows.some(row=>!row.product.productId)){
+    feedback.textContent='Một sản phẩm cần được kiểm tra mã. Vui lòng chọn Liên hệ Zalo để được hỗ trợ.';return;
+  }
+  const payload={customer,items:rows.map(row=>({productId:String(row.product.productId),quantity:row.quantity})).sort((a,b)=>a.productId.localeCompare(b.productId))};
+  orderSending=true;refreshOrderForm();feedback.dataset.error='false';feedback.textContent='Đang gửi danh sách đến An Tín Pharma…';
+  let requestId='';
+  try{
+    requestId=await orderAttempt(payload);
+    const response=await fetch(CONFIG.ORDER_API_URL,{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestId,...payload}),signal:AbortSignal.timeout(30000),credentials:'omit',redirect:'error'
+    });
+    const result=await response.json();
+    if(!response.ok || result.ok!==true || result.requestId!==requestId){
+      feedback.dataset.error='true';
+      feedback.textContent=(typeof result.error==='string'?result.error:'Chưa xác nhận gửi thành công. Vui lòng liên hệ Zalo để kiểm tra.')+(result.uncertain?` Mã yêu cầu: ${requestId}`:'');
+      return;
+    }
+    orderSubmitted=true;
+    feedback.textContent=`Đã gửi yêu cầu đến An Tín Pharma. Mã: ${requestId}. Chúng tôi sẽ liên hệ số ${customer.phone} để xác nhận. Bạn không cần sao chép hoặc gửi lại qua Zalo.`;
+  }catch{
+    feedback.dataset.error='true';
+    feedback.textContent=`Chưa xác nhận được kết quả gửi. Bạn có thể thử lại cùng nội dung hoặc liên hệ Zalo để kiểm tra.${requestId?` Mã yêu cầu: ${requestId}`:''}`;
+  }finally{
+    orderSending=false;refreshOrderForm();
+    ['deleteCart','checkoutCart'].forEach(id=>document.getElementById(id).disabled=!cartRows(true).length);
   }
 }
 function openCart(){
@@ -448,7 +522,9 @@ document.addEventListener('change',event=>{
     setQuantity(key,value===''?NaN:Number(value));
   }
   if(cartAction==='select' && cart.has(key)){
+    if(orderSending) return;
     cart.get(key).selected=event.target.checked;
+    resetOrderFeedback();
     saveCart(); renderCart(false);
   }
 });
@@ -458,15 +534,22 @@ document.getElementById('closeCart').addEventListener('click',closeCart);
 document.getElementById('continueShopping').addEventListener('click',closeCart);
 document.getElementById('cartDialog').addEventListener('close',()=>document.body.classList.remove('cart-open'));
 document.getElementById('selectAll').addEventListener('change',event=>{
+  if(orderSending) return;
   cart.forEach(item=>item.selected=event.target.checked);
+  resetOrderFeedback();
   saveCart(); renderCart(false);
 });
 document.getElementById('deleteCart').addEventListener('click',()=>{
+  if(orderSending) return;
   cartRows(true).forEach(row=>cart.delete(row.key));
+  resetOrderFeedback();
   saveCart(); renderCart();
   document.getElementById('cartFeedback').textContent='Đã xoá các sản phẩm được chọn khỏi giỏ hàng.';
 });
 document.getElementById('copyOrder').addEventListener('click',copyOrder);
+document.getElementById('directOrderForm').addEventListener('submit',sendDirectOrder);
+document.getElementById('customerName').addEventListener('input',resetOrderFeedback);
+document.getElementById('customerPhone').addEventListener('input',resetOrderFeedback);
 document.getElementById('checkoutCart').addEventListener('click',()=>{
   if(!cartRows(true).length) return;
   if(!CONFIG.ZALO_PHONE){
