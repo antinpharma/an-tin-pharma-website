@@ -1,0 +1,80 @@
+name: Update prices and deploy website
+
+on:
+  schedule:
+    - cron: '30 3 * * *' # 10:30 Asia/Ho_Chi_Minh (UTC+7)
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+concurrency:
+  group: antin-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - name: Test price rules
+        run: node --test scripts/sync-prices.test.mjs
+      - name: Authenticate to Google (read-only Sheets access)
+        id: google
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          workload_identity_provider: projects/793819880924/locations/global/workloadIdentityPools/antin-github/providers/github
+          service_account: antin-price-reader@learned-surge-310713.iam.gserviceaccount.com
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/spreadsheets.readonly
+          create_credentials_file: false
+      - name: Read Data san and update catalogue
+        env:
+          GOOGLE_ACCESS_TOKEN: ${{ steps.google.outputs.access_token }}
+        run: node scripts/sync-prices.mjs
+      - name: Commit only changed prices and cache version
+        run: |
+          git diff --check
+          if ! git diff --quiet -- catalogue.js index.html; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add -- catalogue.js index.html
+            git commit -m "Update MIENNAM prices from Data san"
+            git push origin HEAD:main
+          fi
+      - name: Prepare public website files
+        run: |
+          mkdir _site
+          cp index.html app.js config.js catalogue.js style.css logo.svg .nojekyll _site/
+          cp -R images _site/images
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        with:
+          path: _site
+
+  deploy:
+    needs: sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # A GITHUB_TOKEN commit does not trigger another Pages build, so deploy here.
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

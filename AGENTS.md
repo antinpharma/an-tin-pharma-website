@@ -8,7 +8,7 @@ Khách hàng xem sản phẩm, giá, hoạt chất, chỉ định và liên hệ
 - Repository: minhtran123hehe-png/an-tin-pharma-website
 - Branch production: main
 - Hosting: GitHub Pages
-- Mỗi lần push lên main, GitHub Pages sẽ deploy website.
+- Workflow `.github/workflows/daily-prices.yml` cập nhật giá và triển khai GitHub Pages khi push lên main, chạy thủ công hoặc theo lịch 10h30 Việt Nam mỗi ngày (03:30 UTC).
 
 ## Product workflow
 1. Ảnh sản phẩm được upload vào Google Drive.
@@ -22,7 +22,10 @@ Khách hàng xem sản phẩm, giá, hoạt chất, chỉ định và liên hệ
    - Tab `check`: dòng 1 là thời điểm cập nhật, dòng 2 là tiêu đề cột.
    - Đọc bằng tài khoản được cấp quyền; không yêu cầu công khai bảng nguồn.
    - Ghép chính xác `product_id` với Product ID trong catalogue, đọc giá dạng số gốc (UNFORMATTED_VALUE).
-   - Cập nhật giá vào `catalogue.js`; website dùng catalogue đã mirror, không tự đồng bộ khi Sheet thay đổi.
+   - `scripts/sync-prices.mjs` đọc nguồn qua Google Sheets API và cập nhật `catalogue.js`; trình duyệt dùng catalogue đã mirror.
+   - Workflow dùng Workload Identity Federation với service account `antin-price-reader@learned-surge-310713.iam.gserviceaccount.com`, scope chỉ đọc Sheets; không dùng khóa JSON.
+   - Khi giá thay đổi, tự commit `catalogue.js` và phiên bản cache trong `index.html`, rồi triển khai Pages ngay trong workflow.
+   - Lỗi truy cập/API hoặc sai cấu trúc nguồn: dừng, không ghi catalogue. Giá thiếu, không hợp lệ hoặc trùng ID miền Nam có giá khác nhau: dùng "Liên hệ".
 6. Chỉ dùng sales_region_code = MIENNAM.
 7. retail_price_value x 1000 = giá hiển thị website.
 8. Nếu không chắc giá, dùng "Liên hệ", không đoán.
