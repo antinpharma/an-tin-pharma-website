@@ -10,14 +10,16 @@ Website catalogue responsive cho An Tín Pharma.
 - Nút liên hệ Zalo / Facebook
 - Sẵn sàng deploy bằng GitHub Pages
 
-## Cập nhật giá tự động
+## Đồng bộ danh mục và giá tự động
 
-- Nguồn: [Data sàn](https://docs.google.com/spreadsheets/d/1TEOQde1O0JoikDJJnIbe6sdpGl3GL76kJf1hQ_MapCU/edit), tab `check`; tiêu đề dòng 2, dữ liệu giá trong A:F.
+- Nguồn duy nhất: [Data sàn](https://docs.google.com/spreadsheets/d/1TEOQde1O0JoikDJJnIbe6sdpGl3GL76kJf1hQ_MapCU/edit), tab `check`; tiêu đề dòng 2. Đọc A:W bằng quyền Sheets, xuất riêng các trường được phép lên website.
 - Lịch: 10h30 Việt Nam mỗi ngày (cron `30 3 * * *`, UTC), đồng thời chạy khi push lên `main`.
 - Chạy ngay: GitHub → Actions → **Update prices and deploy website** → **Run workflow** → nhánh `main`.
-- Chỉ ghép chính xác Product ID và `sales_region_code = MIENNAM`; lấy số gốc `retail_price_value × 1000`. Không thêm/xóa sản phẩm hoặc sửa nội dung thuốc.
+- Chỉ ghép chính xác Product ID và `sales_region_code = MIENNAM`; `retail_price_value` hiện đã là đồng, không nhân 1.000 (người dùng xác nhận ngày 23/09/2026).
+- Dòng MIENNAM mới tự thêm sản phẩm. Đồng bộ tên (`product_name`), hãng (`brand`), nhóm (`product_category`), `Hoạt chất`, `Chỉ định`, `Quy cách` nếu có. Ô trống giữ thông tin cũ; sản phẩm mới chưa có thông tin hiển thị “Đang cập nhật”. Không đoán dữ liệu thuốc.
+- Giữ ảnh hiện có theo Product ID, tiếp tục quy trình ảnh Drive/mirror repository. Không thay ảnh từ cột `Ảnh`, không xuất cột `Check tồn`. Sản phẩm mới chưa được gắn ảnh dùng ô “Ảnh sản phẩm”. Không tự xóa sản phẩm đang có khi dòng nguồn bị thiếu.
 - Giá thiếu/không hợp lệ/mâu thuẫn dùng “Liên hệ”. Nguồn không đọc được, không có dữ liệu miền Nam hoặc sai tiêu đề thì workflow thất bại và giữ website đã triển khai.
-- Giá thay đổi sẽ tạo commit cho `catalogue.js` và cache trong `index.html`. Workflow tự triển khai Pages bằng artifact chỉ chứa file website, kể cả khi commit của bot không kích hoạt lần build mới.
+- Danh mục hoặc giá thay đổi sẽ tạo commit cho `catalogue.js` và cache trong `index.html`. Trình duyệt chỉ đọc catalogue đã xuất bản; không đọc CSV công khai hoặc quay về Sheet `San pham` cũ. Workflow tự triển khai Pages bằng artifact chỉ chứa file website, kể cả khi commit của bot không kích hoạt lần build mới.
 - Xem kết quả và số sản phẩm thay đổi trong Actions → lần chạy → Summary. Kiểm tra cài đặt thông báo GitHub Actions nếu muốn nhận email khi chạy lỗi.
 
 ## Xác thực Google

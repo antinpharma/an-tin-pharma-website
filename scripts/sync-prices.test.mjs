@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Script } from 'node:vm';
-import { updatePrices, renderUpdate, readWindow, syncPrices, validateAssets } from './sync-prices.mjs';
+import { updatePrices, updateCatalogue, renderUpdate, readWindow, syncPrices, validateAssets } from './sync-prices.mjs';
 
 const headers = ['product_id', 'sales_region_code', 'product_name', 'brand', 'product_category', 'retail_price_value'];
 const table = (...rows) => [['Update: 10h 22/9'], headers, ...rows];
@@ -14,6 +14,43 @@ const products = [
   { productId: '1146', name: 'Klenzit-C Gel', price: '108.400đ', spec: 'Tuýp 15g', active: 'Existing data', image: 'logo.svg', visible: true },
   { productId: '1505', name: 'Nexium MUPS 40mg', price: '322.000đ', indication: 'Existing indication', visible: true },
 ];
+
+test('Data san imports only southern catalogue fields, keeps old images and uses dong directly', () => {
+  const original = structuredClone(products);
+  const values = [[], [...headers, 'Check tồn', 'Hoạt chất', 'Chỉ định', 'Ảnh'],
+    [...row(1146, 'MIENNAM', 113000), 'PRIVATE STOCK', '', '', 'https://example.com/replacement.jpg'],
+    [...row(9001, 'MIENNAM', 322000), 'PRIVATE STOCK', 'Source active', 'Source indication', 'https://example.com/new.jpg'],
+    row(9999, 'MIENBAC', 1000),
+  ];
+  const result = updateCatalogue(products, values, 1);
+  assert.equal(result.added, 1);
+  assert.equal(result.products.length, 3);
+  assert.equal(result.products[0].price, '113.000đ');
+  assert.equal(result.products[0].image, products[0].image);
+  assert.equal(result.products[0].active, products[0].active);
+  assert.equal(result.products[0].spec, products[0].spec);
+  assert.equal(result.products[0].name, 'Source name');
+  assert.equal(result.products[1].indication, products[1].indication);
+  assert.equal(result.products[1].price, 'Liên hệ');
+  assert.equal(result.products[2].price, '322.000đ');
+  assert.equal(result.products[2].active, 'Source active');
+  assert.equal(result.products[2].image, '');
+  assert.doesNotMatch(JSON.stringify(result.products), /PRIVATE STOCK|example\.com|9999/);
+  assert.deepEqual(products, original);
+  assert.equal(updateCatalogue(result.products, values, 1).changes.length, 0);
+});
+
+test('catalogue refuses ambiguous metadata and invalid structure, but marks uncertain prices', () => {
+  const conflicting = row(1146, 'MIENNAM', 113000);
+  conflicting[2] = 'Different name';
+  assert.throws(() => updateCatalogue(products, table(row(1146, 'MIENNAM', 113000), conflicting), 1));
+  assert.throws(() => updateCatalogue(products, [[], ['product_id', 'sales_region_code', 'retail_price_value'], [1146, 'MIENNAM', 113000]], 1));
+  assert.throws(() => updateCatalogue(products, table(row('', 'MIENNAM', 113000)), 1));
+  assert.throws(() => updateCatalogue(products, table(row(1146, 'MIENBAC', 113000)), 1));
+  assert.throws(() => updateCatalogue([products[0], products[0]], table(row(1146, 'MIENNAM', 113000)), 1));
+  const result = updateCatalogue(products, table(row(1146, 'MIENNAM', 113000), row(1146, 'MIENNAM', 114000)), 1);
+  assert.equal(result.products[0].price, 'Liên hệ');
+});
 
 test('website JavaScript parses and referenced local assets exist', async () => {
   const root = fileURLToPath(new URL('../', import.meta.url));
@@ -86,11 +123,11 @@ test('sync uses authenticated unformatted read; failure leaves files intact; rep
     const fetchImpl = async (url, options) => {
       assert.equal(url.hostname, 'sheets.googleapis.com');
       assert.equal(url.searchParams.get('valueRenderOption'), 'UNFORMATTED_VALUE');
-      assert.match(decodeURIComponent(url.pathname), /'check'!A1:F$/);
+      assert.match(decodeURIComponent(url.pathname), /'check'!A1:W$/);
       assert.equal(options.headers.Authorization, 'Bearer test-only');
       return { ok: true, json: async () => ({ values: table(row(1146, 'MIENNAM', 113), row(1505, 'MIENNAM', 322)) }) };
     };
-    assert.equal((await syncPrices({ root, token: 'test-only', fetchImpl })).changes.length, 1);
+    assert.equal((await syncPrices({ root, token: 'test-only', fetchImpl })).changes.length, 2);
     const after = await readFile(join(root, 'catalogue.js'), 'utf8');
     assert.equal(readWindow(after, 'ANTIN_PRODUCTS')[0].price, '113.000đ');
     assert.equal((await syncPrices({ root, token: 'test-only', fetchImpl })).changes.length, 0);
