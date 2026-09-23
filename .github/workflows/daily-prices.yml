@@ -29,8 +29,10 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24'
-      - name: Test price and order rules
-        run: node --test scripts/sync-prices.test.mjs workers/orders.test.mjs
+      - name: Install password hashing dependency
+        run: npm ci --ignore-scripts
+      - name: Test prices, orders and accounts
+        run: npm test
       - name: Authenticate to Google (read-only Sheets access)
         id: google
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
@@ -57,8 +59,9 @@ jobs:
       - name: Prepare public website files
         run: |
           mkdir _site
-          cp index.html app.js config.js catalogue.js style.css logo.svg .nojekyll _site/
+          cp index.html app.js accounts.js config.js catalogue.js style.css logo.svg .nojekyll _site/
           cp -R images _site/images
+          cp -R data _site/data
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
           path: _site

@@ -1,3 +1,6 @@
+import {CustomerAccounts} from './accounts.mjs';
+export {CustomerAccounts};
+
 const MAX_BODY = 16000;
 const DAY = 86400000;
 const json = (data, status=200) => Response.json(data, {status, headers:{'Cache-Control':'no-store'}});
@@ -21,7 +24,9 @@ export function validateOrder(body){
     seen.add(item.productId);
     return {productId:item.productId,quantity:item.quantity};
   }).sort((a,b)=>a.productId.localeCompare(b.productId));
-  return {requestId:body.requestId,customer:{name,phone},items};
+  const customer={name,phone};
+  if(body.customer?.address)customer.address=singleLine(body.customer.address).slice(0,400);
+  return {requestId:body.requestId,customer,items,...(body.accountId?{accountId:body.accountId}:{})};
 }
 
 export function readCatalogue(source){
@@ -48,7 +53,7 @@ export function buildMessages(order,products){
     return `${index+1}. ${singleLine(p.name).slice(0,150)} (Mã ${item.productId})\nQuy cách: ${singleLine(p.spec||'Cần xác nhận').slice(0,150)}\nSL: ${item.quantity} | Giá: ${price===null?'Liên hệ':money(price)} | Thành tiền: ${price===null?'Liên hệ':money(price*item.quantity)}`;
   });
   if(!Number.isSafeInteger(total)) throw new OrderError('Tạm tính vượt giới hạn. Vui lòng liên hệ trực tiếp.');
-  const heading=`YÊU CẦU ĐẶT HÀNG AN TÍN\nMã: ${order.requestId}\nKhách: ${order.customer.name}\nSĐT: ${order.customer.phone}`;
+  const heading=`YÊU CẦU ĐẶT HÀNG AN TÍN\nMã: ${order.requestId}\nKhách: ${order.customer.name}\nSĐT: ${order.customer.phone}${order.customer.address?'\nĐịa chỉ: '+order.customer.address:''}${order.accountId?'\nMã khách: '+order.accountId:''}`;
   const footer=`Số loại: ${order.items.length} | Tổng SL: ${quantity}\nTạm tính: ${unknown===order.items.length?'Liên hệ':money(total)}${unknown?`\nChưa gồm ${unknown} sản phẩm cần báo giá.`:''}\nVui lòng liên hệ khách để xác nhận giá và tình trạng hàng.`;
   const chunks=[];
   let text=heading;
@@ -72,7 +77,7 @@ async function boundedJson(request){
   }
   const bytes=new Uint8Array(size);let offset=0;
   for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
-  try{return JSON.parse(new TextDecoder().decode(bytes));}catch{throw new OrderError('Nội dung yêu cầu không hợp lệ.');}
+  try{const value=JSON.parse(new TextDecoder().decode(bytes));if(!value||typeof value!=='object'||Array.isArray(value))throw new Error();return value;}catch{throw new OrderError('Nội dung yêu cầu không hợp lệ.');}
 }
 
 async function hash(value){
@@ -111,19 +116,33 @@ export default {
     const path=new URL(request.url).pathname;
     const origin=request.headers.get('Origin');
     const admin=path.startsWith('/admin/');
-    const cors={'Access-Control-Allow-Origin':env.ALLOWED_ORIGIN,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Content-Type','Vary':'Origin'};
+    const cors={'Access-Control-Allow-Origin':env.ALLOWED_ORIGIN,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Content-Type, Authorization','Vary':'Origin'};
     if(!admin && origin!==env.ALLOWED_ORIGIN) return json({error:'Nguồn yêu cầu không hợp lệ.'},403);
     if(!admin && request.method==='OPTIONS') return new Response(null,{status:204,headers:cors});
     let response;
     try{
       if(request.method!=='POST') throw new OrderError('Chỉ hỗ trợ POST.',405);
       if(admin && (!env.ZALO_SETUP_KEY || request.headers.get('Authorization')!==`Bearer ${env.ZALO_SETUP_KEY}`)) throw new OrderError('Không có quyền truy cập.',403);
-      if(!['/orders','/admin/check','/admin/pair'].includes(path)) throw new OrderError('Không tìm thấy.',404);
+      const authPaths=['/auth/register','/auth/login','/auth/me','/auth/logout','/auth/profile','/auth/password','/auth/delete'];
+      if(!['/orders','/admin/check','/admin/pair',...authPaths].includes(path)) throw new OrderError('Không tìm thấy.',404);
       const body=await boundedJson(request);
-      const stub=env.ORDERS.get(env.ORDERS.idFromName('antin-order-receiver'));
-      response=await stub.fetch(new Request('https://internal'+path,{
-        method:'POST',headers:{'Content-Type':'application/json','X-Client-Key':await hash(request.headers.get('CF-Connecting-IP')||'unknown')},body:JSON.stringify(body)
-      }));
+      const headers={'Content-Type':'application/json','X-Client-Key':await hash(request.headers.get('CF-Connecting-IP')||'unknown'),Authorization:request.headers.get('Authorization')||''};
+      if(authPaths.includes(path)){
+        const accounts=env.ACCOUNTS.get(env.ACCOUNTS.idFromName('customer-accounts'));
+        response=await accounts.fetch(new Request('https://internal'+path,{method:'POST',headers,body:JSON.stringify(body)}));
+      }else{
+        delete body.accountId;
+        if(path==='/orders'&&(env.REQUIRE_ACCOUNT_LOGIN==='true'||headers.Authorization)){
+          const accounts=env.ACCOUNTS.get(env.ACCOUNTS.idFromName('customer-accounts'));
+          const auth=await accounts.fetch(new Request('https://internal/auth/me',{method:'POST',headers,body:'{}'}));
+          if(!auth.ok)throw new OrderError('Vui lòng đăng nhập tài khoản để gửi yêu cầu đặt hàng.',auth.status===429?429:401);
+          const {profile}=await auth.json();
+          body.accountId=profile.id;
+          body.customer={name:profile.name,phone:profile.phone,address:[profile.address,profile.ward,profile.province].join(', ')};
+        }
+        const stub=env.ORDERS.get(env.ORDERS.idFromName('antin-order-receiver'));
+        response=await stub.fetch(new Request('https://internal'+path,{method:'POST',headers,body:JSON.stringify(body)}));
+      }
     }catch(error){response=json({error:error instanceof OrderError?error.message:'Dịch vụ tạm thời chưa sẵn sàng.'},error instanceof OrderError?error.status:503);}
     if(admin) return response;
     const headers=new Headers(response.headers);
@@ -158,7 +177,10 @@ export class OrderReceiver {
         return json({ok:true,paired:true});
       }
       // Serialize the receipt reservation and provider call: duplicate submits cannot send twice.
-      return await this.state.blockConcurrencyWhile(()=>this.receive(body,request.headers.get('X-Client-Key')));
+      return await this.state.blockConcurrencyWhile(async()=>{
+        try{return await this.receive(body,request.headers.get('X-Client-Key'));}
+        catch(error){return json({error:error instanceof OrderError?error.message:'Dịch vụ tạm thời chưa sẵn sàng.'},error instanceof OrderError?error.status:503);}
+      });
     }catch(error){return json({error:error instanceof OrderError?error.message:'Dịch vụ tạm thời chưa sẵn sàng.'},error instanceof OrderError?error.status:503);}
   }
   async receive(body,clientKey){

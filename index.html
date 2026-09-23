@@ -7,7 +7,7 @@
   <meta name="description" content="Danh mục sản phẩm An Tín Pharma - tìm kiếm sản phẩm, xem giá, hoạt chất và liên hệ tư vấn.">
   <title>An Tín Pharma | Danh mục sản phẩm</title>
   <link rel="icon" href="logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20260922-orders-1">
+  <link rel="stylesheet" href="style.css?v=20260923-accounts-1">
 </head>
 <body>
 <header class="header">
@@ -26,6 +26,9 @@
       <a href="#about">Giới thiệu</a>
       <a href="#contact">Liên hệ</a>
     </nav>
+    <button class="account-toggle" id="accountToggle" type="button" aria-label="Tài khoản khách hàng" aria-haspopup="dialog" aria-controls="accountDialog">
+      <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span id="accountLabel">Đăng nhập</span>
+    </button>
     <button class="cart-toggle" id="cartToggle" type="button" aria-haspopup="dialog" aria-controls="cartDialog" aria-label="Giỏ hàng, 0 sản phẩm">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 3h2l2.4 12h11.2L21 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
       <span>Giỏ hàng</span><span class="cart-badge" id="cartBadge">0</span>
@@ -100,10 +103,13 @@
       <p class="price-note" id="cartPriceNote">Giá được xác nhận khi liên hệ.</p>
       <form id="directOrderForm" class="direct-order" hidden>
         <h3>Thông tin liên hệ</h3>
+        <p id="orderAccountNote">Vui lòng đăng nhập để gửi yêu cầu đặt hàng.</p>
         <label for="customerName">Tên khách hàng</label>
-        <input id="customerName" name="name" autocomplete="name" required minlength="2" maxlength="80" placeholder="Nhập họ và tên">
+        <input id="customerName" name="name" autocomplete="name" readonly placeholder="Họ tên trong tài khoản">
         <label for="customerPhone">Số điện thoại</label>
-        <input id="customerPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="20" placeholder="Ví dụ: 0901234567">
+        <input id="customerPhone" name="phone" type="tel" autocomplete="tel" readonly placeholder="Số điện thoại trong tài khoản">
+        <p id="orderAddress" hidden></p>
+        <button class="account-link" id="editOrderAccount" type="button" hidden>Cập nhật thông tin nhận hàng</button>
         <p>Tên, số điện thoại và danh sách sản phẩm sẽ được gửi đến An Tín Pharma để liên hệ xác nhận yêu cầu.</p>
         <button class="btn zalo-checkout" id="sendOrder" type="submit" disabled>Gửi yêu cầu đặt hàng</button>
         <div id="orderFeedback" class="order-feedback" role="status" aria-live="polite"></div>
@@ -124,8 +130,63 @@
 </dialog>
 <div class="sr-only" id="cartAnnouncement" role="status" aria-live="polite"></div>
 
+<dialog class="account-dialog" id="accountDialog" aria-labelledby="accountTitle">
+  <div class="account-heading"><div><small>AN TÍN PHARMA</small><h2 id="accountTitle">Đăng nhập</h2></div><button class="icon-button" id="closeAccount" type="button" aria-label="Đóng tài khoản">×</button></div>
+  <div class="account-tabs" id="accountTabs"><button type="button" data-account-view="login" aria-pressed="true">Đăng nhập</button><button type="button" data-account-view="register" aria-pressed="false">Đăng ký</button></div>
+  <div class="account-content">
+    <form id="loginForm" class="account-form">
+      <p>Đăng nhập để lưu thông tin và gửi yêu cầu đặt hàng.</p>
+      <label for="loginPhone">Số điện thoại</label><input id="loginPhone" name="phone" type="tel" autocomplete="username" inputmode="tel" required maxlength="20" placeholder="Nhập số điện thoại">
+      <label for="loginPassword">Mật khẩu</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" required maxlength="128" placeholder="Nhập mật khẩu">
+      <label class="check-label"><input type="checkbox" data-show-password="loginForm"> Hiện mật khẩu</label>
+      <button class="btn account-submit" type="submit">Đăng nhập</button>
+      <a class="account-link forgot-password" target="_blank" rel="noopener noreferrer">Quên mật khẩu? Liên hệ An Tín qua Zalo</a>
+      <button class="account-link" type="button" data-account-view="register">Chưa có tài khoản? Đăng ký ngay</button>
+    </form>
+    <form id="registerForm" class="account-form" hidden>
+      <label for="registerName">Họ và tên</label><input id="registerName" name="name" autocomplete="name" required minlength="2" maxlength="80" placeholder="Nhập họ tên">
+      <label for="registerPhone">Số điện thoại</label><input id="registerPhone" name="phone" type="tel" autocomplete="username" inputmode="tel" required maxlength="20" placeholder="Nhập số điện thoại của bạn">
+      <label for="registerProvince">Tỉnh/Thành phố</label><select id="registerProvince" name="provinceCode" required><option value="">Chọn tỉnh/thành phố</option></select>
+      <label for="registerWard">Xã/Phường</label><select id="registerWard" name="wardCode" required disabled><option value="">Chọn tỉnh/thành phố trước</option></select>
+      <label for="registerAddress">Địa chỉ cụ thể</label><input id="registerAddress" name="address" autocomplete="street-address" required minlength="5" maxlength="200" placeholder="Số nhà, đường, thôn/tổ…">
+      <label for="registerPassword">Mật khẩu</label><input id="registerPassword" name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="128" placeholder="Ít nhất 12 ký tự" aria-describedby="passwordHint">
+      <small id="passwordHint">Bạn có thể dùng một câu dài, dễ nhớ làm mật khẩu.</small>
+      <label for="registerConfirm">Nhập lại mật khẩu</label><input id="registerConfirm" name="confirmPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="128" placeholder="Nhập lại mật khẩu">
+      <label class="check-label"><input type="checkbox" data-show-password="registerForm"> Hiện mật khẩu</label>
+      <label class="check-label"><input name="consent" type="checkbox" required> Tôi đồng ý để An Tín lưu thông tin tài khoản và dùng thông tin liên hệ, địa chỉ để xử lý yêu cầu đặt hàng.</label>
+      <button class="btn account-submit" type="submit">Đăng ký tài khoản</button>
+    </form>
+    <section id="profileView" hidden>
+      <p class="account-welcome" id="accountWelcome"></p>
+      <form id="profileForm" class="account-form">
+        <label for="profileName">Họ và tên</label><input id="profileName" name="name" autocomplete="name" required minlength="2" maxlength="80">
+        <label for="profilePhone">Số điện thoại đăng nhập</label><input id="profilePhone" type="tel" readonly>
+        <label for="profileProvince">Tỉnh/Thành phố</label><select id="profileProvince" name="provinceCode" required><option value="">Chọn tỉnh/thành phố</option></select>
+        <label for="profileWard">Xã/Phường</label><select id="profileWard" name="wardCode" required disabled><option value="">Chọn tỉnh/thành phố trước</option></select>
+        <label for="profileAddress">Địa chỉ cụ thể</label><input id="profileAddress" name="address" autocomplete="street-address" required minlength="5" maxlength="200">
+        <button class="btn account-submit" type="submit">Lưu thông tin</button>
+      </form>
+      <details class="account-security"><summary>Đổi mật khẩu</summary><form id="passwordForm" class="account-form">
+        <label for="currentPassword">Mật khẩu hiện tại</label><input id="currentPassword" name="currentPassword" type="password" autocomplete="current-password" required maxlength="128">
+        <label for="newPassword">Mật khẩu mới</label><input id="newPassword" name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="128">
+        <label for="confirmNewPassword">Nhập lại mật khẩu mới</label><input id="confirmNewPassword" name="confirmPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="128">
+        <button class="btn account-submit" type="submit">Đổi mật khẩu</button>
+      </form></details>
+      <button class="btn account-logout" id="logoutAccount" type="button">Đăng xuất</button>
+      <details class="account-security"><summary>Xóa tài khoản</summary><form id="deleteAccountForm" class="account-form">
+        <p>Thông tin tài khoản sẽ bị xóa. Các yêu cầu đã gửi qua Zalo vẫn nằm trong cuộc trò chuyện với An Tín.</p>
+        <label for="deletePassword">Xác nhận mật khẩu</label><input id="deletePassword" name="currentPassword" type="password" autocomplete="current-password" required maxlength="128">
+        <label class="check-label"><input type="checkbox" required> Tôi muốn xóa tài khoản này.</label>
+        <button class="btn delete-button" type="submit">Xóa tài khoản của tôi</button>
+      </form></details>
+    </section>
+    <p id="accountFeedback" class="account-feedback" role="status" aria-live="polite"></p>
+  </div>
+</dialog>
+
 <script src="config.js?v=20260922-orders-2"></script>
 <script src="catalogue.js?v=4b4d714f38ac"></script>
-<script src="app.js?v=20260922-orders-1"></script>
+<script src="accounts.js?v=20260923-accounts-1"></script>
+<script src="app.js?v=20260923-accounts-1"></script>
 </body>
 </html>

@@ -29,10 +29,11 @@ Không cần khóa JSON hoặc GitHub Secret cho Google; token ngắn hạn dùn
 
 ## Kiểm tra
 
-Yêu cầu Node.js 24, không cần cài thư viện:
+Yêu cầu Node.js 24. Cài thư viện băm mật khẩu đã khóa phiên bản rồi chạy kiểm tra:
 
 ```sh
-node --test scripts/sync-prices.test.mjs workers/orders.test.mjs
+npm ci --ignore-scripts
+npm test
 ```
 
 Chạy đồng bộ ngoài GitHub cần biến môi trường `GOOGLE_ACCESS_TOKEN` hợp lệ và lệnh `node scripts/sync-prices.mjs`.
@@ -62,3 +63,15 @@ Giỏ hàng lưu sản phẩm trên trình duyệt. Khách có thể chọn/bỏ
 - Tối đa 3 yêu cầu mới/phút/địa chỉ IP và 2 tin nhắn Zalo/yêu cầu; danh sách quá dài cần chia nhỏ. Kiểm tra Origin và giới hạn IP chỉ giảm gửi nhầm/spam cơ bản, không thay thế cơ chế xác thực khách hàng.
 - Durable Object lưu tài khoản nhận, mã băm nội dung và trạng thái gửi; không lưu tên, số điện thoại hoặc nội dung đơn. Thông báo có các thông tin khách cung cấp được chuyển tới Zalo. Log Worker mặc định tắt.
 - Khi cần tạm ngừng, để trống `ORDER_API_URL` rồi triển khai lại website; khách vẫn sử dụng chức năng sao chép và mở Zalo.
+
+## Tài khoản khách hàng
+
+- Đăng ký/đăng nhập bằng số điện thoại và mật khẩu; thông tin gồm họ tên, tỉnh/thành, xã/phường, địa chỉ cụ thể. Không có mục “Bạn là”. Đăng ký thành công sẽ đăng nhập ngay.
+- Gửi yêu cầu đặt hàng bắt buộc đăng nhập (`REQUIRE_ACCOUNT_LOGIN=true` ở Worker). Máy chủ lấy thông tin người gửi từ phiên đăng nhập, không tin ID/tên/địa chỉ do trình duyệt tự khai trong đơn. Đơn Zalo kèm mã khách và địa chỉ để An Tín làm việc tiếp với khách.
+- Khách sửa tên/địa chỉ, đổi mật khẩu, đăng xuất và xóa tài khoản trong cửa sổ Tài khoản. Số điện thoại đăng nhập giữ nguyên. Quên mật khẩu hiện dùng liên hệ hỗ trợ qua Zalo; chưa có khôi phục tự động hoặc xác minh OTP, không coi số điện thoại tự đăng ký là danh tính đã xác thực. Không cấp lại quyền chỉ dựa trên người tự khai số điện thoại.
+- `workers/accounts.mjs` lưu tài khoản trong SQLite Durable Object `CustomerAccounts`, migration `v2-accounts`; giữ nguyên dữ liệu ghép bot của `OrderReceiver`. Không dùng Sheet công khai để lưu khách. Mật khẩu dùng scrypt với salt ngẫu nhiên riêng (N=16384, r=8, p=5), theo [cấu hình OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html).
+- Phiên đăng nhập là mã ngẫu nhiên 256 bit, lưu dạng băm phía máy chủ, hết hạn sau 8 giờ, tối đa 5 phiên/tài khoản. Đổi mật khẩu thu hồi các phiên cũ. Trình duyệt giữ mã phiên trong sessionStorage của tab; không lưu mật khẩu hoặc hồ sơ vào localStorage. Cách này hoạt động giữa GitHub Pages và workers.dev mà không phụ thuộc cookie bên thứ ba. Không thêm script bên thứ ba không tin cậy vì script cùng trang có thể đọc mã phiên.
+- Có giới hạn thử đăng nhập theo IP và số điện thoại, giới hạn đăng ký 5 lần/ngày/IP. Giới hạn đăng ký bao gồm các lần đăng ký bị từ chối; hỗ trợ trường hợp nhiều khách dùng chung mạng nếu nhu cầu thực tế tăng. Không gửi tin nhắn SMS hoặc mở dịch vụ trả phí.
+- Giỏ hàng trên cùng trình duyệt tách theo tài khoản. Các sản phẩm khách chọn trước khi đăng nhập được chuyển vào giỏ tài khoản. Giỏ chưa đồng bộ giữa nhiều thiết bị.
+- Danh sách địa chỉ lấy từ [Province Open API v2](https://provinces.open-api.vn/), lưu bản sao ở `data/locations.json` (34 tỉnh/thành, 3321 xã/phường tại lần cập nhật). Chạy `node scripts/sync-locations.mjs` để cập nhật có kiểm tra cấu trúc. Website đọc file cùng nguồn; không gửi thông tin khách đến API địa chỉ.
+- Khi triển khai: chạy kiểm tra, triển khai Worker với dependency đã cài, sau đó push website lên `main`. Artifact Pages chỉ có mã giao diện, danh mục, ảnh và danh sách địa chỉ; không chứa cơ sở dữ liệu, mã quản trị hoặc secret.

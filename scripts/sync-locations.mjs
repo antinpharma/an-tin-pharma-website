@@ -1,0 +1,11 @@
+import {mkdir,writeFile} from 'node:fs/promises';
+const source='https://provinces.open-api.vn/api/v2/?depth=2';
+const response=await fetch(source,{signal:AbortSignal.timeout(30000)});
+if(!response.ok)throw new Error('Location source unavailable');
+const rows=await response.json();
+if(!Array.isArray(rows)||rows.length!==34)throw new Error('Review changed province structure before updating');
+const provinces=rows.map(p=>({code:String(p.code),name:p.name,wards:p.wards.map(w=>({code:String(w.code),name:w.name}))}));
+if(provinces.some(p=>!p.name||!p.wards.length||p.wards.some(w=>!w.name)))throw new Error('Incomplete location data');
+await mkdir(new URL('../data/',import.meta.url),{recursive:true});
+await writeFile(new URL('../data/locations.json',import.meta.url),JSON.stringify({source,updatedAt:new Date().toISOString().slice(0,10),provinces})+'\n');
+console.log(`Saved ${provinces.length} provinces and ${provinces.reduce((n,p)=>n+p.wards.length,0)} wards.`);

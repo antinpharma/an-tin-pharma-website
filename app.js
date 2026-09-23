@@ -10,7 +10,8 @@ const FALLBACK_PRODUCTS = (Array.isArray(window.ANTIN_PRODUCTS) && window.ANTIN_
 let products = [...FALLBACK_PRODUCTS];
 let categories = ['Tất cả'];
 let activeCategory = 'Tất cả';
-const CART_STORAGE_KEY = 'antin-cart-v1';
+let CART_STORAGE_KEY = 'antin-cart-v1';
+let cartAccountId=null;
 const MAX_QUANTITY = 9999;
 let cart = new Map();
 let orderSending=false;
@@ -259,10 +260,17 @@ function renderCart(refreshItems=true){
 }
 function refreshOrderForm(){
   const enabled=Boolean(CONFIG.ORDER_API_URL);
+  const account=window.AntinAccount?.profile;
   document.getElementById('directOrderForm').hidden=!enabled;
   document.querySelector('.cart-summary').classList.toggle('has-direct-order',enabled);
   document.getElementById('sendOrder').disabled=orderSending || orderSubmitted || !cartRows(true).length;
-  document.getElementById('sendOrder').textContent=orderSending?'Đang gửi yêu cầu…':orderSubmitted?'Đã gửi yêu cầu':'Gửi yêu cầu đặt hàng';
+  document.getElementById('sendOrder').textContent=orderSending?'Đang gửi yêu cầu…':orderSubmitted?'Đã gửi yêu cầu':account?'Gửi yêu cầu đặt hàng':'Đăng nhập để gửi đơn';
+  document.getElementById('customerName').value=account?.name||'';
+  document.getElementById('customerPhone').value=account?.phone||'';
+  document.getElementById('orderAccountNote').textContent=account?'Đơn sẽ được gửi bằng thông tin trong tài khoản của bạn.':'Vui lòng đăng nhập hoặc đăng ký tài khoản để gửi yêu cầu đặt hàng.';
+  document.getElementById('editOrderAccount').hidden=!account;
+  document.getElementById('orderAddress').hidden=!account;
+  document.getElementById('orderAddress').textContent=account?[account.address,account.ward,account.province].join(', '):'';
   document.querySelector('.cart-products').inert=orderSending;
   document.getElementById('customerName').disabled=orderSending;
   document.getElementById('customerPhone').disabled=orderSending;
@@ -293,7 +301,9 @@ async function sendDirectOrder(event){
   if(orderSending || orderSubmitted || !CONFIG.ORDER_API_URL) return;
   const rows=cartRows(true),feedback=document.getElementById('orderFeedback');
   if(!rows.length) return;
-  const customer={name:document.getElementById('customerName').value.trim(),phone:document.getElementById('customerPhone').value.replace(/[\s().-]/g,'')};
+  if(!window.AntinAccount?.profile){window.AntinAccount?.open('login');return;}
+  const account=window.AntinAccount.profile;
+  const customer={name:account.name,phone:account.phone,address:[account.address,account.ward,account.province].join(', ')};
   feedback.dataset.error='true';
   if(customer.name.length<2 || !/^(?:0|\+84)[0-9]{9}$/.test(customer.phone)){
     feedback.textContent='Vui lòng nhập tên và số điện thoại Việt Nam hợp lệ.';return;
@@ -301,16 +311,17 @@ async function sendDirectOrder(event){
   if(rows.some(row=>!row.product.productId)){
     feedback.textContent='Một sản phẩm cần được kiểm tra mã. Vui lòng chọn Liên hệ Zalo để được hỗ trợ.';return;
   }
-  const payload={customer,items:rows.map(row=>({productId:String(row.product.productId),quantity:row.quantity})).sort((a,b)=>a.productId.localeCompare(b.productId))};
+  const payload={customer,accountId:window.AntinAccount.profile.id,items:rows.map(row=>({productId:String(row.product.productId),quantity:row.quantity})).sort((a,b)=>a.productId.localeCompare(b.productId))};
   orderSending=true;refreshOrderForm();feedback.dataset.error='false';feedback.textContent='Đang gửi danh sách đến An Tín Pharma…';
   let requestId='';
   try{
     requestId=await orderAttempt(payload);
     const response=await fetch(CONFIG.ORDER_API_URL,{
-      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestId,...payload}),signal:AbortSignal.timeout(30000),credentials:'omit',redirect:'error'
+      method:'POST',headers:{'Content-Type':'application/json',...window.AntinAccount.headers()},body:JSON.stringify({requestId,...payload}),signal:AbortSignal.timeout(30000),credentials:'omit',redirect:'error'
     });
     const result=await response.json();
     if(!response.ok || result.ok!==true || result.requestId!==requestId){
+      if(response.status===401){window.AntinAccount.expire();window.AntinAccount.open('login');}
       feedback.dataset.error='true';
       feedback.textContent=(typeof result.error==='string'?result.error:'Chưa xác nhận gửi thành công. Vui lòng liên hệ Zalo để kiểm tra.')+(result.uncertain?` Mã yêu cầu: ${requestId}`:'');
       return;
@@ -334,6 +345,7 @@ function closeCart(){
   document.getElementById('cartDialog').close();
 }
 async function copyOrder(){
+  if(!window.AntinAccount?.profile){window.AntinAccount?.open('login');return false;}
   const text=orderText(cartRows(true));
   if(!text) return false;
   let copied=false;
@@ -548,10 +560,27 @@ document.getElementById('deleteCart').addEventListener('click',()=>{
 });
 document.getElementById('copyOrder').addEventListener('click',copyOrder);
 document.getElementById('directOrderForm').addEventListener('submit',sendDirectOrder);
+document.getElementById('editOrderAccount').addEventListener('click',()=>window.AntinAccount?.open('profile'));
+window.addEventListener('antin-account-changed',event=>{
+  const nextId=event.detail?.id||null;
+  if(nextId!==cartAccountId){
+    const guestItems=!cartAccountId&&nextId?new Map(cart):null;
+    saveCart();
+    CART_STORAGE_KEY=nextId?'antin-cart-account:'+nextId:'antin-cart-v1';
+    cart=restoreCart();
+    if(guestItems){
+      for(const [key,item] of guestItems)cart.set(key,item);
+      try{localStorage.removeItem('antin-cart-v1');}catch{}
+    }
+    cartAccountId=nextId;saveCart();
+  }
+  resetOrderFeedback();renderCart();syncQuantityControls();
+});
 document.getElementById('customerName').addEventListener('input',resetOrderFeedback);
 document.getElementById('customerPhone').addEventListener('input',resetOrderFeedback);
 document.getElementById('checkoutCart').addEventListener('click',()=>{
   if(!cartRows(true).length) return;
+  if(!window.AntinAccount?.profile){window.AntinAccount?.open('login');return;}
   if(!CONFIG.ZALO_PHONE){
     document.getElementById('cartFeedback').textContent='Kênh Zalo chưa được cấu hình.';
     return;

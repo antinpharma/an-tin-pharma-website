@@ -211,3 +211,47 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible,t
   .cart-item{grid-template-columns:20px 46px minmax(0,1fr);gap:6px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Customer accounts */
+.account-toggle{display:flex;align-items:center;gap:7px;border:1px solid #d8e8df;border-radius:12px;background:#f3faf5;color:#126439;min-height:44px;padding:9px 12px;cursor:pointer;white-space:nowrap;font-weight:600;font-size:13px}
+.account-dialog{padding:0;border:0;border-radius:18px;width:min(500px,calc(100% - 24px));max-height:calc(100dvh - 32px);color:var(--text);box-shadow:0 24px 90px #17281d38;overflow-y:auto}
+.account-dialog::backdrop{background:#15281dcc;backdrop-filter:blur(2px)}
+.account-heading{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:22px 24px 16px;background:#f5faf6;border-bottom:1px solid #e0ece2}
+.account-heading small{font-size:10px;letter-spacing:.15em;color:#267d48;font-weight:700}
+.account-heading h2{font-size:24px;margin:6px 0 0;font-weight:650}
+.account-heading .icon-button{background:#fff;border-color:#d8e8df}
+.account-tabs{display:flex;border-bottom:1px solid #e0ece2;padding:0 24px;gap:22px}
+.account-tabs[hidden]{display:none}
+.account-tabs button{padding:16px 0 12px;border:0;border-bottom:3px solid transparent;background:white;color:var(--muted);font-weight:600;cursor:pointer}
+.account-tabs button[aria-pressed="true"]{color:#126439;border-bottom-color:#168047}
+.account-content{padding:6px 24px 20px}
+.account-form{display:flex;flex-direction:column;gap:0}
+.account-form[hidden]{display:none}
+.account-form>label:not(.check-label){font-size:13px;font-weight:600;margin:18px 0 7px}
+.account-form input:not([type="checkbox"]),.account-form select{font:inherit;font-size:16px;min-height:48px;width:100%;min-width:0;padding:11px 13px;border:1px solid #ccd8ce;border-radius:8px;color:var(--text);background:white}
+.account-form input[readonly],.direct-order input[readonly]{background:#f2f6f3;color:#536258}
+.account-form select:disabled{background:#f2f6f3}
+.account-form p,.account-welcome{font-size:14px;line-height:1.6;color:var(--muted)}
+.account-form small{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.6}
+.account-form .check-label{display:flex;align-items:flex-start;gap:9px;font-size:13px;line-height:1.6;margin:15px 0 0;cursor:pointer}
+.check-label input{width:17px;height:17px;flex-shrink:0;margin:2px 0 0;accent-color:#126439}
+.account-submit{background:#146b3e;color:white;border:0;min-height:48px;margin-top:22px;cursor:pointer}
+.account-submit:hover{background:#105632}
+.account-link{display:block;background:none;border:0;padding:10px 0;color:#146b3e;font-size:13px;text-align:left;cursor:pointer;text-decoration:underline;text-underline-offset:3px;line-height:1.5}
+.account-logout{width:100%;min-height:44px;margin-top:20px;background:#fff;border:1px solid #c9d7ce;color:#126439;cursor:pointer}
+.account-security{border-top:1px solid #e0ece2;margin-top:22px;padding-top:16px;font-size:14px}
+.account-security summary{cursor:pointer}
+.account-security .delete-button{margin-top:18px}
+.account-feedback{font-size:14px;line-height:1.6;color:#126439;overflow-wrap:anywhere}
+.account-feedback[data-error="true"]{color:#a12b23}
+.account-dialog button:disabled{opacity:.55;cursor:wait}
+.search{min-width:0}.search input{min-width:0}
+@media(max-width:1300px){.links{display:none}}
+@media(max-width:640px){
+  .header .nav{gap:8px}.account-toggle{padding:8px;font-size:12px;gap:5px}
+  .logo{min-width:0}.brand strong{font-size:16px}.brand span{font-size:11px}
+  .account-dialog{width:calc(100% - 20px);max-height:calc(100dvh - 20px);border-radius:14px}
+  .account-heading{padding:18px}.account-content{padding:4px 18px 18px}.account-tabs{padding:0 18px}
+  .account-heading h2{font-size:22px}.account-form>label:not(.check-label){margin-top:16px}
+}
+@media(max-width:420px){.account-toggle span{display:none}.account-toggle{width:40px;justify-content:center}.account-toggle:after{content:none}}
