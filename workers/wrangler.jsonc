@@ -10,7 +10,7 @@
   "vars": {
     "ALLOWED_ORIGIN": "https://minhtran123hehe-png.github.io",
     "CATALOGUE_URL": "https://minhtran123hehe-png.github.io/an-tin-pharma-website/catalogue.js",
-    "EXPECTED_BOT_ID": "576169620734670481"
+    "EXPECTED_BOT_ID": "3232808305802016399"
   },
   "durable_objects": {
     "bindings": [{ "name": "ORDERS", "class_name": "OrderReceiver" }]

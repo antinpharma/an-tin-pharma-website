@@ -12,11 +12,11 @@ if(!key || !['check','pair'].includes(command) || (command==='pair' && !/^ANTIN-
       method:'POST',
       headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},
       body:JSON.stringify(command==='pair'?{code}:{}),
-      signal:AbortSignal.timeout(20000),redirect:'error'
+      signal:AbortSignal.timeout(command==='pair'?45000:20000),redirect:'error'
     });
     const data=await response.json();
     // Print only the documented safe fields; never raw provider responses or URLs.
-    console.log(JSON.stringify({status:response.status,ok:data.ok,botId:data.botId,paired:data.paired,error:data.error}));
+    console.log(JSON.stringify({status:response.status,ok:data.ok,botId:data.botId,accountName:data.accountName,paired:data.paired,error:data.error}));
     if(!response.ok)process.exitCode=1;
   }catch{
     console.error('Không kiểm tra được kết nối. Thông tin xác thực không được ghi ra log.');

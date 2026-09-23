@@ -89,7 +89,7 @@ async function zalo(env,method,data){
   const tokenPath=encodeURIComponent(token).replace(/%3A/gi,':');
   try{
     const res=await fetch(`https://bot-api.zaloplatforms.com/bot${tokenPath}/${method}`,{
-      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),signal:AbortSignal.timeout(8000),redirect:'manual'
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),signal:AbortSignal.timeout(method==='getUpdates'?35000:8000),redirect:'manual'
     });
     let result;
     try{result=await res.json();}catch{throw new OrderError(`Zalo chưa trả dữ liệu hợp lệ (HTTP ${res.status}).`,502);}
@@ -139,7 +139,7 @@ export class OrderReceiver {
       const path=new URL(request.url).pathname,body=await request.json();
       if(path==='/admin/check'){
         const bot=await zalo(this.env,'getMe',{});
-        if(String(bot.id)!==this.env.EXPECTED_BOT_ID) throw new OrderError('Bot Token không thuộc bot đã chọn.',409);
+        if(String(bot.id)!==this.env.EXPECTED_BOT_ID) return json({ok:false,error:'ID do API Zalo trả về khác ID đang cấu hình.',botId:String(bot.id),accountName:singleLine(bot.account_name),paired:!!await this.state.storage.get('owner')},409);
         return json({ok:true,botId:String(bot.id),paired:!!await this.state.storage.get('owner')});
       }
       if(path==='/admin/pair'){
@@ -147,7 +147,7 @@ export class OrderReceiver {
         if(await this.state.storage.get('owner')) throw new OrderError('Bot đã có tài khoản nhận đơn.',409);
         const bot=await zalo(this.env,'getMe',{});
         if(String(bot.id)!==this.env.EXPECTED_BOT_ID) throw new OrderError('Sai bot.',409);
-        const result=await zalo(this.env,'getUpdates',{timeout:'5'});
+        const result=await zalo(this.env,'getUpdates',{timeout:'30'});
         const updates=Array.isArray(result)?result:[result];
         const message=updates.map(update=>update?.message).find(message=>message?.text?.trim()===body.code && message.chat?.id && message.chat?.chat_type==='PRIVATE');
         if(!message) return json({ok:false,error:'Chưa thấy mã xác minh trong tin nhắn riêng gửi cho bot.'},409);
