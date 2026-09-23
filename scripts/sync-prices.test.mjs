@@ -6,6 +6,37 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Script } from 'node:vm';
 import { updatePrices, updateCatalogue, renderUpdate, readWindow, syncPrices, validateAssets } from './sync-prices.mjs';
+import { syncImages, imageSources } from './sync-images.mjs';
+import sharp from 'sharp';
+
+test('image sync matches southern IDs, caches downloaded files and keeps old images on failure or blank URL', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'antin-images-'));
+  try {
+    const values = [[], ['product_id','sales_region_code','link ảnh URL'],
+      [1146,'MIENNAM','https://cdn-gcs.thuocsi.vn/one'],
+      [1505,'MIENBAC','https://cdn-gcs.thuocsi.vn/north'],
+      [1505,'MIENNAM','']];
+    let calls = 0;
+    const png = await sharp({create:{width:1200,height:600,channels:3,background:'#ffffff'}}).png().toBuffer();
+    const fetchImage = async () => { calls++; return new Response(png,{headers:{'content-type':'image/png'}}); };
+    const first = await syncImages(root, products, values, fetchImage);
+    assert.equal(first.downloaded,1); assert.equal(calls,1);
+    assert.match(first.products[0].image,/^images\/sheet\/[a-f0-9]+\.webp$/);
+    assert.equal(first.products[1].image,products[1].image);
+    assert.equal((await readFile(join(root,first.products[0].image))).subarray(8,12).toString(),'WEBP');
+    const metadata = await sharp(await readFile(join(root,first.products[0].image))).metadata();
+    assert.equal(metadata.width,1000); assert.equal(metadata.height,500);
+    const second = await syncImages(root, products, values, fetchImage);
+    assert.equal(second.downloaded,0); assert.equal(calls,1);
+    values[2][2] = 'https://cdn-gcs.thuocsi.vn/broken';
+    const failed = await syncImages(root, first.products, values, async()=>new Response('<html>error</html>'));
+    assert.equal(failed.failures.length,1); assert.equal(failed.products[0].image,first.products[0].image);
+    values[2][2] = 'http://127.0.0.1/private';
+    assert.equal((await syncImages(root,products,values,fetchImage)).failures.length,1);
+    assert.equal(calls,1);
+    assert.throws(()=>imageSources([...values,[1146,'MIENNAM','https://cdn-gcs.thuocsi.vn/conflict']]));
+  } finally { await rm(root,{recursive:true,force:true}); }
+});
 
 const headers = ['product_id', 'sales_region_code', 'product_name', 'brand', 'product_category', 'retail_price_value'];
 const table = (...rows) => [['Update: 10h 22/9'], headers, ...rows];

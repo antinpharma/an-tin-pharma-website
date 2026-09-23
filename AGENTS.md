@@ -22,7 +22,8 @@ Khách hàng xem sản phẩm, giá, hoạt chất, chỉ định và liên hệ
    - Tab `check`: dòng 1 là thời điểm cập nhật, dòng 2 là tiêu đề cột.
    - Đọc bằng tài khoản được cấp quyền; không yêu cầu công khai bảng nguồn.
    - Ghép chính xác `product_id` với Product ID trong catalogue, đọc giá dạng số gốc (UNFORMATTED_VALUE).
-   - Đồng bộ product_name, brand, product_category, Hoạt chất, Chỉ định và Quy cách nếu có. Không đưa cột Check tồn lên website; không thay ảnh từ cột Ảnh.
+   - Đồng bộ product_name, brand, product_category, Hoạt chất, Chỉ định và Quy cách nếu có. Không đưa cột Check tồn lên website.
+   - Theo yêu cầu ngày 24/09/2026, tải URL từ cột `link ảnh URL` về `images/sheet` và ghép đúng Product ID miền Nam. URL trống hoặc tải lỗi giữ ảnh cũ. Hiện hỗ trợ CDN `cdn-gcs.thuocsi.vn`; không xóa ảnh cũ.
    - `scripts/sync-prices.mjs` đọc nguồn qua Google Sheets API và cập nhật `catalogue.js`; trình duyệt dùng catalogue đã mirror.
    - Workflow dùng Workload Identity Federation với service account `antin-price-reader@learned-surge-310713.iam.gserviceaccount.com`, scope chỉ đọc Sheets; không dùng khóa JSON.
    - Khi danh mục/giá thay đổi, tự commit `catalogue.js` và phiên bản cache trong `index.html`, rồi triển khai Pages ngay trong workflow. Không tự xóa sản phẩm cũ khi vắng trong nguồn.

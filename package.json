@@ -2,6 +2,11 @@
   "name": "an-tin-pharma-website",
   "private": true,
   "type": "module",
-  "scripts": { "test": "node --test scripts/sync-prices.test.mjs workers/orders.test.mjs workers/accounts.test.mjs" },
-  "dependencies": { "@noble/hashes": "2.4.0" }
+  "scripts": {
+    "test": "node --test scripts/sync-prices.test.mjs workers/orders.test.mjs workers/accounts.test.mjs"
+  },
+  "dependencies": {
+    "@noble/hashes": "2.4.0",
+    "sharp": "0.35.4"
+  }
 }

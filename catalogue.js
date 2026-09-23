@@ -8,7 +8,7 @@ window.ANTIN_PRODUCTS = [
     "price": "113.000đ",
     "active": "Adapalene 1 mg/g + Clindamycin 10 mg/g",
     "indication": "Điều trị tại chỗ mụn trứng cá.",
-    "image": "images/klenzit-c-15g.jpg",
+    "image": "images/sheet/909561616e257762645829a130d2b490.webp",
     "visible": true
   },
   {
@@ -20,7 +20,7 @@ window.ANTIN_PRODUCTS = [
     "price": "322.000đ",
     "active": "Esomeprazole 40mg",
     "indication": "Điều trị viêm thực quản do trào ngược; điều trị hội chứng Zollinger–Ellison; điều trị kéo dài sau dự phòng tái xuất huyết loét dạ dày–tá tràng bằng đường tĩnh mạch.",
-    "image": "images/nexium-mups-40mg.jpg",
+    "image": "images/sheet/16d8d1aad1b86b0cc826c63b721729ff.webp",
     "visible": true
   },
   {
@@ -32,7 +32,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Bổ sung khi thiếu canxi hoặc nhu cầu tăng; dùng phối hợp trong điều trị loãng xương.",
     "spec": "",
     "price": "357.900đ",
-    "image": "",
+    "image": "images/sheet/43075df7e58fac82129565b89412f1de.webp",
     "visible": true
   },
   {
@@ -44,7 +44,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị triệu chứng co cứng cơ sau đột quỵ ở người lớn theo đơn.",
     "spec": "",
     "price": "141.000đ",
-    "image": "",
+    "image": "images/sheet/f4ec9092859e0e6b0667ae75b6d20305.webp",
     "visible": true
   },
   {
@@ -56,7 +56,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị triệu chứng co cứng cơ sau đột quỵ ở người lớn theo đơn.",
     "spec": "",
     "price": "100.700đ",
-    "image": "",
+    "image": "images/sheet/0fc7abb2840943396c7fdf1a73cdb71d.webp",
     "visible": true
   },
   {
@@ -68,7 +68,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị ngắn hạn các bệnh viêm da không nhiễm khuẩn đáp ứng với corticosteroid, như chàm, viêm da dị ứng, viêm da tiết bã và vảy nến, theo đơn.",
     "spec": "",
     "price": "45.700đ",
-    "image": "",
+    "image": "images/sheet/9b6b2e5686dd85ef1288151f6623519c.webp",
     "visible": true
   },
   {
@@ -80,7 +80,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị mụn trứng cá và hỗ trợ liền da tại vùng tổn thương, theo hướng dẫn thuốc.",
     "spec": "",
     "price": "15.800đ",
-    "image": "",
+    "image": "images/sheet/88d00c1868a27cee4c99cbce78e1b03f.webp",
     "visible": true
   },
   {
@@ -92,7 +92,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm sán máng, sán lá gan nhỏ, sán phổi, sán dây và một số nhiễm sán khác theo đơn.",
     "spec": "",
     "price": "37.100đ",
-    "image": "",
+    "image": "images/sheet/1abd33996663ca02f94a7c5bfdd70526.webp",
     "visible": true
   },
   {
@@ -104,7 +104,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "129.400đ",
-    "image": "",
+    "image": "images/sheet/25d5c531b7434e63b52a8c32bfb20de2.webp",
     "visible": true
   },
   {
@@ -116,7 +116,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Hỗ trợ điều trị nhiễm khuẩn đường tiết niệu dưới không biến chứng.",
     "spec": "",
     "price": "271.500đ",
-    "image": "",
+    "image": "images/sheet/c83b0b78f6e34cbc96aca39f49e58144.webp",
     "visible": true
   },
   {
@@ -128,7 +128,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị các biểu hiện lo âu theo đơn bác sĩ.",
     "spec": "",
     "price": "217.800đ",
-    "image": "",
+    "image": "images/sheet/6eec6b886b1356713f15e78719c858b9.webp",
     "visible": true
   },
   {
@@ -140,7 +140,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn răng miệng; phòng nhiễm khuẩn sau phẫu thuật răng miệng theo đơn.",
     "spec": "",
     "price": "43.500đ",
-    "image": "",
+    "image": "images/sheet/ee2cf24aee5070d39ed47700164d3ce5.webp",
     "visible": true
   },
   {
@@ -152,7 +152,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn răng miệng và dự phòng nhiễm khuẩn sau phẫu thuật răng miệng theo đơn.",
     "spec": "",
     "price": "25.000đ",
-    "image": "",
+    "image": "images/sheet/0db1981fe9370b09f88801c51c1891b5.webp",
     "visible": true
   },
   {
@@ -164,7 +164,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn nhạy cảm ở hô hấp, tiết niệu, da, mô mềm hoặc răng miệng theo đơn.",
     "spec": "",
     "price": "33.000đ",
-    "image": "",
+    "image": "images/sheet/3d06b904062963f9ecc6d3dcd0e97049.webp",
     "visible": true
   },
   {
@@ -176,7 +176,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn nhạy cảm ở đường hô hấp, tiết niệu, da, mô mềm hoặc răng miệng theo đơn.",
     "spec": "",
     "price": "61.300đ",
-    "image": "",
+    "image": "images/sheet/86885fdae1edaafd07976a8b2ec77271.webp",
     "visible": true
   },
   {
@@ -188,7 +188,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Chống viêm và ức chế miễn dịch trong một số bệnh viêm, tự miễn hoặc dị ứng nặng theo đơn bác sĩ.",
     "spec": "",
     "price": "39.000đ",
-    "image": "",
+    "image": "images/sheet/c6a044a0b3dac8c0a08c92fb1205854c.webp",
     "visible": true
   },
   {
@@ -200,7 +200,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giảm phù nề sau chấn thương, phẫu thuật hoặc bỏng.",
     "spec": "",
     "price": "19.200đ",
-    "image": "",
+    "image": "images/sheet/300c1714ad4eaa0594586c3ca10287d8.webp",
     "visible": true
   },
   {
@@ -212,7 +212,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giảm phù nề sau chấn thương hoặc phẫu thuật.",
     "spec": "",
     "price": "70.500đ",
-    "image": "",
+    "image": "images/sheet/a0d4c7727be1d140b0bbffb9f22c5318.webp",
     "visible": true
   },
   {
@@ -224,7 +224,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Làm sạch bụi bẩn, giữ ẩm và làm dịu mắt; giảm khô, mỏi và kích ứng mắt.",
     "spec": "",
     "price": "20.000đ",
-    "image": "",
+    "image": "images/sheet/09f8ed2c86ebef66cd69aae46fad4e56.webp",
     "visible": true
   },
   {
@@ -236,7 +236,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Hỗ trợ điều trị suy giảm chức năng gan và các triệu chứng liên quan như ăn kém, khó tiêu, táo bón, mẩn ngứa do bệnh gan.",
     "spec": "",
     "price": "100.000đ",
-    "image": "",
+    "image": "images/sheet/24705113a63b5d3b7623aa847b50f3a0.webp",
     "visible": true
   },
   {
@@ -248,7 +248,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị bệnh trào ngược dạ dày–thực quản; dự phòng tái phát viêm thực quản đã lành và một số bệnh tăng tiết acid theo đơn.",
     "spec": "",
     "price": "305.000đ",
-    "image": "",
+    "image": "images/sheet/9268f31efc393ccf7cca9fc0b8ac0c98.webp",
     "visible": true
   },
   {
@@ -260,7 +260,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị lỵ, viêm ruột và tiêu chảy theo hướng dẫn thuốc.",
     "spec": "",
     "price": "11.500đ",
-    "image": "",
+    "image": "images/sheet/844612d6354210526eb62ac5bb9a4101.webp",
     "visible": true
   },
   {
@@ -272,7 +272,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Hỗ trợ tiêu hóa, giảm đầy hơi, chướng bụng và khó tiêu.",
     "spec": "",
     "price": "260.000đ",
-    "image": "",
+    "image": "images/sheet/b903ae74ea9a47c38bff2ad1aa6ac6bb.webp",
     "visible": true
   },
   {
@@ -284,7 +284,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị loét dạ dày, tá tràng, đợt cấp viêm dạ dày mạn; dùng trong phác đồ diệt H. pylori theo chỉ định.",
     "spec": "",
     "price": "362.300đ",
-    "image": "",
+    "image": "images/sheet/f6f0ce54d78757cd20d4852ac0d4c960.webp",
     "visible": true
   },
   {
@@ -296,7 +296,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị tăng cholesterol máu và rối loạn lipid máu, kết hợp chế độ ăn phù hợp, theo đơn.",
     "spec": "",
     "price": "445.000đ",
-    "image": "",
+    "image": "images/sheet/a10613272baca56d7001edb47b251dd8.webp",
     "visible": true
   },
   {
@@ -308,7 +308,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn do vi khuẩn nhạy cảm, gồm nhiễm khuẩn hô hấp, tiết niệu và một số nhiễm khuẩn khác theo đơn.",
     "spec": "",
     "price": "23.900đ",
-    "image": "",
+    "image": "images/sheet/97eb313e2d1908d131d06ab3ebc79c97.webp",
     "visible": true
   },
   {
@@ -320,7 +320,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị huyết áp cao và kiểm soát đau thắt ngực ổn định hoặc do co thắt mạch vành.",
     "spec": "",
     "price": "18.500đ",
-    "image": "",
+    "image": "images/sheet/2f179e0ef2639f2728e543b546e94f9c.webp",
     "visible": true
   },
   {
@@ -332,7 +332,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn mắt kèm đỏ, ngứa hoặc kích ứng theo hướng dẫn của bác sĩ.",
     "spec": "",
     "price": "14.500đ",
-    "image": "",
+    "image": "images/sheet/54e27d38acf18f9d20ce78c258435ead.webp",
     "visible": true
   },
   {
@@ -344,7 +344,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giảm tạm thời nghẹt mũi do cảm lạnh, viêm mũi dị ứng hoặc viêm xoang.",
     "spec": "",
     "price": "27.400đ",
-    "image": "",
+    "image": "images/sheet/9e1d098a0f8240dfbf479b0741d64d6c.webp",
     "visible": true
   },
   {
@@ -352,11 +352,11 @@ window.ANTIN_PRODUCTS = [
     "name": "Eugica candy mega (h/100v)",
     "brand": "Mega We Care",
     "category": "Hàng tiêu dùng",
-    "active": "",
-    "indication": "",
+    "active": "Tinh dầu bạc hà 7 mg, quế 1 mg, khuynh diệp 0,6 mg, gừng 0,6 mg, tần 0,5 mg/viên.",
+    "indication": "Kẹo thảo dược giúp làm ấm, thông cổ, dịu ho, giảm đau rát họng và khản tiếng.",
     "spec": "",
     "price": "70.500đ",
-    "image": "",
+    "image": "images/sheet/ad71ad0794a9e58283358ce0af6d0759.webp",
     "visible": true
   },
   {
@@ -368,7 +368,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giúp làm mềm, làm phẳng và giảm thâm sẹo sau khi vết thương đã liền kín.",
     "spec": "",
     "price": "190.000đ",
-    "image": "",
+    "image": "images/sheet/d1d34e71194c8f9481b885085036897b.webp",
     "visible": true
   },
   {
@@ -380,7 +380,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị viêm da đáp ứng corticoid kèm nhiễm khuẩn hoặc nhiễm nấm nhạy cảm, theo đơn.",
     "spec": "",
     "price": "14.100đ",
-    "image": "",
+    "image": "images/sheet/fdffc7a493d8009a6bf6c60a324cd01f.webp",
     "visible": true
   },
   {
@@ -392,7 +392,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "111.900đ",
-    "image": "",
+    "image": "images/sheet/e58ab36413e9c5a414fed73886fd7cb7.webp",
     "visible": true
   },
   {
@@ -404,7 +404,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Làm sạch dịu nhẹ vùng kín bên ngoài, phù hợp da nhạy cảm; giúp giảm cảm giác khó chịu và mùi hôi.",
     "spec": "",
     "price": "86.500đ",
-    "image": "",
+    "image": "images/sheet/b59dd8d8619b5606a3a0ac8ec6d4d969.webp",
     "visible": true
   },
   {
@@ -416,7 +416,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị đau bụng, rối loạn nhu động và khó chịu do rối loạn chức năng đường ruột theo đơn.",
     "spec": "",
     "price": "24.000đ",
-    "image": "",
+    "image": "images/sheet/de13858ea1ef8cbcb02ef9205ffdfcab.webp",
     "visible": true
   },
   {
@@ -428,7 +428,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "26.500đ",
-    "image": "",
+    "image": "images/sheet/5ae8d448e424e461acfe46a04ec00dcf.webp",
     "visible": true
   },
   {
@@ -440,7 +440,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị thiếu vitamin nhóm B, một số bệnh thần kinh và thiếu máu liên quan theo đơn; thuốc tiêm do nhân viên y tế sử dụng.",
     "spec": "",
     "price": "53.000đ",
-    "image": "",
+    "image": "images/sheet/15ad80b6ec640fb4763d9767768047d0.webp",
     "visible": true
   },
   {
@@ -452,7 +452,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn nhạy cảm ở đường hô hấp, tiết niệu, da và mô mềm, xương và khớp theo đơn.",
     "spec": "",
     "price": "56.000đ",
-    "image": "",
+    "image": "images/sheet/ec48d3293e9d6ffe0a080546db48e46b.webp",
     "visible": true
   },
   {
@@ -464,7 +464,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị tăng huyết áp, suy tim; dùng trong một số trường hợp sau nhồi máu cơ tim và bệnh thận do đái tháo đường típ 1.",
     "spec": "",
     "price": "56.000đ",
-    "image": "",
+    "image": "images/sheet/cbe98b56fdcd301e4fb7be4e6bf3cc5a.webp",
     "visible": true
   },
   {
@@ -476,7 +476,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Làm sạch khoang miệng, hỗ trợ giảm vi khuẩn, mảng bám và hôi miệng.",
     "spec": "",
     "price": "34.400đ",
-    "image": "",
+    "image": "images/sheet/726e54f1b70655b386d9060a01b7d264.webp",
     "visible": true
   },
   {
@@ -488,7 +488,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Dự phòng và điều trị thiếu máu do thiếu sắt; bổ sung sắt và acid folic khi có chỉ định.",
     "spec": "",
     "price": "130.800đ",
-    "image": "",
+    "image": "images/sheet/5d92e5d899261316ad4f632e34cde2f9.webp",
     "visible": true
   },
   {
@@ -500,7 +500,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giảm đau và viêm tại chỗ trong đau cơ, đau khớp, đau lưng, căng cơ, bầm tím hoặc bong gân.",
     "spec": "",
     "price": "42.000đ",
-    "image": "",
+    "image": "images/sheet/1081a44becddfbe33803bb44448637d0.webp",
     "visible": true
   },
   {
@@ -508,11 +508,11 @@ window.ANTIN_PRODUCTS = [
     "name": "Skinbibi cam namha (tube/10gr)",
     "brand": "Naphaco - Nam Hà",
     "category": "Dược mỹ phẩm",
-    "active": "",
-    "indication": "",
+    "active": "Thành phần chính: cúc La Mã, kẽm oxyd 10%, vitamin E, dexpanthenol.",
+    "indication": "Giúp giảm hăm da, mẩn ngứa do chàm hoặc côn trùng đốt; dưỡng ẩm và làm mềm da khô rát, nứt nẻ.",
     "spec": "",
     "price": "21.200đ",
-    "image": "",
+    "image": "images/sheet/854d481b597babb023a5c0a5d4fc04c6.webp",
     "visible": true
   },
   {
@@ -524,7 +524,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị viêm gan B mạn ở người lớn; phối hợp thuốc khác để điều trị hoặc dự phòng HIV theo phác đồ.",
     "spec": "",
     "price": "106.800đ",
-    "image": "",
+    "image": "images/sheet/650270e7aaf6417a1afba9a6c879695c.webp",
     "visible": true
   },
   {
@@ -536,7 +536,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều chỉnh rối loạn lipid máu, phối hợp thay đổi chế độ ăn theo chỉ định.",
     "spec": "",
     "price": "101.100đ",
-    "image": "",
+    "image": "images/sheet/650270e7aaf6417a1afba9a6c879695c.webp",
     "visible": true
   },
   {
@@ -548,7 +548,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Kiểm soát đường huyết trong đái tháo đường típ 2 khi ăn uống và vận động chưa đủ hiệu quả.",
     "spec": "",
     "price": "50.000đ",
-    "image": "",
+    "image": "images/sheet/bf0400a84695d1735dd7972823683271.webp",
     "visible": true
   },
   {
@@ -560,7 +560,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "128.400đ",
-    "image": "",
+    "image": "images/sheet/aa395cf1df52c597ae2ffdd784d59682.webp",
     "visible": true
   },
   {
@@ -572,7 +572,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "17.000đ",
-    "image": "",
+    "image": "images/sheet/e156f287cd37850f9503d4c1064d3969.webp",
     "visible": true
   },
   {
@@ -584,7 +584,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn nhạy cảm ở đường hô hấp, tai giữa hoặc tiết niệu theo đơn bác sĩ.",
     "spec": "",
     "price": "17.500đ",
-    "image": "",
+    "image": "images/sheet/89ff032ba8d2dc8f8f6da69a534ace54.webp",
     "visible": true
   },
   {
@@ -596,7 +596,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị loét dạ dày–tá tràng, viêm thực quản do trào ngược và hội chứng Zollinger–Ellison theo đơn.",
     "spec": "",
     "price": "24.000đ",
-    "image": "",
+    "image": "images/sheet/d03807672729d4c34ca79a0eca1d94be.webp",
     "visible": true
   },
   {
@@ -608,7 +608,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giảm triệu chứng tăng acid, viêm loét dạ dày–tá tràng và trào ngược dạ dày–thực quản.",
     "spec": "",
     "price": "55.500đ",
-    "image": "",
+    "image": "images/sheet/3efff51d32f7abcba79b3aa21398aa5c.webp",
     "visible": true
   },
   {
@@ -620,7 +620,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "16.000đ",
-    "image": "",
+    "image": "images/sheet/dfb99a6d792c4aa1395585ac8b8b51d4.webp",
     "visible": true
   },
   {
@@ -632,7 +632,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Phòng và điều trị thiếu kali theo chỉ định của bác sĩ.",
     "spec": "",
     "price": "88.000đ",
-    "image": "",
+    "image": "images/sheet/e85dbedda06ed467fc642298e4391ac1.webp",
     "visible": true
   },
   {
@@ -640,11 +640,11 @@ window.ANTIN_PRODUCTS = [
     "name": "Bổ phế nam hà chỉ khái lộ (c/125ml)",
     "brand": "Naphaco - Nam Hà",
     "category": "Thuốc không kê đơn",
-    "active": "",
-    "indication": "",
+    "active": "Bạch linh, bán hạ, cát cánh, cam thảo, tỳ bà diệp, bách bộ, tang bạch bì, mơ muối, ma hoàng, phèn chua, thiên môn, bạc hà diệp và tinh dầu bạc hà.",
+    "indication": "Chữa ho, tiêu đờm; dùng trong ho cảm, ho gió, ho khan và viêm phế quản.",
     "spec": "",
     "price": "47.300đ",
-    "image": "",
+    "image": "images/sheet/11154a653dc3b5241da123b3a7362d38.webp",
     "visible": true
   },
   {
@@ -656,7 +656,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "63.000đ",
-    "image": "",
+    "image": "images/sheet/80ed09365884db965247ba60a54dd4e2.webp",
     "visible": true
   },
   {
@@ -668,7 +668,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị tiêu chảy, viêm ruột cấp hoặc mạn, rối loạn tiêu hóa và đi ngoài phân sống.",
     "spec": "",
     "price": "23.900đ",
-    "image": "",
+    "image": "images/sheet/887fe2ad44195dd7e209a6ac3d92e4f6.webp",
     "visible": true
   },
   {
@@ -680,7 +680,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giảm đau thần kinh ở người lớn và hỗ trợ điều trị động kinh cục bộ theo đơn.",
     "spec": "",
     "price": "121.000đ",
-    "image": "",
+    "image": "images/sheet/c58c15581fd8bf7e58774687c95e1546.webp",
     "visible": true
   },
   {
@@ -692,7 +692,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "38.600đ",
-    "image": "",
+    "image": "images/sheet/dbc7e1c94a3cb96d5a149774a98dcd50.webp",
     "visible": true
   },
   {
@@ -704,7 +704,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Dầu xoa giảm đau, viêm tại chỗ trong đau cơ, đau vai, đau khớp, đau lưng, bầm tím hoặc bong gân.",
     "spec": "",
     "price": "30.200đ",
-    "image": "",
+    "image": "images/sheet/9dc4600557abcef0c8dca9bd0bb5065f.webp",
     "visible": true
   },
   {
@@ -716,7 +716,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "123.600đ",
-    "image": "",
+    "image": "images/sheet/a4cbb05fa86fe48265fee2ec73d8676a.webp",
     "visible": true
   },
   {
@@ -728,7 +728,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị một số nhiễm khuẩn nặng do vi khuẩn nhạy cảm khi bác sĩ xác định thuốc phù hợp.",
     "spec": "",
     "price": "203.000đ",
-    "image": "",
+    "image": "images/sheet/cfbb8d7a459a7e09ebdfc9b9500e3686.webp",
     "visible": true
   },
   {
@@ -740,7 +740,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giảm đau mức độ nhẹ đến vừa và hạ sốt.",
     "spec": "",
     "price": "10.800đ",
-    "image": "",
+    "image": "images/sheet/7fa1f9ac94a95ba0f2429eaeda56cbc9.webp",
     "visible": true
   },
   {
@@ -752,7 +752,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Phòng say tàu xe; giảm chóng mặt và buồn nôn do rối loạn tiền đình theo hướng dẫn thuốc.",
     "spec": "",
     "price": "12.900đ",
-    "image": "",
+    "image": "images/sheet/f741e09d3fa4fc109892c58de6792ac6.webp",
     "visible": true
   },
   {
@@ -764,7 +764,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị tiêu chảy cấp kết hợp bù nước; phòng tiêu chảy do kháng sinh và tái phát tiêu chảy do C. difficile.",
     "spec": "",
     "price": "119.000đ",
-    "image": "",
+    "image": "images/sheet/75bdd24ef6059392c5a48f7f4dfad0e7.webp",
     "visible": true
   },
   {
@@ -776,7 +776,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Kiểm soát đường huyết trong đái tháo đường típ 2, kết hợp chế độ ăn và vận động.",
     "spec": "",
     "price": "40.200đ",
-    "image": "",
+    "image": "images/sheet/2231add9923bb233a4aef7718b7e3153.webp",
     "visible": true
   },
   {
@@ -788,7 +788,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị thiếu vitamin PP, bệnh pellagra.",
     "spec": "",
     "price": "18.500đ",
-    "image": "",
+    "image": "images/sheet/079a4bdbc4b835a9159258cbf0c15fcf.webp",
     "visible": true
   },
   {
@@ -800,7 +800,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giảm triệu chứng viêm, thoái hóa khớp; điều trị đau cấp hoặc đau bụng kinh khi có chỉ định.",
     "spec": "",
     "price": "35.200đ",
-    "image": "",
+    "image": "images/sheet/054d0957c7750e882fd5a2d305fb493e.webp",
     "visible": true
   },
   {
@@ -812,7 +812,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm giun đũa, giun tóc, giun móc và giun kim đường ruột.",
     "spec": "",
     "price": "7.000đ",
-    "image": "",
+    "image": "images/sheet/a1863a4b89b1a916076d14f3126eb1de.webp",
     "visible": true
   },
   {
@@ -824,7 +824,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị tăng huyết áp và một số thể đau thắt ngực theo chỉ định của bác sĩ.",
     "spec": "",
     "price": "54.900đ",
-    "image": "",
+    "image": "images/sheet/cf71a2331d38edd3d73b77278b02ad4d.webp",
     "visible": true
   },
   {
@@ -836,7 +836,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Vệ sinh vùng kín bên ngoài, giúp dưỡng ẩm, làm mềm và duy trì môi trường pH phù hợp.",
     "spec": "",
     "price": "74.500đ",
-    "image": "",
+    "image": "images/sheet/63cfd61c2ba77fddda5e1ee7a13421f1.webp",
     "visible": true
   },
   {
@@ -848,7 +848,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị trào ngược dạ dày–thực quản, loét dạ dày–tá tràng và hội chứng tăng tiết acid Zollinger–Ellison.",
     "spec": "",
     "price": "70.000đ",
-    "image": "",
+    "image": "images/sheet/49bf239db659a2c08fa0c98b98b05ab7.webp",
     "visible": true
   },
   {
@@ -860,7 +860,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "130.200đ",
-    "image": "",
+    "image": "images/sheet/efad7949a1532fc64e2d890ba117f4bf.webp",
     "visible": true
   },
   {
@@ -872,7 +872,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giảm ho khan và ho do kích ứng họng hoặc phế quản.",
     "spec": "",
     "price": "47.000đ",
-    "image": "",
+    "image": "images/sheet/67b704b091a4e0f3874630303bac6ec0.webp",
     "visible": true
   },
   {
@@ -884,7 +884,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Tạo vị ngọt ít năng lượng cho người cần hạn chế đường. Không dùng cho người mắc phenylketon niệu.",
     "spec": "",
     "price": "64.000đ",
-    "image": "",
+    "image": "images/sheet/8cdfd70ab9b69027152621d80b725797.webp",
     "visible": true
   },
   {
@@ -896,7 +896,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn nhạy cảm ở hô hấp, tiết niệu, da và mô mềm; dùng theo đơn.",
     "spec": "",
     "price": "79.000đ",
-    "image": "",
+    "image": "images/sheet/e07545acf8a9ddfe06a93b032f979093.webp",
     "visible": true
   },
   {
@@ -908,7 +908,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn nhạy cảm ở đường hô hấp, tiết niệu, da và mô mềm theo đơn bác sĩ.",
     "spec": "",
     "price": "35.200đ",
-    "image": "",
+    "image": "images/sheet/f4687fe6683b3be6fd4d8a517d4ea0ce.webp",
     "visible": true
   },
   {
@@ -920,7 +920,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Hỗ trợ giảm ho, tiêu đờm, giảm hắt hơi, nghẹt mũi, sổ mũi do cảm; hỗ trợ sức đề kháng. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
     "price": "62.500đ",
-    "image": "",
+    "image": "images/sheet/98efb6d06c112c8c8ba5fdbfcae3de2c.webp",
     "visible": true
   },
   {
@@ -932,7 +932,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Hỗ trợ tuần hoàn và giảm nguy cơ hình thành huyết khối. Thực phẩm bảo vệ sức khỏe, không thay thế thuốc điều trị.",
     "spec": "",
     "price": "132.700đ",
-    "image": "",
+    "image": "images/sheet/271f8985cca7e22a5dd8ed27805fa4b3.webp",
     "visible": true
   },
   {
@@ -944,7 +944,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Cao dán giảm đau và viêm tại chỗ trong đau cơ, đau khớp, đau vai, đau lưng, bầm tím hoặc bong gân.",
     "spec": "",
     "price": "304.400đ",
-    "image": "",
+    "image": "images/sheet/b51edb5d92bafb6f2cfe45326223eec7.webp",
     "visible": true
   },
   {
@@ -956,7 +956,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Dùng trong đau bụng do lạnh, đầy trướng, khó tiêu và ho do cảm lạnh.",
     "spec": "",
     "price": "11.000đ",
-    "image": "",
+    "image": "images/sheet/f8a083e04d49d92dda9dbc53bc361c87.webp",
     "visible": true
   },
   {
@@ -968,7 +968,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Phối hợp điều trị suy tim mạn tính ổn định theo chỉ định của bác sĩ.",
     "spec": "",
     "price": "18.600đ",
-    "image": "",
+    "image": "images/sheet/cbd86b29ea6e042e0648a72a84c5e2d0.webp",
     "visible": true
   },
   {
@@ -980,7 +980,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn nhạy cảm ở đường hô hấp, tiết niệu, đường mật, da và mô mềm theo đơn.",
     "spec": "",
     "price": "134.000đ",
-    "image": "",
+    "image": "images/sheet/2272ac2c60337614b83dc62844806af8.webp",
     "visible": true
   },
   {
@@ -992,7 +992,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Cao dán giảm đau và viêm tại chỗ trong đau cổ, vai, lưng, cơ, khớp, bầm tím hoặc bong gân.",
     "spec": "",
     "price": "49.500đ",
-    "image": "",
+    "image": "images/sheet/a94adb8c675c63fc2b3daf4d7144f348.webp",
     "visible": true
   },
   {
@@ -1004,7 +1004,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Kiểm soát tăng acid uric lâu dài trong gút mạn và một số bệnh sỏi thận.",
     "spec": "",
     "price": "27.800đ",
-    "image": "",
+    "image": "images/sheet/50b57436c51160b8fb4ef89c630ffdf3.webp",
     "visible": true
   },
   {
@@ -1016,7 +1016,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Vệ sinh vùng kín bên ngoài, hỗ trợ khử mùi và giữ cảm giác sạch thoáng.",
     "spec": "",
     "price": "49.900đ",
-    "image": "",
+    "image": "images/sheet/eda14cfd78fe6fd3037abbd397a31e6d.webp",
     "visible": true
   },
   {
@@ -1028,7 +1028,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "50.500đ",
-    "image": "",
+    "image": "images/sheet/47938b1ea0c7129d75acea501f2f0d48.webp",
     "visible": true
   },
   {
@@ -1040,7 +1040,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị đau thần kinh, đau do xơ cơ và hỗ trợ điều trị động kinh cục bộ ở người lớn theo đơn.",
     "spec": "",
     "price": "135.700đ",
-    "image": "",
+    "image": "images/sheet/b037fc929484d7d4909020c559d79ce5.webp",
     "visible": true
   },
   {
@@ -1048,11 +1048,11 @@ window.ANTIN_PRODUCTS = [
     "name": "Thuốc ho bổ phế nam hà ngậm (h/24v)",
     "brand": "Naphaco - Nam Hà",
     "category": "Thuốc không kê đơn",
-    "active": "",
-    "indication": "",
+    "active": "Bạch linh, cát cánh, tỳ bà diệp, ô mai, tang bạch bì, bán hạ, bách bộ, cam thảo, thiên môn, bạc hà, xạ can, phèn chua, tinh dầu bạc hà và menthol.",
+    "indication": "Bổ phế, giảm ho, tiêu đờm; dùng trong ho do cảm lạnh, ho khan, ho có đờm, đau rát họng, khản tiếng và viêm phế quản.",
     "spec": "",
     "price": "28.800đ",
-    "image": "",
+    "image": "images/sheet/4d87ba6b5f82d37aa62ca831d545da51.webp",
     "visible": true
   },
   {
@@ -1064,7 +1064,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị một số nhiễm khuẩn nặng hoặc phức tạp khi kháng sinh thông thường không phù hợp, theo đơn bác sĩ.",
     "spec": "",
     "price": "92.000đ",
-    "image": "",
+    "image": "images/sheet/2a2e47ccdc0faa5065f74f5d8cf79e76.webp",
     "visible": true
   },
   {
@@ -1076,7 +1076,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị tại chỗ nhiễm khuẩn miệng, họng như đau họng, viêm miệng, viêm nướu.",
     "spec": "",
     "price": "40.000đ",
-    "image": "",
+    "image": "images/sheet/46dd667efbb870c6cc48e6a06a177093.webp",
     "visible": true
   },
   {
@@ -1088,7 +1088,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Làm loãng đờm trong các bệnh đường hô hấp có tăng tiết chất nhầy.",
     "spec": "",
     "price": "53.000đ",
-    "image": "",
+    "image": "images/sheet/0e4a0c26a3ec056d8129801e3cf95931.webp",
     "visible": true
   },
   {
@@ -1100,7 +1100,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn nhạy cảm ở hô hấp, tiết niệu, da và mô mềm; dùng theo đơn.",
     "spec": "",
     "price": "82.100đ",
-    "image": "",
+    "image": "images/sheet/f12bd1fcc2c6af362e5ec7bc939d4492.webp",
     "visible": true
   },
   {
@@ -1112,7 +1112,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nấm da, Candida ngoài da và lang ben.",
     "spec": "",
     "price": "22.000đ",
-    "image": "",
+    "image": "images/sheet/1f996b8eb5f972e408375549e8f4d3f6.webp",
     "visible": true
   },
   {
@@ -1124,7 +1124,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "108.600đ",
-    "image": "",
+    "image": "images/sheet/840c788a1c8dddfeb7a7fc66fb637d42.webp",
     "visible": true
   },
   {
@@ -1132,11 +1132,11 @@ window.ANTIN_PRODUCTS = [
     "name": "Methorphan siro traphaco (c/60ml)",
     "brand": "Traphaco",
     "category": "Thuốc kê đơn",
-    "active": "",
-    "indication": "",
+    "active": "Dextromethorphan hydrobromid, chlorpheniramin maleat và guaifenesin.",
+    "indication": "Giảm ho khan, ho do dị ứng hoặc cảm cúm; long đờm trong ho có đờm.",
     "spec": "",
     "price": "23.900đ",
-    "image": "",
+    "image": "images/sheet/84a479a1650d40730250590b6fc0d143.webp",
     "visible": true
   },
   {
@@ -1148,7 +1148,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị hoặc dự phòng một số nhiễm khuẩn kỵ khí; điều trị nhiễm Trichomonas theo đơn.",
     "spec": "",
     "price": "6.100đ",
-    "image": "",
+    "image": "images/sheet/b62470a746ab586a6a433351aafc1381.webp",
     "visible": true
   },
   {
@@ -1160,7 +1160,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn nhạy cảm mức độ nhẹ–vừa ở hô hấp, tiết niệu, da và mô mềm.",
     "spec": "",
     "price": "99.000đ",
-    "image": "",
+    "image": "images/sheet/8a9dee85c7aa529529a925b237b704df.webp",
     "visible": true
   },
   {
@@ -1172,7 +1172,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "24.200đ",
-    "image": "",
+    "image": "images/sheet/98af1e42636a7035383b7f506b052c83.webp",
     "visible": true
   },
   {
@@ -1184,7 +1184,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị kinh nguyệt không đều, đau bụng kinh; hỗ trợ hồi phục tử cung sau sinh. Không dùng khi mang thai.",
     "spec": "",
     "price": "28.500đ",
-    "image": "",
+    "image": "images/sheet/3356684310e3144295bbf78a073879e6.webp",
     "visible": true
   },
   {
@@ -1196,7 +1196,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị cơn gút cấp và dự phòng tái phát cơn gút theo đơn bác sĩ.",
     "spec": "",
     "price": "50.000đ",
-    "image": "",
+    "image": "images/sheet/c59dcfb4f5a6df3440ec5ae92bcd3ed2.webp",
     "visible": true
   },
   {
@@ -1208,7 +1208,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị lo âu ở người lớn khi cách điều trị thông thường không hiệu quả; chỉ dùng theo đơn bác sĩ.",
     "spec": "",
     "price": "16.100đ",
-    "image": "",
+    "image": "images/sheet/84e81d2120c3937ed3a28c6f41bbef6a.webp",
     "visible": true
   },
   {
@@ -1220,7 +1220,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Bổ sung vitamin, hỗ trợ sức đề kháng và phục hồi thể trạng khi mệt mỏi. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
     "price": "25.900đ",
-    "image": "",
+    "image": "images/sheet/c6aa4c8ba2c6cf18f7a843655fc8e58e.webp",
     "visible": true
   },
   {
@@ -1232,7 +1232,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị lo âu, căng thẳng, mất ngủ; giảm đau đầu, đau bụng kinh và một số đau đường tiêu hóa theo chỉ định.",
     "spec": "",
     "price": "102.000đ",
-    "image": "",
+    "image": "images/sheet/dd6ec12c44cee9c28e7d12a2bb378c41.webp",
     "visible": true
   },
   {
@@ -1244,7 +1244,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị viêm da đáp ứng corticoid kèm nhiễm khuẩn hoặc nhiễm nấm nhạy cảm, theo đơn.",
     "spec": "",
     "price": "20.900đ",
-    "image": "",
+    "image": "images/sheet/672910f6dbe3a785bf3e4cf45b7ab070.webp",
     "visible": true
   },
   {
@@ -1256,7 +1256,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn nhạy cảm ở đường hô hấp, tiết niệu, da, mô mềm hoặc răng miệng theo đơn.",
     "spec": "",
     "price": "83.000đ",
-    "image": "",
+    "image": "images/sheet/7b75764666d277cdff4da663215065fe.webp",
     "visible": true
   },
   {
@@ -1268,7 +1268,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Làm sạch khoang miệng, hỗ trợ giảm vi khuẩn, mảng bám và hôi miệng.",
     "spec": "",
     "price": "75.300đ",
-    "image": "",
+    "image": "images/sheet/1e1600f6d69214f75b467d8474d6174b.webp",
     "visible": true
   },
   {
@@ -1280,7 +1280,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Làm loãng đờm trong bệnh đường hô hấp có tăng tiết dịch phế quản bất thường.",
     "spec": "",
     "price": "47.300đ",
-    "image": "",
+    "image": "images/sheet/fa0b0d07406c9f7d5206cd872617613a.webp",
     "visible": true
   },
   {
@@ -1292,7 +1292,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "73.700đ",
-    "image": "",
+    "image": "images/sheet/fd507d04e75842221c6d2289c1695df3.webp",
     "visible": true
   },
   {
@@ -1304,7 +1304,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "54.800đ",
-    "image": "",
+    "image": "images/sheet/95ba229c15f922fa2bcb527e048e90b8.webp",
     "visible": true
   },
   {
@@ -1316,7 +1316,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị tăng huyết áp, suy tim và một số bệnh lý tim, thận theo đơn.",
     "spec": "",
     "price": "28.600đ",
-    "image": "",
+    "image": "images/sheet/aca6fd42b8c545847e7df7aa341b14c2.webp",
     "visible": true
   },
   {
@@ -1328,7 +1328,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Dùng trong suy giảm trí nhớ, kém tập trung, thiểu năng tuần hoàn não và hội chứng tiền đình theo hướng dẫn thuốc.",
     "spec": "",
     "price": "140.000đ",
-    "image": "",
+    "image": "images/sheet/72710e963036cf95f1bbeb5656d466f4.webp",
     "visible": true
   },
   {
@@ -1340,7 +1340,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giảm đau đầu, đau răng, đau cơ, đau lưng, đau bụng kinh và hạ sốt.",
     "spec": "",
     "price": "161.500đ",
-    "image": "",
+    "image": "images/sheet/838149aeeab9b178821a963d6067a41f.webp",
     "visible": true
   },
   {
@@ -1352,7 +1352,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn da như chốc lở, viêm nang lông và nhọt do vi khuẩn nhạy cảm, theo đơn.",
     "spec": "",
     "price": "37.400đ",
-    "image": "",
+    "image": "images/sheet/509038d8deaa1f4f06731e274e8e81d9.webp",
     "visible": true
   },
   {
@@ -1364,7 +1364,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn nhạy cảm, như Chlamydia, Mycoplasma và một số trường hợp mụn trứng cá theo đơn.",
     "spec": "",
     "price": "168.200đ",
-    "image": "",
+    "image": "images/sheet/c25dc76a442d4a5a159bda16be0f8491.webp",
     "visible": true
   },
   {
@@ -1376,7 +1376,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị khô mắt và rối loạn biểu mô kết - giác mạc theo chỉ định.",
     "spec": "",
     "price": "130.500đ",
-    "image": "",
+    "image": "images/sheet/9905cefd4e4af888cc55517298cc900d.webp",
     "visible": true
   },
   {
@@ -1388,7 +1388,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Sữa tắm làm sạch, giúp da mềm mịn và hạn chế rôm sảy; dùng cho trẻ em và người lớn.",
     "spec": "",
     "price": "35.200đ",
-    "image": "",
+    "image": "images/sheet/3820802f3fbdc80cf3694534584a8043.webp",
     "visible": true
   },
   {
@@ -1400,7 +1400,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn do vi khuẩn nhạy cảm như viêm phổi cộng đồng, viêm họng và viêm amidan theo đơn.",
     "spec": "",
     "price": "43.800đ",
-    "image": "",
+    "image": "images/sheet/97469bf4598d8c3c605909e133d5d556.webp",
     "visible": true
   },
   {
@@ -1408,11 +1408,11 @@ window.ANTIN_PRODUCTS = [
     "name": "Siro Prospan Syrup Engelhard Arznelmittel (C/100ml)",
     "brand": "Engelhard Arzneimittel",
     "category": "Thuốc không kê đơn",
-    "active": "",
-    "indication": "",
+    "active": "Cao khô lá thường xuân 7 mg/ml.",
+    "indication": "Viêm đường hô hấp cấp kèm ho; điều trị triệu chứng trong bệnh lý viêm phế quản mạn tính.",
     "spec": "",
     "price": "87.300đ",
-    "image": "",
+    "image": "images/sheet/1f14b211c32daa153214fcddba263194.webp",
     "visible": true
   },
   {
@@ -1424,7 +1424,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị tiêu chảy cấp do nhiễm khuẩn không có dấu hiệu xâm lấn; cần bù nước phù hợp.",
     "spec": "",
     "price": "36.500đ",
-    "image": "",
+    "image": "images/sheet/a7067a426cf71c72c6577b1a521cd9da.webp",
     "visible": true
   },
   {
@@ -1436,7 +1436,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Bổ sung vitamin C, hỗ trợ sức đề kháng và giảm nguy cơ thiếu vitamin C. Không phải thuốc.",
     "spec": "",
     "price": "23.000đ",
-    "image": "",
+    "image": "images/sheet/b8eef704dca2ff85e12205160f7d7394.webp",
     "visible": true
   },
   {
@@ -1448,7 +1448,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn răng miệng; phòng nhiễm khuẩn sau phẫu thuật răng miệng theo đơn.",
     "spec": "",
     "price": "60.300đ",
-    "image": "",
+    "image": "images/sheet/e6c3da7231673c32bde7404b92991ff5.webp",
     "visible": true
   },
   {
@@ -1460,7 +1460,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn nhạy cảm ở hô hấp, tiết niệu, da và mô mềm theo đơn.",
     "spec": "",
     "price": "236.400đ",
-    "image": "",
+    "image": "images/sheet/5a6690cd980d5bf0c2a00763972365ca.webp",
     "visible": true
   },
   {
@@ -1472,7 +1472,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Hỗ trợ giảm ho, tiêu đờm, giảm hắt hơi, nghẹt mũi, sổ mũi do cảm; hỗ trợ sức đề kháng. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
     "price": "96.900đ",
-    "image": "",
+    "image": "images/sheet/bf7d9c2a4cd25b5d25deb3ca12e81e5c.webp",
     "visible": true
   },
   {
@@ -1484,7 +1484,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giảm đau và viêm trong thoái hóa khớp, viêm khớp dạng thấp theo chỉ định.",
     "spec": "",
     "price": "25.100đ",
-    "image": "",
+    "image": "images/sheet/1709f50d2dd6c15d8bb80690bed00d89.webp",
     "visible": true
   },
   {
@@ -1496,7 +1496,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "86.500đ",
-    "image": "",
+    "image": "images/sheet/7830882584958a2228774fb2ed23458b.webp",
     "visible": true
   },
   {
@@ -1508,7 +1508,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị rối loạn chú ý, trí nhớ ở người cao tuổi và một số rối loạn tuần hoàn theo chỉ định.",
     "spec": "",
     "price": "33.200đ",
-    "image": "",
+    "image": "images/sheet/1c925836d8f172596246db660c42a35f.webp",
     "visible": true
   },
   {
@@ -1516,11 +1516,11 @@ window.ANTIN_PRODUCTS = [
     "name": "Kem chống nắng sunplay skin aqua clear white spf50+ (t/25g) (vàng)",
     "brand": "Rohto-Mentholatum",
     "category": "Dược mỹ phẩm",
-    "active": "",
-    "indication": "",
+    "active": "Thành phần chính: zinc oxide, ethylhexyl methoxycinnamate, diethylamino hydroxybenzoyl hexyl benzoate, bis-ethylhexyloxyphenol methoxyphenyl triazine; vitamin C, B3 và ceramide NP.",
+    "indication": "Chống nắng SPF50+ PA++++, dưỡng ẩm và giúp da sáng mịn; phù hợp da dầu, hỗn hợp và da thường.",
     "spec": "",
     "price": "92.200đ",
-    "image": "",
+    "image": "images/sheet/f54d63ca419251015cd34f8c2593f08c.webp",
     "visible": true
   },
   {
@@ -1532,7 +1532,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Kiểm soát đường huyết trong đái tháo đường típ 2 khi chế độ ăn đơn thuần chưa đủ.",
     "spec": "",
     "price": "119.400đ",
-    "image": "",
+    "image": "images/sheet/3fec37ef603d19ed0ed6f35e6ef71613.webp",
     "visible": true
   },
   {
@@ -1544,7 +1544,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giảm các triệu chứng cảm như sốt, đau đầu, đau họng, nghẹt mũi và ho.",
     "spec": "",
     "price": "144.200đ",
-    "image": "",
+    "image": "images/sheet/90c6e784c985ee4c48bfbf5be91a28e3.webp",
     "visible": true
   },
   {
@@ -1556,7 +1556,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "48.000đ",
-    "image": "",
+    "image": "images/sheet/eec6c0e9ab69c21ed2938928d57e573d.webp",
     "visible": true
   },
   {
@@ -1568,7 +1568,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "12.900đ",
-    "image": "",
+    "image": "images/sheet/f48516c9a658b92df03386ff6efd8554.webp",
     "visible": true
   },
   {
@@ -1580,7 +1580,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "35.000đ",
-    "image": "",
+    "image": "images/sheet/c7a4bbcc2758ca34d4bde12f99419212.webp",
     "visible": true
   },
   {
@@ -1592,7 +1592,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị hỗ trợ triệu chứng đau thắt ngực ổn định ở người lớn khi liệu pháp khác chưa kiểm soát tốt hoặc không dung nạp.",
     "spec": "",
     "price": "58.500đ",
-    "image": "",
+    "image": "images/sheet/9a4250d1e84954c83d9d1c29ae17fd09.webp",
     "visible": true
   },
   {
@@ -1604,7 +1604,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "380.000đ",
-    "image": "",
+    "image": "images/sheet/9af1ca4b13f2b0b3f7822f265d69fbd2.webp",
     "visible": true
   },
   {
@@ -1616,7 +1616,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị rối loạn tiết dịch phế quản trong bệnh viêm đường hô hấp có chỉ định.",
     "spec": "",
     "price": "42.700đ",
-    "image": "",
+    "image": "images/sheet/4c6e75660ee5440b61b6460245399be7.webp",
     "visible": true
   },
   {
@@ -1628,7 +1628,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Phòng và điều trị thiếu vitamin A, D; quáng gà do thiếu vitamin A, còi xương và nhuyễn xương do thiếu vitamin D.",
     "spec": "",
     "price": "33.000đ",
-    "image": "",
+    "image": "images/sheet/b36d3c584206b176ef7d9798fa50a957.webp",
     "visible": true
   },
   {
@@ -1640,7 +1640,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị bệnh lý thần kinh ngoại biên và thiếu máu hồng cầu to do thiếu vitamin B12 theo đơn.",
     "spec": "",
     "price": "97.300đ",
-    "image": "",
+    "image": "images/sheet/076c4494798af43a4794c73a06c2d184.webp",
     "visible": true
   },
   {
@@ -1652,7 +1652,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị tiêu chảy và hội chứng lỵ theo hướng dẫn sử dụng.",
     "spec": "",
     "price": "28.300đ",
-    "image": "",
+    "image": "images/sheet/2a5a9745efd35f70440722d0d328d681.webp",
     "visible": true
   },
   {
@@ -1664,7 +1664,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "50.000đ",
-    "image": "",
+    "image": "images/sheet/f6752a6064134a05ce93e54dec57edf8.webp",
     "visible": true
   },
   {
@@ -1676,7 +1676,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giảm viêm mũi dị ứng và mày đay mạn tính vô căn ở người lớn, trẻ từ 6 tuổi.",
     "spec": "",
     "price": "52.900đ",
-    "image": "",
+    "image": "images/sheet/1f80dff7711c4b3ef74adc2024a36822.webp",
     "visible": true
   },
   {
@@ -1688,7 +1688,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Dùng khi cần hỗ trợ tổng hợp protein trong chán ăn, suy dinh dưỡng, chậm phát triển hoặc hồi phục sau nhiễm khuẩn.",
     "spec": "",
     "price": "24.400đ",
-    "image": "",
+    "image": "images/sheet/9cac2a3ba0f6dffee46807375c2a52e4.webp",
     "visible": true
   },
   {
@@ -1700,7 +1700,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Kiểm soát đường huyết trong đái tháo đường típ 2, kết hợp chế độ ăn và vận động.",
     "spec": "",
     "price": "55.000đ",
-    "image": "",
+    "image": "images/sheet/f8d2a2c7671c4dcf7078c944f9470eb2.webp",
     "visible": true
   },
   {
@@ -1712,7 +1712,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Giảm triệu chứng tăng acid, viêm loét dạ dày–tá tràng và trào ngược dạ dày–thực quản.",
     "spec": "",
     "price": "58.000đ",
-    "image": "",
+    "image": "images/sheet/5e3650375865bf61f49ea9f028edf833.webp",
     "visible": true
   },
   {
@@ -1724,7 +1724,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Điều trị nhiễm khuẩn nhạy cảm ở đường hô hấp, tiết niệu, đường mật, da và mô mềm theo đơn.",
     "spec": "",
     "price": "130.000đ",
-    "image": "",
+    "image": "images/sheet/078a3aa01b64d39151211536c8cdc28e.webp",
     "visible": true
   },
   {
@@ -1736,7 +1736,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Dùng trong suy giảm trí nhớ, kém tập trung, căng thẳng thần kinh và hội chứng tiền đình theo hướng dẫn thuốc.",
     "spec": "",
     "price": "124.600đ",
-    "image": "",
+    "image": "images/sheet/09b35c8d0924ade129513ef801e03b01.webp",
     "visible": true
   },
   {
@@ -1748,7 +1748,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Chống viêm và ức chế miễn dịch trong một số bệnh viêm, tự miễn hoặc dị ứng nặng theo đơn bác sĩ.",
     "spec": "",
     "price": "42.200đ",
-    "image": "",
+    "image": "images/sheet/b4a4a18b8962e943633cc1504e7ab90f.webp",
     "visible": true
   },
   {
@@ -1760,7 +1760,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Cao dán giảm đau và viêm tại chỗ trong đau cơ, đau khớp, đau vai, đau lưng, bầm tím hoặc bong gân.",
     "spec": "",
     "price": "350.000đ",
-    "image": "",
+    "image": "images/sheet/1f644b3471ecb0d5eb398d84631ad9a9.webp",
     "visible": true
   },
   {
@@ -1828,8 +1828,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Kem ngừa mụn yoosun acnes đại bắc (t/15gr) (trắng)",
     "brand": "Đại Bắc",
     "category": "Dược mỹ phẩm",
-    "active": "",
-    "indication": "",
+    "active": "Thành phần nổi bật: chiết xuất hoa cúc tâm tư, rau má, lá neem, vỏ liễu và vitamin E.",
+    "indication": "Chăm sóc da mụn; giúp giảm mụn, mờ thâm và duy trì da trong điều kiện tốt.",
     "spec": "",
     "price": "45.000đ",
     "image": "",
@@ -2284,8 +2284,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Kem dưỡng ẩm cetaphil moisturizing cream galderma (t/50gr)",
     "brand": "Cetaphil",
     "category": "Dược mỹ phẩm",
-    "active": "",
-    "indication": "",
+    "active": "Thành phần chính: glycerin, petrolatum, dimethicone, panthenol, niacinamide và dầu hạnh nhân ngọt.",
+    "indication": "Dưỡng ẩm cho da khô, rất khô và nhạy cảm; giúp làm mềm và hỗ trợ hàng rào bảo vệ da.",
     "spec": "",
     "price": "138.000đ",
     "image": "",
@@ -2392,8 +2392,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Bổ phế nam hà chỉ khái lộ không đường (c/125ml) (xanh lá)",
     "brand": "Naphaco - Nam Hà",
     "category": "Thuốc không kê đơn",
-    "active": "",
-    "indication": "",
+    "active": "Bách bộ, tỳ bà diệp, tang bạch bì, bán hạ, cát cánh, bạc hà, mơ muối, thiên môn đông, bạch linh, xạ can, cam thảo, bạch phàn và tinh dầu bạc hà.",
+    "indication": "Chữa ho, tiêu đờm; dùng trong ho cảm, ho gió, ho khan và viêm phế quản.",
     "spec": "",
     "price": "56.200đ",
     "image": "",
@@ -2656,8 +2656,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Kem chống muỗi metholatum remos hương lavender rohto (tube/70g)",
     "brand": "Rohto-Mentholatum",
     "category": "Hàng tiêu dùng",
-    "active": "",
-    "indication": "",
+    "active": "Diethyltoluamide (DEET) 15%, vitamin E và lô hội.",
+    "indication": "Xua muỗi, giúp bảo vệ da khỏi muỗi đốt; đồng thời dưỡng ẩm da. Dùng ngoài da cho người lớn và trẻ trên 4 tuổi.",
     "spec": "",
     "price": "21.700đ",
     "image": "",
@@ -2668,8 +2668,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Eugica Candy Mega (Túi/15viên)",
     "brand": "Mega We Care",
     "category": "Thực phẩm chức năng",
-    "active": "",
-    "indication": "",
+    "active": "Tinh dầu bạc hà 7 mg, quế 1 mg, khuynh diệp 0,6 mg, gừng 0,6 mg, tần 0,5 mg/viên.",
+    "indication": "Kẹo thảo dược giúp làm ấm, thông cổ, dịu ho, giảm đau rát họng và khản tiếng.",
     "spec": "",
     "price": "11.900đ",
     "image": "",
@@ -2680,8 +2680,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Eugica Candy Cool Extra Mega (Gói/15viên)",
     "brand": "Mega We Care",
     "category": "Thực phẩm chức năng",
-    "active": "",
-    "indication": "",
+    "active": "Mỗi viên: menthol 9,65 mg, chiết xuất hoa cúc La Mã 6,675 mg, tinh dầu quế 1 mg, khuynh diệp 0,8 mg, gừng 0,6 mg, tần 0,5 mg.",
+    "indication": "Kẹo thảo dược giúp thơm miệng, thông cổ, làm dịu ho, đau rát họng và khản tiếng.",
     "spec": "",
     "price": "16.300đ",
     "image": "",
@@ -4240,8 +4240,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Ngậm ho prospan bolder arznelmittel (h/20v)",
     "brand": "Engelhard Arzneimittel",
     "category": "Thuốc không kê đơn",
-    "active": "",
-    "indication": "",
+    "active": "Cao khô lá thường xuân 26 mg/viên ngậm.",
+    "indication": "Tiêu nhầy, giảm ho trong viêm đường hô hấp; dùng cho người lớn và trẻ từ 6 tuổi.",
     "spec": "",
     "price": "81.500đ",
     "image": "",
@@ -4300,8 +4300,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Xương khớp magnesium calcium d3 aktiv Doppelherz (H/30v)",
     "brand": "Doppelherz",
     "category": "Thực phẩm chức năng",
-    "active": "",
-    "indication": "",
+    "active": "Magiê 250 mg, canxi 450 mg và vitamin D3 10 microgam/viên.",
+    "indication": "Bổ sung magiê, canxi và vitamin D3; hỗ trợ xương chắc khỏe. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
     "price": "334.000đ",
     "image": "",
@@ -4312,8 +4312,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Bổ sung vitamin az depot doppel queisser (h/30v)",
     "brand": "Queisser",
     "category": "Thực phẩm chức năng",
-    "active": "",
-    "indication": "",
+    "active": "Vitamin A, B1, B2, B3, B5, B6, B7, B9, B12, C, D, E, K và các khoáng chất: canxi, magiê, crôm, sắt, iốt, kali, đồng, mangan, molybden, phospho, selen, kẽm.",
+    "indication": "Bổ sung vitamin và khoáng chất; hỗ trợ tăng cường sức khỏe, sức đề kháng. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
     "price": "346.100đ",
     "image": "",
@@ -4324,8 +4324,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Bổ máu haemo vital doppel queisser (h/30v)",
     "brand": "Queisser",
     "category": "Thực phẩm chức năng",
-    "active": "",
-    "indication": "",
+    "active": "Sắt 20 mg, kẽm 5 mg, đồng 500 microgam, vitamin A 400 microgam, B2 1,4 mg, B6 1,4 mg, B12 2,5 microgam/viên.",
+    "indication": "Bổ sung sắt; hỗ trợ cải thiện thiếu máu do thiếu sắt. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
     "price": "337.000đ",
     "image": "",
@@ -4420,8 +4420,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Giảm ho kinder thymepect doppelherz (c/100ml)",
     "brand": "Doppelherz",
     "category": "Thực phẩm chức năng",
-    "active": "",
-    "indication": "",
+    "active": "Mỗi 5 ml: chiết xuất cỏ xạ hương 126 mg, nước ép quả cơm cháy 65 mg và mật ong 650 mg.",
+    "indication": "Hỗ trợ giảm ho có đờm, giảm kích ứng đường hô hấp và tăng sức đề kháng. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
     "price": "234.100đ",
     "image": "",
@@ -4432,8 +4432,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Hỗ Trợ Tăng Cường Sức Đề Kháng Cho Trẻ Kinder Optima Doppelherz (C/100ml)",
     "brand": "Doppelherz",
     "category": "Thực phẩm chức năng",
-    "active": "",
-    "indication": "",
+    "active": "L-lysin, vitamin A, nhóm B, C, D3, E cùng magiê, kẽm, mangan, iốt và sắt.",
+    "indication": "Bổ sung lysin, vitamin và khoáng chất; hỗ trợ trẻ ăn ngon, tiêu hóa và phát triển khỏe mạnh. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
     "price": "319.700đ",
     "image": "",
@@ -4456,8 +4456,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Sủi vitamin tổng hợp AZ Fizz Doppelherz (t/13v)",
     "brand": "Doppelherz",
     "category": "Thực phẩm chức năng",
-    "active": "",
-    "indication": "",
+    "active": "Vitamin A, B1, B2, B3, B5, B6, B7, B9, B12, C, D3, E, K cùng canxi, magiê, crôm, iốt, molybden, phospho, selen và kẽm.",
+    "indication": "Bổ sung vitamin và khoáng chất thiết yếu; hỗ trợ sức khỏe và sức đề kháng. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
     "price": "82.400đ",
     "image": "",
@@ -4468,8 +4468,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Bổ Não Omega 3 Doppelherz (H/30V)",
     "brand": "Doppelherz",
     "category": "Thực phẩm chức năng",
-    "active": "",
-    "indication": "",
+    "active": "Dầu cá cung cấp omega-3 (EPA, DHA), vitamin E, acid folic, vitamin B6 và B12.",
+    "indication": "Bổ sung omega-3 và vitamin nhóm B; hỗ trợ duy trì mạch máu khỏe mạnh và tăng cường sức khỏe. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
     "price": "280.000đ",
     "image": "",
@@ -4600,8 +4600,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Sữa Rửa Mặt Cetaphil Gentle Skin Cleanser (c/473ml)",
     "brand": "Cetaphil",
     "category": "Dược mỹ phẩm",
-    "active": "",
-    "indication": "",
+    "active": "Thành phần chính: glycerin, niacinamide (vitamin B3), panthenol (tiền vitamin B5).",
+    "indication": "Làm sạch dịu nhẹ, duy trì độ ẩm và bảo vệ hàng rào da; phù hợp da nhạy cảm.",
     "spec": "",
     "price": "318.000đ",
     "image": "",
@@ -4624,8 +4624,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Hỗ trợ xương khớp osteoblast henry blooms (c/60v)",
     "brand": "Henry Blooms",
     "category": "Thực phẩm chức năng",
-    "active": "",
-    "indication": "",
+    "active": "Canxi 500 mg, vitamin D3 12,5 microgam, K1 23 microgam, K2 45 microgam; magiê, kẽm, mangan, đồng, boron và silic/viên.",
+    "indication": "Bổ sung dưỡng chất; hỗ trợ phát triển, khoáng hóa, mật độ xương và sức mạnh cơ.",
     "spec": "",
     "price": "340.600đ",
     "image": "",
@@ -4996,8 +4996,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Remos xịt hương lavender rohto (c/70ml)",
     "brand": "Rohto-Mentholatum",
     "category": "Hàng tiêu dùng",
-    "active": "",
-    "indication": "",
+    "active": "Diethyltoluamide (DEET) 15%, vitamin E và lô hội.",
+    "indication": "Xua muỗi, giúp bảo vệ da khỏi muỗi đốt; đồng thời dưỡng ẩm da. Dùng ngoài da cho người lớn và trẻ trên 4 tuổi.",
     "spec": "",
     "price": "36.300đ",
     "image": "",
@@ -5428,8 +5428,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Bổ não Aktiv Ginkgo B vitamins Choline Doppel Herz (H/30v)",
     "brand": "Doppelherz",
     "category": "Thực phẩm chức năng",
-    "active": "",
-    "indication": "",
+    "active": "Chiết xuất lá bạch quả 100 mg, choline 100 mg, vitamin B1, B2, B5, acid folic, B12 và kẽm.",
+    "indication": "Hỗ trợ tuần hoàn não, khả năng tập trung và trí nhớ. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
     "price": "325.200đ",
     "image": "",
@@ -5512,8 +5512,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Siro Hỗ Trợ Tăng Cường Sức Đề Kháng Cho Trẻ Kinder Immune Doppelherz (C/150ml)",
     "brand": "Doppelherz",
     "category": "Thực phẩm chức năng",
-    "active": "",
-    "indication": "",
+    "active": "Mỗi 10 ml: vitamin A 300 microgam, D3 5 microgam, E 12 mg, C 150 mg, kẽm 5 mg, selen 8,25 microgam.",
+    "indication": "Bổ sung vitamin và khoáng chất; hỗ trợ chức năng miễn dịch, sức đề kháng và phục hồi sức khỏe. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
     "price": "318.400đ",
     "image": "",
@@ -5740,8 +5740,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Vitamin D3 + K2 Doppelherz (H/30v)",
     "brand": "Doppelherz",
     "category": "Thực phẩm chức năng",
-    "active": "",
-    "indication": "",
+    "active": "Vitamin D3 35 microgam và vitamin K2 100 microgam/viên.",
+    "indication": "Bổ sung vitamin D3, K2; hỗ trợ tăng hấp thu canxi. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
     "price": "347.600đ",
     "image": "",
@@ -5764,8 +5764,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Kem dưỡng ẩm Vaseline Original Protecting Jelly (Hũ/5.5g)",
     "brand": "Vaseline Unilever",
     "category": "Dược mỹ phẩm",
-    "active": "",
-    "indication": "",
+    "active": "Petrolatum (sáp dầu khoáng).",
+    "indication": "Dưỡng ẩm, khóa ẩm, làm mềm và bảo vệ vùng da khô, nứt nẻ.",
     "spec": "",
     "price": "19.000đ",
     "image": "",
@@ -5836,8 +5836,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Sáp dưỡng ẩm Vaseline Original Protecting Jelly (Hũ/250ml)",
     "brand": "Vaseline Unilever",
     "category": "Dược mỹ phẩm",
-    "active": "",
-    "indication": "",
+    "active": "Petrolatum (sáp dầu khoáng).",
+    "indication": "Dưỡng ẩm, khóa ẩm, làm mềm và bảo vệ vùng da khô, nứt nẻ.",
     "spec": "",
     "price": "103.000đ",
     "image": "",
@@ -5872,8 +5872,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Kem Chống Nắng Cực Mạnh Sunplay Super Block SPF50+ (C/30gr)",
     "brand": "Rohto-Mentholatum",
     "category": "Dược mỹ phẩm",
-    "active": "",
-    "indication": "",
+    "active": "Thành phần chính: ethylhexyl methoxycinnamate, zinc oxide, titanium dioxide, diethylamino hydroxybenzoyl hexyl benzoate; panthenol, rau má, vitamin C, E và hyaluronic acid.",
+    "indication": "Bảo vệ da trước tia UV, dưỡng ẩm; phù hợp vận động ngoài trời hoặc dưới nước.",
     "spec": "",
     "price": "88.700đ",
     "image": "",
@@ -6220,8 +6220,8 @@ window.ANTIN_PRODUCTS = [
     "name": "Sữa rửa mặt Cetaphil Gentle Skin Cleanser (C/118ml)",
     "brand": "Cetaphil",
     "category": "Dược mỹ phẩm",
-    "active": "",
-    "indication": "",
+    "active": "Thành phần chính: glycerin, niacinamide (vitamin B3), panthenol (tiền vitamin B5).",
+    "indication": "Làm sạch dịu nhẹ, duy trì độ ẩm và bảo vệ hàng rào da; phù hợp da nhạy cảm.",
     "spec": "",
     "price": "117.000đ",
     "image": "",

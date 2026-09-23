@@ -3,6 +3,7 @@ import { resolve, relative, isAbsolute } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { runInNewContext, Script } from 'node:vm';
 import { createHash } from 'node:crypto';
+import { syncImages } from './sync-images.mjs';
 
 export function readWindow(source, key) {
   const context = { window: {} };
@@ -140,6 +141,11 @@ export async function syncPrices({ root = process.cwd(), token = process.env.GOO
   const products = readWindow(source, 'ANTIN_PRODUCTS');
   const values = await fetchPriceValues(config, token, fetchImpl);
   const result = updateCatalogue(products, values, config.PRICE_MULTIPLIER);
+  const images = await syncImages(root, result.products, values, fetchImpl);
+  result.products = images.products;
+  result.imageFailures = images.failures;
+  result.imagesDownloaded = images.downloaded;
+  result.changes = result.products.filter(p => JSON.stringify(products.find(old => old.productId === p.productId)) !== JSON.stringify(p)).map(p => ({productId:p.productId}));
   const output = renderUpdate(source, html, result);
   await validateAssets(root, output.html, result.products);
   if (result.changes.length) {
@@ -154,6 +160,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
     const result = await syncPrices();
     const summary = `Checked ${result.products.length} catalogue products; changed ${result.changes.length}; added ${result.added}; contact price ${result.uncertain.length}.`;
     console.log(summary);
+    console.log(`Product images downloaded: ${result.imagesDownloaded}; failed: ${result.imageFailures.length}.`);
+    for (const failure of result.imageFailures) console.log(`::warning::Product ${failure.productId}: image update failed (${failure.reason}); previous image retained.`);
     for (const id of result.uncertain) console.log(`::warning::Product ${id}: price missing, invalid, or conflicting; using Lien he.`);
     if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, summary + '\n');
   } catch (error) {

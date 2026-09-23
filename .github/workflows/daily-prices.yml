@@ -49,10 +49,10 @@ jobs:
       - name: Commit changed catalogue and cache version
         run: |
           git diff --check
-          if ! git diff --quiet -- catalogue.js index.html; then
+          if [ -n "$(git status --porcelain -- catalogue.js index.html images/sheet)" ]; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add -- catalogue.js index.html
+            git add -- catalogue.js index.html images/sheet
             git commit -m "Update MIENNAM catalogue from Data san"
             git push origin HEAD:main
           fi
