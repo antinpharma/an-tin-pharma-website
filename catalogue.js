@@ -19,7 +19,7 @@ window.ANTIN_PRODUCTS = [
     "spec": "Hộp 14 viên",
     "price": "322.000đ",
     "active": "Esomeprazole 40mg",
-    "indication": "Điều trị viêm thực quản do trào ngược; điều trị hội chứng Zollinger–Ellison; điều trị kéo dài sau dự phòng tái xuất huyết loét dạ dày–tá tràng bằng đường tĩnh mạch.",
+    "indication": "Người lớn: điều trị trào ngược dạ dày–thực quản (GERD), gồm làm lành viêm xước thực quản, kiểm soát triệu chứng và duy trì để tránh tái phát sau khi lành; phối hợp kháng sinh tiệt trừ Helicobacter pylori để chữa loét tá tràng và ngăn loét dạ dày–tá tràng tái phát; chữa loét dạ dày và dự phòng loét dạ dày–tá tràng ở người có nguy cơ phải dùng NSAID liên tục; tiếp tục điều trị sau liệu pháp đường tĩnh mạch ngăn tái xuất huyết do loét dạ dày–tá tràng; điều trị hội chứng Zollinger–Ellison. Trẻ vị thành niên từ 12 tuổi: điều trị GERD và phối hợp kháng sinh chữa loét tá tràng do H. pylori. Hàm lượng và liều dùng do bác sĩ lựa chọn theo từng chỉ định.",
     "image": "images/sheet/16d8d1aad1b86b0cc826c63b721729ff.webp",
     "visible": true
   },
