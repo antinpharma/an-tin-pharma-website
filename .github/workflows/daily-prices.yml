@@ -59,7 +59,7 @@ jobs:
       - name: Prepare public website files
         run: |
           mkdir _site
-          cp index.html app.js accounts.js config.js catalogue.js style.css logo.svg .nojekyll _site/
+          cp index.html app.js accounts.js config.js catalogue.js product-groups.js style.css logo.svg .nojekyll _site/
           cp -R images _site/images
           cp -R data _site/data
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3

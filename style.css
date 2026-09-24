@@ -37,6 +37,33 @@ h1 span{color:var(--orange)}
 .trust-grid b{display:block;color:var(--orange);font-size:22px}
 .trust-grid span{font-size:13px;color:var(--muted)}
 .categories{display:flex;gap:10px;flex-wrap:wrap;padding:26px 0 8px}
+.catalogue-layout{display:grid;grid-template-columns:254px minmax(0,1fr);gap:24px;align-items:start;padding-top:20px}
+.catalogue-results{min-width:0}
+.catalogue-results .section-title{margin-top:0;gap:16px}
+.catalogue-results .section-title small{white-space:nowrap}
+.catalogue-results .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.group-sidebar{position:sticky;top:96px;min-width:0}
+.group-panel{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+.group-panel>summary{padding:17px 16px;background:var(--cream);font-weight:750;color:#a74120;cursor:pointer}
+.group-panel>summary small{display:none}
+#productGroups{padding:8px;max-height:calc(100dvh - 185px);overflow-y:auto;scrollbar-width:thin}
+@media(min-width:981px){.has-cart #productGroups{max-height:calc(100dvh - 300px)}}
+.group-section{border-top:1px solid var(--line);margin-top:5px;padding-top:5px}
+.group-section>summary{position:relative;display:flex;align-items:center;gap:10px;padding:13px 22px 13px 8px;font-weight:650;font-size:14px;cursor:pointer;list-style:none;line-height:1.45}
+.group-section>summary::-webkit-details-marker{display:none}
+.group-section>summary:after{content:'';position:absolute;right:7px;width:6px;height:6px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);top:18px}
+.group-section[open]>summary:after{transform:rotate(225deg);top:22px}
+.group-section.has-selection>summary{color:#b34420}
+.group-section>summary>span:first-child{flex:1}
+.group-button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:44px;padding:10px;border:1px solid transparent;border-radius:8px;background:#fff;text-align:left;color:var(--text);font-size:14px;line-height:1.5;cursor:pointer}
+.group-button:hover{background:#fff8ef}
+.group-button.active{background:#fff0df;border-color:#f2c79d;color:#a83b16;font-weight:700}
+.group-count{flex-shrink:0;min-width:23px;text-align:center;font-size:12px;font-weight:500;color:var(--muted);background:#f5f5f3;border-radius:6px;padding:2px 4px}
+.group-button.active .group-count{background:#ffe0be;color:#923712}
+.filter-status{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 18px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--cream);font-size:13px;line-height:1.5}
+.filter-status span{overflow-wrap:anywhere}
+.filter-status button{flex-shrink:0;min-height:40px;padding:6px 10px;border:1px solid #efcfb3;border-radius:8px;background:#fff;color:#a74120;cursor:pointer}
+.product-group-label{align-self:flex-start;background:#f3f7f3;color:#3b664c;padding:4px 8px;border-radius:6px;font-size:12px;line-height:1.4}
 .chip{border:1px solid #efcfb3;background:#fff;border-radius:999px;padding:10px 16px;cursor:pointer}
 .chip.active{background:linear-gradient(135deg,var(--orange),var(--amber));color:#fff;border-color:transparent}
 .section-title{display:flex;align-items:end;justify-content:space-between;margin:28px 0 16px}
@@ -149,6 +176,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible,t
 .cart-summary.has-direct-order .cart-buttons .zalo-checkout{background:#fff;color:#087b46;border:1px solid #a9d0bb;grid-row:auto}
 @media(min-width:981px) and (max-width:1170px){.links{display:none}}
 @media(max-width:980px){
+  .catalogue-layout{grid-template-columns:minmax(0,1fr);gap:20px}
+  .group-sidebar{position:static}
+  .group-panel>summary small{display:block;margin-top:4px;font-weight:400;color:var(--muted)}
+  #productGroups{max-height:60dvh}
+  .catalogue-results .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .links{display:none}
   .grid{grid-template-columns:repeat(2,1fr)}
   .hero-inner{grid-template-columns:1fr}
@@ -248,6 +280,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible,t
 .search{min-width:0}.search input{min-width:0}
 @media(max-width:1300px){.links{display:none}}
 @media(max-width:640px){
+  .catalogue-results .grid{grid-template-columns:minmax(0,1fr)}
+  .catalogue-results .section-title{flex-wrap:wrap;gap:8px}
   .header .nav{gap:8px}.account-toggle{padding:8px;font-size:12px;gap:5px}
   .logo{min-width:0}.brand strong{font-size:16px}.brand span{font-size:11px}
   .account-dialog{width:calc(100% - 20px);max-height:calc(100dvh - 20px);border-radius:14px}

@@ -39,6 +39,7 @@ Khách hàng xem sản phẩm, giá, hoạt chất, chỉ định và liên hệ
 - app.js: logic website
 - config.js: Facebook, Zalo và cấu hình
 - catalogue.js: dữ liệu catalogue public
+- product-groups.js: nhóm duyệt sản phẩm theo Product ID, độc lập với product_category trong Sheet; mã chưa được rà soát vào “Chưa phân nhóm”. Khi thêm nhóm mới, cập nhật kiểm thử scripts/product-groups.test.mjs.
 - images/: ảnh sản phẩm public
 
 ## Contact
