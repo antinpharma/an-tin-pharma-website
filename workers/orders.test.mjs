@@ -78,6 +78,50 @@ test('network ambiguity never reports success or blindly resends; token stays ou
   assert.equal((await receiver.fetch(request())).status,409);
   assert.equal(calls,1);
 });
+
+test('a 50-product order sends every part outside the short lock, even with overlapping retries',async t=>{
+  const many=Array.from({length:50},(_,i)=>({...products[0],productId:String(i),name:'Sản phẩm '.repeat(20),spec:'Quy cách '.repeat(20)}));
+  const input={...body(),items:many.map(p=>({productId:p.productId,quantity:1}))};
+  const expected=buildMessages(validateOrder(input),many),storage=state();
+  let locked=false,calls=0,release,started;
+  const began=new Promise(resolve=>{started=resolve;}),hold=new Promise(resolve=>{release=resolve;});
+  const block=storage.blockConcurrencyWhile;
+  storage.blockConcurrencyWhile=callback=>block(async()=>{locked=true;try{return await callback();}finally{locked=false;}});
+  t.mock.method(globalThis,'fetch',async(url,options)=>{
+    if(url===env.CATALOGUE_URL) return new Response('window.ANTIN_PRODUCTS = '+JSON.stringify(many)+';');
+    assert.equal(locked,false,'Zalo network calls must not hold the 30-second lock');
+    assert.equal(JSON.parse(options.body).text,expected[calls++]);
+    if(calls===1){started();await hold;}
+    return Response.json({ok:true,result:{message_id:'part-'+calls}});
+  });
+  assert.ok(expected.length>2);
+  const receiver=new OrderReceiver(storage,env),first=receiver.fetch(request(input));
+  await began;
+  const duplicate=receiver.fetch(request(input));
+  assert.equal((await receiver.fetch(request({...input,customer:{name:'Changed',phone:'0905561550'}}))).status,409);
+  release();
+  for(const response of await Promise.all([first,duplicate])) assert.deepEqual(await response.json(),{ok:true,requestId:id});
+  assert.equal(calls,expected.length);
+  // A restarted object must still recognize the completed receipt.
+  assert.equal((await new OrderReceiver(storage,env).fetch(request(input))).status,200);
+  assert.equal(calls,expected.length);
+});
+
+test('failure partway through a long order never reports success or resends accepted parts',async t=>{
+  const many=Array.from({length:50},(_,i)=>({...products[0],productId:String(i),name:'Sản phẩm '.repeat(20),spec:'Quy cách '.repeat(20)}));
+  const input={...body(),items:many.map(p=>({productId:p.productId,quantity:1}))},storage=state();
+  let calls=0;
+  t.mock.method(globalThis,'fetch',async url=>{
+    if(url===env.CATALOGUE_URL) return new Response('window.ANTIN_PRODUCTS = '+JSON.stringify(many)+';');
+    if(++calls===3) throw new Error('Connection lost');
+    return Response.json({ok:true,result:{message_id:'part-'+calls}});
+  });
+  const receiver=new OrderReceiver(storage,env),response=await receiver.fetch(request(input));
+  assert.equal(response.status,502);
+  assert.equal((await response.json()).uncertain,true);
+  for(const instance of [receiver,new OrderReceiver(storage,env)]) assert.equal((await instance.fetch(request(input))).status,409);
+  assert.equal(calls,3);
+});
 test('requests from other origins and unauthenticated admin calls are rejected before provider access',async()=>{
   assert.equal((await worker.fetch(new Request('https://worker.test/orders',{method:'POST',headers:{Origin:'https://evil.test'},body:'{}'}),env)).status,403);
   assert.equal((await worker.fetch(new Request('https://worker.test/admin/check',{method:'POST',body:'{}'}),env)).status,403);

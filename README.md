@@ -64,7 +64,7 @@ Giỏ hàng lưu sản phẩm trên trình duyệt. Khách có thể chọn/bỏ
 
 - Worker tự đọc catalogue đã xuất bản và tính giá; không tin giá, nội dung thông báo hoặc người nhận do trình duyệt gửi lên. Giá chưa xác định giữ “Liên hệ”. Đây là yêu cầu liên hệ xác nhận hàng, chưa phải thanh toán hoặc xác nhận đơn bán.
 - Cùng một mã yêu cầu và nội dung được chống gửi trùng trong 30 ngày. Khi phản hồi Zalo không rõ ràng, website báo chưa xác nhận; khách liên hệ kèm mã yêu cầu để kiểm tra, không tự gửi lại thông báo có thể đã được nhận.
-- Tối đa 3 yêu cầu mới/phút/địa chỉ IP và 2 tin nhắn Zalo/yêu cầu; danh sách quá dài cần chia nhỏ. Kiểm tra Origin và giới hạn IP chỉ giảm gửi nhầm/spam cơ bản, không thay thế cơ chế xác thực khách hàng.
+- Tối đa 3 yêu cầu mới/phút/địa chỉ IP và 50 loại sản phẩm/yêu cầu; danh sách tự chia thành các tin nhắn Zalo có đánh số phần. Bước gửi Zalo nằm ngoài khóa 30 giây của Durable Object; các lần gửi lặp đang xử lý cùng chờ một kết quả, không gửi lại. Trình duyệt chờ tối đa 3 phút cho đơn dài. Kiểm tra Origin và giới hạn IP chỉ giảm gửi nhầm/spam cơ bản, không thay thế cơ chế xác thực khách hàng.
 - Durable Object lưu tài khoản nhận, mã băm nội dung và trạng thái gửi; không lưu tên, số điện thoại hoặc nội dung đơn. Thông báo có các thông tin khách cung cấp được chuyển tới Zalo. Log Worker mặc định tắt.
 - Khi cần tạm ngừng, để trống `ORDER_API_URL` rồi triển khai lại website; khách vẫn sử dụng chức năng sao chép và mở Zalo.
 

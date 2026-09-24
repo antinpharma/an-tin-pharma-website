@@ -279,7 +279,7 @@ async function sendDirectOrder(event){
   try{
     requestId=await orderAttempt(payload);
     const response=await fetch(CONFIG.ORDER_API_URL,{
-      method:'POST',headers:{'Content-Type':'application/json',...window.AntinAccount.headers()},body:JSON.stringify({requestId,...payload}),signal:AbortSignal.timeout(30000),credentials:'omit',redirect:'error'
+      method:'POST',headers:{'Content-Type':'application/json',...window.AntinAccount.headers()},body:JSON.stringify({requestId,...payload}),signal:AbortSignal.timeout(180000),credentials:'omit',redirect:'error'
     });
     const result=await response.json();
     if(!response.ok || result.ok!==true || result.requestId!==requestId){

@@ -152,7 +152,7 @@ export default {
 };
 
 export class OrderReceiver {
-  constructor(state,env){this.state=state;this.env=env;}
+  constructor(state,env){this.state=state;this.env=env;this.inFlight=new Map();}
   async fetch(request){
     try{
       const path=new URL(request.url).pathname,body=await request.json();
@@ -176,17 +176,23 @@ export class OrderReceiver {
         });
         return json({ok:true,paired:true});
       }
-      // Serialize the receipt reservation and provider call: duplicate submits cannot send twice.
-      return await this.state.blockConcurrencyWhile(async()=>{
-        try{return await this.receive(body,request.headers.get('X-Client-Key'));}
-        catch(error){return json({error:error instanceof OrderError?error.message:'Dịch vụ tạm thời chưa sẵn sàng.'},error instanceof OrderError?error.status:503);}
-      });
+      const order=validateOrder(body),fingerprint=await hash(JSON.stringify(order));
+      const active=this.inFlight.get(order.requestId);
+      if(active){
+        if(active.fingerprint!==fingerprint) throw new OrderError('Mã yêu cầu đã dùng cho nội dung khác.',409);
+        return (await active.promise).clone();
+      }
+      // Retries share the ongoing delivery; persisted receipts protect across restarts.
+      const promise=this.receive(order,request.headers.get('X-Client-Key'),fingerprint);
+      this.inFlight.set(order.requestId,{fingerprint,promise});
+      try{return (await promise).clone();}
+      finally{this.inFlight.delete(order.requestId);}
     }catch(error){return json({error:error instanceof OrderError?error.message:'Dịch vụ tạm thời chưa sẵn sàng.'},error instanceof OrderError?error.status:503);}
   }
-  async receive(body,clientKey){
-    const order=validateOrder(body),owner=await this.state.storage.get('owner');
+  async reserve(order,clientKey,fingerprint){
+    const owner=await this.state.storage.get('owner');
     if(!owner) throw new OrderError('Dịch vụ nhận đơn đang được thiết lập. Vui lòng liên hệ Zalo trực tiếp.',503);
-    const fingerprint=await hash(JSON.stringify(order)),key='order:'+order.requestId;
+    const key='order:'+order.requestId;
     const previous=await this.state.storage.get(key);
     if(previous){
       if(previous.hash!==fingerprint) throw new OrderError('Mã yêu cầu đã dùng cho nội dung khác.',409);
@@ -201,15 +207,24 @@ export class OrderReceiver {
     const res=await fetch(this.env.CATALOGUE_URL,{signal:AbortSignal.timeout(5000),redirect:'manual',cache:'no-store'});
     if(!res.ok) throw new OrderError('Chưa kiểm tra được danh mục hiện hành.',503);
     const messages=buildMessages(order,readCatalogue(await res.text()));
-    // Keep provider calls inside the Durable Object's 30-second critical section.
-    if(messages.length>2) throw new OrderError('Danh sách quá dài. Vui lòng chia thành các yêu cầu nhỏ hơn.');
     await this.state.storage.put(key,{hash:fingerprint,status:'sending',time:now});
+    return {key,owner,messages,time:now};
+  }
+  async receive(order,clientKey,fingerprint){
+    // Only reserve under the 30-second lock. A long order must not reset the object
+    // while Zalo is accepting its messages. Never retry a delivery after uncertainty.
+    const plan=await this.state.blockConcurrencyWhile(async()=>{
+      try{return await this.reserve(order,clientKey,fingerprint);}
+      catch(error){return json({error:error instanceof OrderError?error.message:'Dịch vụ tạm thời chưa sẵn sàng.'},error instanceof OrderError?error.status:503);}
+    });
+    if(plan instanceof Response) return plan;
+    const {key,owner,messages,time}=plan;
     try{
       for(const text of messages){
         const result=await zalo(this.env,'sendMessage',{chat_id:owner,text});
         if(!result?.message_id) throw new Error('Missing receipt');
       }
-      await this.state.storage.put(key,{hash:fingerprint,status:'sent',time:now});
+      await this.state.storage.put(key,{hash:fingerprint,status:'sent',time});
       return json({ok:true,requestId:order.requestId});
     }catch{
       return json({error:'Chưa xác nhận gửi đủ danh sách. Vui lòng liên hệ Zalo và cung cấp mã yêu cầu để kiểm tra.',requestId:order.requestId,uncertain:true},502);
