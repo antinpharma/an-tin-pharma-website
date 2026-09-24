@@ -2,7 +2,7 @@ name: Update prices and deploy website
 
 on:
   schedule:
-    - cron: '30 3 * * *' # 10:30 Asia/Ho_Chi_Minh (UTC+7)
+    - cron: '7,22,37,52 * * * *' # Every 15 minutes; avoid the busy start of each hour.
   workflow_dispatch:
   push:
     branches: [main]
@@ -19,6 +19,8 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      publish: ${{ steps.catalogue.outputs.publish }}
     permissions:
       contents: write
       id-token: write
@@ -42,32 +44,42 @@ jobs:
           token_format: access_token
           access_token_scopes: https://www.googleapis.com/auth/spreadsheets.readonly
           create_credentials_file: false
-      - name: Read Data san and update catalogue
+      - name: Read Data san A-G and backup product details
         env:
           GOOGLE_ACCESS_TOKEN: ${{ steps.google.outputs.access_token }}
         run: node scripts/sync-prices.mjs
       - name: Commit changed catalogue and cache version
+        id: catalogue
+        env:
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           git diff --check
+          publish=false
           if [ -n "$(git status --porcelain -- catalogue.js index.html images/sheet)" ]; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             git add -- catalogue.js index.html images/sheet
-            git commit -m "Update MIENNAM catalogue from Data san"
+            git commit -m "Sync MIENNAM prices and backup product details"
             git push origin HEAD:main
+            publish=true
           fi
+          if [ "$EVENT_NAME" != "schedule" ]; then publish=true; fi
+          echo "publish=$publish" >> "$GITHUB_OUTPUT"
       - name: Prepare public website files
+        if: steps.catalogue.outputs.publish == 'true'
         run: |
           mkdir _site
           cp index.html app.js accounts.js config.js catalogue.js product-groups.js style.css logo.svg .nojekyll _site/
           cp -R images _site/images
           cp -R data _site/data
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        if: steps.catalogue.outputs.publish == 'true'
         with:
           path: _site
 
   deploy:
     needs: sync
+    if: needs.sync.outputs.publish == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

@@ -12,12 +12,14 @@ Website catalogue responsive cho An Tín Pharma.
 
 ## Đồng bộ danh mục và giá tự động
 
-- Nguồn duy nhất: [Data sàn](https://docs.google.com/spreadsheets/d/1TEOQde1O0JoikDJJnIbe6sdpGl3GL76kJf1hQ_MapCU/edit), tab `check`; tiêu đề dòng 2. Đọc A:W bằng quyền Sheets, xuất riêng các trường được phép lên website.
-- Lịch: 10h30 Việt Nam mỗi ngày (cron `30 3 * * *`, UTC), đồng thời chạy khi push lên `main`.
+- [Data sàn](https://docs.google.com/spreadsheets/d/1TEOQde1O0JoikDJJnIbe6sdpGl3GL76kJf1hQ_MapCU/edit), tab `check`, tiêu đề dòng 2: chỉ đọc A:G để lấy mã, miền, tên, hãng, danh mục và giá. Không xuất `Check tồn` lên website.
+- [Data sàn backup 1](https://docs.google.com/spreadsheets/d/1AlreWSLbHiXHGP9BqdMH1WC_wVyEbV3pRREXVuD3r9k/edit), tab `Sheet1`, tiêu đề dòng 1: đọc A:J nhưng chỉ dùng Product ID + miền để ghép H `Hoạt chất`, I `Chỉ định`, J `link ảnh URL`. Bỏ qua tên, giá và tồn kho cũ trong backup. Tuyệt đối không dùng H:J của Data sàn vì thứ tự dòng có thể thay đổi.
+- Lịch: mỗi 15 phút (phút 07, 22, 37, 52 mỗi giờ), đồng thời chạy khi push lên `main`. Đây là đồng bộ định kỳ, không phải thời gian thực từng giây; GitHub có thể chạy trễ. Lần chạy theo lịch không có thay đổi sẽ bỏ qua triển khai Pages.
 - Chạy ngay: GitHub → Actions → **Update prices and deploy website** → **Run workflow** → nhánh `main`.
-- Chỉ ghép chính xác Product ID và `sales_region_code = MIENNAM`; `retail_price_value` hiện đã là đồng, không nhân 1.000 (người dùng xác nhận ngày 23/09/2026).
-- Dòng MIENNAM mới tự thêm sản phẩm. Đồng bộ tên (`product_name`), hãng (`brand`), nhóm (`product_category`), `Hoạt chất`, `Chỉ định`, `Quy cách` nếu có. Ô trống giữ thông tin cũ; sản phẩm mới chưa có thông tin hiển thị “Đang cập nhật”. Không đoán dữ liệu thuốc.
-- Giữ ảnh hiện có theo Product ID, tiếp tục quy trình ảnh Drive/mirror repository. Không thay ảnh từ cột `Ảnh`, không xuất cột `Check tồn`. Sản phẩm mới chưa được gắn ảnh dùng ô “Ảnh sản phẩm”. Không tự xóa sản phẩm đang có khi dòng nguồn bị thiếu.
+- Chỉ ghép chính xác Product ID và `sales_region_code = MIENNAM`; nguồn mới trả giá theo nghìn đồng, nhân 1.000 (người dùng xác nhận lại ngày 24/09/2026): 113 → 113.000đ, 322 → 322.000đ. Nếu phần lớn giá đột ngột tăng/giảm khoảng 1.000 lần, dừng đồng bộ và xác nhận lại hệ số, không tự đoán.
+- Dòng MIENNAM mới trong Data sàn tự thêm sản phẩm. Đồng bộ tên (`product_name`), hãng (`brand`), nhóm (`product_category`) từ Data sàn; hoạt chất, chỉ định từ backup. Ô trống hoặc không có mã trong backup giữ thông tin cũ; sản phẩm mới thiếu thông tin hiển thị “Đang cập nhật”. Giữ quy cách hiện có. Không đoán dữ liệu thuốc.
+- Ảnh từ J trong backup được tải về `images/sheet` rồi ghép theo đúng Product ID miền Nam. Hiện hỗ trợ CDN `cdn-gcs.thuocsi.vn`. URL trống hoặc tải lỗi giữ ảnh cũ; không xóa ảnh cũ. Sản phẩm chưa có ảnh dùng ô “Ảnh sản phẩm”. Không tự xóa sản phẩm khi vắng trong nguồn; mã chỉ có trong backup chưa tự tạo sản phẩm bán mới.
+- Khi bổ sung nội dung: tìm Product ID ở backup rồi điền H:I:J trên cùng dòng. Có thể sắp xếp **toàn bộ A:J**, không sắp xếp riêng H:I:J. Không cần giữ thứ tự dòng giữa hai file giống nhau. Nếu mã miền Nam bị trùng nhưng nội dung khác nhau, dừng đồng bộ để tránh gán nhầm.
 - Giá thiếu/không hợp lệ/mâu thuẫn dùng “Liên hệ”. Nguồn không đọc được, không có dữ liệu miền Nam hoặc sai tiêu đề thì workflow thất bại và giữ website đã triển khai.
 - Danh mục hoặc giá thay đổi sẽ tạo commit cho `catalogue.js` và cache trong `index.html`. Trình duyệt chỉ đọc catalogue đã xuất bản; không đọc CSV công khai hoặc quay về Sheet `San pham` cũ. Workflow tự triển khai Pages bằng artifact chỉ chứa file website, kể cả khi commit của bot không kích hoạt lần build mới.
 - Xem kết quả và số sản phẩm thay đổi trong Actions → lần chạy → Summary. Kiểm tra cài đặt thông báo GitHub Actions nếu muốn nhận email khi chạy lỗi.
@@ -25,7 +27,7 @@ Website catalogue responsive cho An Tín Pharma.
 ## Xác thực Google
 
 Service account: `antin-price-reader@learned-surge-310713.iam.gserviceaccount.com`.
-Sheet cần chia sẻ **Người xem** cho email này. Giữ truy cập chung **Bị hạn chế**.
+Cả hai Sheet cần chia sẻ **Người xem** cho email này. Giữ truy cập chung **Bị hạn chế**.
 Workflow dùng provider `projects/793819880924/locations/global/workloadIdentityPools/antin-github/providers/github`, giới hạn repository và nhánh `main` ở phía Google Cloud.
 Không cần khóa JSON hoặc GitHub Secret cho Google; token ngắn hạn dùng scope `spreadsheets.readonly`, chỉ truyền vào bước đọc nguồn, không lưu vào file hay artifact.
 

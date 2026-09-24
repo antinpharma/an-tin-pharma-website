@@ -52,18 +52,18 @@ export function updatePrices(products, values, multiplier=1000) {
 }
 
 export function updateCatalogue(products,values,multiplier){
-  const headers=values?.[1];
+  // Data san owns A:G only. Its manually maintained H:J can drift after refresh.
+  const headers=values?.[1]?.slice(0,7);
   const required=['product_id','sales_region_code','product_name','brand','product_category','retail_price_value'];
   if(!Array.isArray(headers)||required.some(name=>headers.filter(h=>h===name).length!==1))throw new Error('Expected unique catalogue headers in row 2. Catalogue was not changed.');
   const columns=Object.fromEntries(headers.map((header,index)=>[header,index]));
-  for(const name of ['Hoạt chất','Chỉ định','Quy cách'])if(headers.filter(h=>h===name).length>1)throw new Error('Ambiguous catalogue headers. Catalogue was not changed.');
   const text=value=>typeof value==='string'?value.trim():'';
   const byId=new Map();
   for(const row of values.slice(2)){
     if(row[columns.sales_region_code]!=='MIENNAM')continue;
     const productId=String(row[columns.product_id]??'').trim();
     if(!productId)throw new Error('A MIENNAM product is missing its Product ID. Catalogue was not changed.');
-    const details={name:text(row[columns.product_name]),brand:text(row[columns.brand]),category:text(row[columns.product_category]),active:text(row[columns['Hoạt chất']]),indication:text(row[columns['Chỉ định']]),spec:text(row[columns['Quy cách']])};
+    const details={name:text(row[columns.product_name]),brand:text(row[columns.brand]),category:text(row[columns.product_category])};
     if(!details.name)throw new Error(`Product ${productId} has no source name. Catalogue was not changed.`);
     if(byId.has(productId)&&JSON.stringify(byId.get(productId))!==JSON.stringify(details))throw new Error(`Product ${productId} has conflicting source details. Catalogue was not changed.`);
     byId.set(productId,details);
@@ -81,23 +81,74 @@ export function updateCatalogue(products,values,multiplier){
   let added=0;
   for(const [productId,source] of byId){
     if(original.has(productId))continue;
-    merged.push({productId,...source,category:source.category||'Khác',price:'Liên hệ',image:'',visible:true});added++;
+    merged.push({productId,...source,category:source.category||'Khác',active:'',indication:'',spec:'',price:'Liên hệ',image:'',visible:true});added++;
   }
   const priced=updatePrices(merged,values,multiplier);
   const changes=priced.products.filter(p=>JSON.stringify(original.get(p.productId))!==JSON.stringify(p)).map(p=>({productId:p.productId}));
   return {...priced,changes,added};
 }
 
-export async function fetchPriceValues(config, token, fetchImpl = fetch) {
-  if (!token) throw new Error('Missing GOOGLE_ACCESS_TOKEN.');
-  if (config.PRICE_REGION !== 'MIENNAM' || ![1,1000].includes(config.PRICE_MULTIPLIER)) {
-    throw new Error('Expected MIENNAM and an explicit price multiplier.');
+export function readProductDetails(values) {
+  // Backup Sheet1 has its header in row 1, unlike Data san's row 2.
+  const headers = values?.[0]?.map(h => String(h).normalize('NFC').trim().toLowerCase());
+  const required = ['product_id','sales_region_code','hoạt chất','chỉ định','link ảnh url'];
+  if (!Array.isArray(headers) || required.some(h => headers.filter(v => v === h).length !== 1)) {
+    throw new Error('Expected unique product detail headers in backup row 1. Catalogue was not changed.');
   }
-  const source = new URL(config.PRICE_SOURCE_SHEET_URL);
+  const [idCol, regionCol, activeCol, indicationCol, imageCol] = required.map(h => headers.indexOf(h));
+  const byId = new Map();
+  for (const row of values.slice(1)) {
+    if (row[regionCol] !== 'MIENNAM') continue;
+    const id = String(row[idCol] ?? '').trim();
+    if (!id) throw new Error('A backup MIENNAM product is missing its Product ID.');
+    const detail = {};
+    for (const [field,col] of [['active',activeCol],['indication',indicationCol],['imageUrl',imageCol]]) {
+      const value = row[col];
+      if (value != null && typeof value !== 'string') throw new Error(`Invalid backup ${field} for product ${id}.`);
+      detail[field] = value?.trim() || '';
+      if (/^#(?:REF!|N\/A|VALUE!|ERROR!|DIV\/0!|NAME\?|NUM!|SPILL!)/.test(detail[field])) throw new Error(`Sheet error in backup ${field} for product ${id}.`);
+    }
+    if (byId.has(id) && JSON.stringify(byId.get(id)) !== JSON.stringify(detail)) throw new Error(`Conflicting backup details for product ${id}.`);
+    byId.set(id, detail);
+  }
+  if (!byId.size) throw new Error('No MIENNAM product details found in backup.');
+  return byId;
+}
+
+export function updateProductDetails(products, byId) {
+  return products.map(product => {
+    const details = byId.get(String(product.productId));
+    const updated = {...product};
+    for (const field of ['active','indication']) if (details?.[field]) updated[field] = details[field];
+    return updated;
+  });
+}
+
+export function validatePriceScale(before, after) {
+  // Detect a feed-wide unit change; never guess a new multiplier automatically.
+  const parse = value => typeof value === 'string' && /^\d{1,3}(?:\.\d{3})*đ$/.test(value)
+    ? Number(value.replace(/[.đ]/g,'')) : null;
+  const previous = new Map(before.map(p => [String(p.productId),parse(p.price)]));
+  let compared = 0, unitShift = 0;
+  for (const p of after) {
+    const oldPrice = previous.get(String(p.productId)), newPrice = parse(p.price);
+    if (!oldPrice || !newPrice) continue;
+    compared++;
+    const ratio = newPrice / oldPrice;
+    if ((ratio >= 0.0008 && ratio <= 0.0012) || (ratio >= 800 && ratio <= 1200)) unitShift++;
+  }
+  if (compared >= 10 && unitShift / compared >= 0.8) {
+    throw new Error('Possible 1000x price unit change. Confirm PRICE_MULTIPLIER against Data san before publishing. Catalogue was not changed.');
+  }
+}
+
+async function fetchSheetValues(sheetUrl, sheetName, columns, token, fetchImpl) {
+  if (!token) throw new Error('Missing GOOGLE_ACCESS_TOKEN.');
+  const source = new URL(sheetUrl);
   const id = source.hostname === 'docs.google.com'
     && source.pathname.match(/^\/spreadsheets\/d\/([\w-]+)(?:\/|$)/)?.[1];
-  if (!id || !config.PRICE_SHEET_NAME) throw new Error('Invalid price source configuration.');
-  const range = "'" + config.PRICE_SHEET_NAME.replaceAll("'", "''") + "'!A1:W";
+  if (!id || !sheetName) throw new Error('Invalid Sheet source configuration.');
+  const range = "'" + sheetName.replaceAll("'", "''") + "'!A1:" + columns;
   const url = new URL(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(range)}`);
   url.searchParams.set('valueRenderOption', 'UNFORMATTED_VALUE');
   const response = await fetchImpl(url, {
@@ -109,6 +160,15 @@ export async function fetchPriceValues(config, token, fetchImpl = fetch) {
   const data = await response.json();
   if (!Array.isArray(data.values)) throw new Error('Empty Sheets response. Catalogue was not changed.');
   return data.values;
+}
+
+export async function fetchPriceValues(config, token, fetchImpl = fetch) {
+  if (config.PRICE_REGION !== 'MIENNAM' || ![1,1000].includes(config.PRICE_MULTIPLIER)) throw new Error('Expected MIENNAM and an explicit price multiplier.');
+  return fetchSheetValues(config.PRICE_SOURCE_SHEET_URL, config.PRICE_SHEET_NAME, 'G', token, fetchImpl);
+}
+
+export async function fetchDetailValues(config, token, fetchImpl = fetch) {
+  return fetchSheetValues(config.DETAIL_SOURCE_SHEET_URL, config.DETAIL_SHEET_NAME, 'J', token, fetchImpl);
 }
 
 export function renderUpdate(source, html, result) {
@@ -139,9 +199,16 @@ export async function syncPrices({ root = process.cwd(), token = process.env.GOO
   for (const text of [source, configSource, app]) new Script(text);
   const config = readWindow(configSource, 'ANTIN_CONFIG');
   const products = readWindow(source, 'ANTIN_PRODUCTS');
-  const values = await fetchPriceValues(config, token, fetchImpl);
+  const [values, detailValues] = await Promise.all([
+    fetchPriceValues(config, token, fetchImpl), fetchDetailValues(config, token, fetchImpl),
+  ]);
+  const details = readProductDetails(detailValues);
   const result = updateCatalogue(products, values, config.PRICE_MULTIPLIER);
-  const images = await syncImages(root, result.products, values, fetchImpl);
+  validatePriceScale(products, result.products);
+  result.products = updateProductDetails(result.products, details);
+  const imageValues = [[], ['product_id','sales_region_code','link ảnh URL'],
+    ...[...details].map(([id,detail]) => [id,'MIENNAM',detail.imageUrl])];
+  const images = await syncImages(root, result.products, imageValues, fetchImpl);
   result.products = images.products;
   result.imageFailures = images.failures;
   result.imagesDownloaded = images.downloaded;

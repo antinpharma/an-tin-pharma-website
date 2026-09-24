@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Script } from 'node:vm';
-import { updatePrices, updateCatalogue, renderUpdate, readWindow, syncPrices, validateAssets } from './sync-prices.mjs';
+import { updatePrices, updateCatalogue, readProductDetails, updateProductDetails, validatePriceScale, renderUpdate, readWindow, syncPrices, validateAssets } from './sync-prices.mjs';
 import { syncImages, imageSources } from './sync-images.mjs';
 import sharp from 'sharp';
 
@@ -46,7 +46,7 @@ const products = [
   { productId: '1505', name: 'Nexium MUPS 40mg', price: '322.000đ', indication: 'Existing indication', visible: true },
 ];
 
-test('Data san imports only southern catalogue fields, keeps old images and uses dong directly', () => {
+test('Data san imports only A:G, ignores drifting H:J, keeps old images and uses dong directly', () => {
   const original = structuredClone(products);
   const values = [[], [...headers, 'Check tồn', 'Hoạt chất', 'Chỉ định', 'Ảnh'],
     [...row(1146, 'MIENNAM', 113000), 'PRIVATE STOCK', '', '', 'https://example.com/replacement.jpg'],
@@ -64,7 +64,8 @@ test('Data san imports only southern catalogue fields, keeps old images and uses
   assert.equal(result.products[1].indication, products[1].indication);
   assert.equal(result.products[1].price, 'Liên hệ');
   assert.equal(result.products[2].price, '322.000đ');
-  assert.equal(result.products[2].active, 'Source active');
+  assert.equal(result.products[2].active, '');
+  assert.equal(result.products[2].indication, '');
   assert.equal(result.products[2].image, '');
   assert.doesNotMatch(JSON.stringify(result.products), /PRIVATE STOCK|example\.com|9999/);
   assert.deepEqual(products, original);
@@ -144,7 +145,7 @@ test('sync uses authenticated unformatted read; failure leaves files intact; rep
   try {
     const source = 'window.ANTIN_PRODUCTS = ' + JSON.stringify(products) + ';';
     const html = '<script src="config.js"></script><script src="catalogue.js?v=old"></script>';
-    const config = { PRICE_SOURCE_SHEET_URL: 'https://docs.google.com/spreadsheets/d/test-id/edit', PRICE_SHEET_NAME: 'check', PRICE_REGION: 'MIENNAM', PRICE_MULTIPLIER: 1000 };
+    const config = { PRICE_SOURCE_SHEET_URL: 'https://docs.google.com/spreadsheets/d/test-id/edit', PRICE_SHEET_NAME: 'check', PRICE_REGION: 'MIENNAM', PRICE_MULTIPLIER: 1000, DETAIL_SOURCE_SHEET_URL:'https://docs.google.com/spreadsheets/d/backup-id/edit', DETAIL_SHEET_NAME:'Sheet1' };
     await Promise.all(Object.entries({ 'catalogue.js': source, 'index.html': html, 'config.js': 'window.ANTIN_CONFIG = ' + JSON.stringify(config) + ';', 'app.js': '', 'logo.svg': '<svg/>' }).map(([name, text]) => writeFile(join(root, name), text)));
     for (const fetchImpl of [async () => ({ ok: false, status: 403 }), async () => { throw new Error('Network unavailable'); }, async () => ({ ok: true, json: async () => ({ values: [] }) })]) {
       await assert.rejects(syncPrices({ root, token: 'test-only', fetchImpl }));
@@ -154,8 +155,12 @@ test('sync uses authenticated unformatted read; failure leaves files intact; rep
     const fetchImpl = async (url, options) => {
       assert.equal(url.hostname, 'sheets.googleapis.com');
       assert.equal(url.searchParams.get('valueRenderOption'), 'UNFORMATTED_VALUE');
-      assert.match(decodeURIComponent(url.pathname), /'check'!A1:W$/);
       assert.equal(options.headers.Authorization, 'Bearer test-only');
+      if (url.pathname.includes('/backup-id/')) {
+        assert.match(decodeURIComponent(url.pathname), /'Sheet1'!A1:J$/);
+        return {ok:true,json:async()=>({values:[detailHeaders,[1146,'MIENNAM','','','']]})};
+      }
+      assert.match(decodeURIComponent(url.pathname), /'check'!A1:G$/);
       return { ok: true, json: async () => ({ values: table(row(1146, 'MIENNAM', 113), row(1505, 'MIENNAM', 322)) }) };
     };
     assert.equal((await syncPrices({ root, token: 'test-only', fetchImpl })).changes.length, 2);
@@ -163,7 +168,68 @@ test('sync uses authenticated unformatted read; failure leaves files intact; rep
     assert.equal(readWindow(after, 'ANTIN_PRODUCTS')[0].price, '113.000đ');
     assert.equal((await syncPrices({ root, token: 'test-only', fetchImpl })).changes.length, 0);
     assert.equal(await readFile(join(root, 'catalogue.js'), 'utf8'), after);
+    // A backup-only failure must also leave the previous catalogue and cache intact.
+    const afterHtml = await readFile(join(root,'index.html'),'utf8');
+    for (const backupResponse of [{ok:false,status:403},{ok:true,json:async()=>({values:[['bad header']]})}]) {
+      await assert.rejects(syncPrices({root,token:'test-only',fetchImpl:(url,options)=>url.pathname.includes('/backup-id/')?Promise.resolve(backupResponse):fetchImpl(url,options)}));
+      assert.equal(await readFile(join(root,'catalogue.js'),'utf8'),after);
+      assert.equal(await readFile(join(root,'index.html'),'utf8'),afterHtml);
+    }
   } finally {
     await rm(root, { recursive: true, force: true });
+  }
+});
+
+const detailHeaders = ['product_id','sales_region_code','Hoạt chất','Chỉ định','link ảnh URL'];
+
+test('feed-wide 1000x unit changes stop publication; ordinary price changes and contact prices remain valid',()=>{
+  const before = Array.from({length:20},(_,i)=>({productId:String(i),price:'113.000đ'}));
+  const after = price=>before.map(p=>({...p,price}));
+  assert.throws(()=>validatePriceScale(before,after('113đ')),/1000x/);
+  assert.throws(()=>validatePriceScale(before,after('113.000.000đ')),/1000x/);
+  assert.doesNotThrow(()=>validatePriceScale(before,after('114.000đ')));
+  assert.doesNotThrow(()=>validatePriceScale(before,after('Liên hệ')));
+  assert.doesNotThrow(()=>validatePriceScale(before,[{...before[0],price:'113đ'},...before.slice(1)]));
+});
+
+test('backup joins exact southern IDs regardless of row order and never supplies price or name', () => {
+  const values = [[], [...headers,'Check tồn','Hoạt chất','Chỉ định','link ảnh URL'],
+    [...row(1505,'MIENNAM',322000),'PRIVATE STOCK','Wrong drug','Wrong use','https://wrong-image'],
+    [...row(1146,'MIENNAM',113000),'PRIVATE STOCK','Shifted active','Shifted use','https://shifted-image'],
+    row(9001,'MIENNAM',42000)];
+  const backup = [ [...detailHeaders,'retail_price_value','product_name'],
+    [1146,'MIENBAC','Northern active','Northern indication','north.jpg',1,'North name'],
+    [1146,'MIENNAM','Correct active','Correct use','https://cdn-gcs.thuocsi.vn/1146',999,'Stale name'],
+    [9002,'MIENNAM','Backup only','Backup only','','', 'Do not add'],
+    [1505,'MIENNAM','','','','','']];
+  const priced = updateCatalogue(products,values,1);
+  const details = readProductDetails(backup);
+  const merged = updateProductDetails(priced.products,details);
+  assert.equal(merged[0].active,'Correct active');
+  assert.equal(merged[0].indication,'Correct use');
+  assert.equal(merged[0].price,'113.000đ');
+  assert.equal(merged[0].name,'Source name');
+  assert.equal(merged[1].indication,'Existing indication');
+  assert.equal(merged[2].active,'');
+  assert.equal(merged.length,3);
+  assert.doesNotMatch(JSON.stringify(merged),/Wrong|Shifted|Northern|PRIVATE STOCK|Stale name|9002/);
+  assert.deepEqual(updateProductDetails(priced.products,readProductDetails([backup[0],...backup.slice(1).reverse()])),merged);
+  assert.equal(details.get('1146').imageUrl,'https://cdn-gcs.thuocsi.vn/1146');
+  // Existing products missing from the price feed can still receive backup details.
+  assert.equal(updateProductDetails(products,details)[0].indication,'Correct use');
+});
+
+test('backup rejects conflicting IDs, malformed headers and cell errors before publishing', () => {
+  const good=[1146,'MIENNAM','Active','Use','https://cdn-gcs.thuocsi.vn/a'];
+  assert.equal(readProductDetails([detailHeaders,good,good]).size,1);
+  for (const values of [[],[detailHeaders],[[],detailHeaders,good],
+    [[...detailHeaders,'Hoạt chất'],good],
+    [detailHeaders,[1146,'MIENBAC','A','I','']],
+    [detailHeaders,['','MIENNAM','A','I','']],
+    [detailHeaders,[1146,'MIENNAM',123,'I','']],
+    [detailHeaders,[1146,'MIENNAM','#REF!','I','']],
+    [detailHeaders,good,[1146,'MIENNAM','Other','Use',good[4]]],
+    [detailHeaders,good,[1146,'MIENNAM','Active','Use','https://cdn-gcs.thuocsi.vn/b']]]) {
+    assert.throws(()=>readProductDetails(values));
   }
 });

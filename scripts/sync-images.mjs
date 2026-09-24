@@ -55,7 +55,7 @@ export async function syncImages(root, products, values, fetchImpl = fetch) {
       const source = sources.get(id);
       try {
         const url = new URL(source);
-        // This is the product-image CDN supplied in Data san; no credentials or arbitrary network targets.
+        // Product-image CDN supplied in the backup; no credentials or arbitrary network targets.
         if (url.protocol !== 'https:' || url.hostname !== 'cdn-gcs.thuocsi.vn' || url.username || url.password || url.port) throw new Error('Unsupported image host');
         const cached = manifest[id];
         if (cached?.source === source && /^images\/sheet\/[a-f0-9]{32}\.(jpg|png|webp|gif|avif)$/.test(cached.image)) {
