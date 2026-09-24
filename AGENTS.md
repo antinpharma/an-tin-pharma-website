@@ -5,7 +5,8 @@ Website catalogue công khai của An Tín Pharma.
 Khách hàng xem sản phẩm, giá, hoạt chất, chỉ định và liên hệ qua Zalo/Facebook.
 
 ## Deployment
-- Repository: minhtran123hehe-png/an-tin-pharma-website
+- Repository: antinpharma/an-tin-pharma-website
+- Website: https://antinpharma.github.io/an-tin-pharma-website/
 - Branch production: main
 - Hosting: GitHub Pages
 - Workflow `.github/workflows/daily-prices.yml` đồng bộ khi push lên main, chạy thủ công hoặc mỗi 15 phút (phút 07, 22, 37, 52 mỗi giờ). Lịch GitHub có thể trễ; chỉ triển khai lại theo lịch khi dữ liệu thay đổi.

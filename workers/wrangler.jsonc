@@ -8,8 +8,8 @@
   "keep_vars": true,
   "observability": { "enabled": false },
   "vars": {
-    "ALLOWED_ORIGIN": "https://minhtran123hehe-png.github.io",
-    "CATALOGUE_URL": "https://minhtran123hehe-png.github.io/an-tin-pharma-website/catalogue.js",
+    "ALLOWED_ORIGIN": "https://antinpharma.github.io",
+    "CATALOGUE_URL": "https://antinpharma.github.io/an-tin-pharma-website/catalogue.js",
     "EXPECTED_BOT_ID": "3232808305802016399",
     "REQUIRE_ACCOUNT_LOGIN": "true"
   },

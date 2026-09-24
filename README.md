@@ -2,6 +2,9 @@
 
 Website catalogue responsive cho An Tín Pharma.
 
+Website: https://antinpharma.github.io/an-tin-pharma-website/
+Repository: `antinpharma/an-tin-pharma-website`.
+
 ## Chức năng hiện có
 - Responsive desktop / tablet / mobile
 - Tìm kiếm theo tên sản phẩm, hoạt chất, quy cách
