@@ -2,7 +2,7 @@ name: Update prices and deploy website
 
 on:
   schedule:
-    - cron: '7,22,37,52 * * * *' # Every 15 minutes; avoid the busy start of each hour.
+    - cron: '0 4 * * *' # Daily at 11:00 Vietnam time (UTC+7); GitHub may queue runs.
   workflow_dispatch:
   push:
     branches: [main]

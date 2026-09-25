@@ -9,7 +9,7 @@ Khách hàng xem sản phẩm, giá, hoạt chất, chỉ định và liên hệ
 - Website: https://antinpharma.github.io/an-tin-pharma-website/
 - Branch production: main
 - Hosting: GitHub Pages
-- Workflow `.github/workflows/daily-prices.yml` đồng bộ khi push lên main, chạy thủ công hoặc mỗi 15 phút (phút 07, 22, 37, 52 mỗi giờ). Lịch GitHub có thể trễ; chỉ triển khai lại theo lịch khi dữ liệu thay đổi.
+- Workflow `.github/workflows/daily-prices.yml` đồng bộ khi push lên main, chạy thủ công hoặc lúc 11:00 hằng ngày theo giờ Việt Nam (04:00 UTC, cron `0 4 * * *`). Lịch GitHub có thể trễ; chỉ triển khai lại theo lịch khi dữ liệu thay đổi.
 
 ## Product workflow
 1. Ảnh sản phẩm được upload vào Google Drive.
