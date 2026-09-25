@@ -6768,7 +6768,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "11.000đ",
-    "image": "",
+    "image": "images/sheet/80be820830f4a87a588aa069d2448bb6.webp",
     "visible": true,
     "availability": "out_of_stock"
   },
@@ -6781,7 +6781,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "29.500đ",
-    "image": "",
+    "image": "images/sheet/8afdde5e628b4adc2a28d6c2a423aef7.webp",
     "visible": true,
     "availability": "in_stock"
   },
@@ -6794,7 +6794,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "52.000đ",
-    "image": "",
+    "image": "images/sheet/6e28fab6283c45b7a52e3a322a53ffc9.webp",
     "visible": true,
     "availability": "out_of_stock"
   },
@@ -6820,7 +6820,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "23.000đ",
-    "image": "",
+    "image": "images/sheet/793f8d319def92e14632c2bbc2a6f99a.webp",
     "visible": true,
     "availability": "in_stock"
   },
@@ -6833,7 +6833,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "38.400đ",
-    "image": "",
+    "image": "images/sheet/2b7eb202c7e9897f953c07cc4852e388.webp",
     "visible": true,
     "availability": "in_stock"
   },
@@ -6872,7 +6872,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "83.700đ",
-    "image": "",
+    "image": "images/sheet/f77705019f6f0fc85d37c1697ce64e5b.webp",
     "visible": true,
     "availability": "in_stock"
   },
@@ -6885,7 +6885,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "19.000đ",
-    "image": "",
+    "image": "images/sheet/c414a0eb3e04008a231e404e9ec7328f.webp",
     "visible": true,
     "availability": "in_stock"
   },
@@ -6898,7 +6898,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "118.800đ",
-    "image": "",
+    "image": "images/sheet/f0c1fce294387e4d250256f97c0128e4.webp",
     "visible": true,
     "availability": "out_of_stock"
   },
@@ -6911,7 +6911,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "40.428đ",
-    "image": "",
+    "image": "images/sheet/e70408da8ba923679e1675a4440acd29.webp",
     "visible": true,
     "availability": "out_of_stock"
   },
@@ -6924,7 +6924,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "58.000đ",
-    "image": "",
+    "image": "images/sheet/c2da7de2773acbb0815dfe62e6414f85.webp",
     "visible": true,
     "availability": "out_of_stock"
   },
@@ -6937,7 +6937,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "52.000đ",
-    "image": "",
+    "image": "images/sheet/1fa6e349f6b3b23aa189a3939a84cfa1.webp",
     "visible": true,
     "availability": "out_of_stock"
   },
@@ -6950,7 +6950,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "32.000đ",
-    "image": "",
+    "image": "images/sheet/6380594992439027ef17458d049fd72b.webp",
     "visible": true,
     "availability": "out_of_stock"
   },
@@ -6963,7 +6963,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "90.000đ",
-    "image": "",
+    "image": "images/sheet/f3cb8e6bdba063ca3664099c968347d6.webp",
     "visible": true,
     "availability": "out_of_stock"
   },
