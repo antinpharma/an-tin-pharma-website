@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Script } from 'node:vm';
-import { updatePrices, updateCatalogue, readProductDetails, updateProductDetails, validatePriceScale, renderUpdate, readWindow, syncPrices, validateAssets } from './sync-prices.mjs';
+import { updatePrices, updateCatalogue, updateAvailability, readProductDetails, updateProductDetails, validatePriceScale, renderUpdate, readWindow, syncPrices, validateAssets } from './sync-prices.mjs';
 import { syncImages, imageSources } from './sync-images.mjs';
 import sharp from 'sharp';
 
@@ -45,6 +45,23 @@ const products = [
   { productId: '1146', name: 'Klenzit-C Gel', price: '108.400đ', spec: 'Tuýp 15g', active: 'Existing data', image: 'logo.svg', visible: true },
   { productId: '1505', name: 'Nexium MUPS 40mg', price: '322.000đ', indication: 'Existing indication', visible: true },
 ];
+
+test('stock status uses only column G and exact southern IDs, with no leaked stock counts',()=>{
+  const stockTable=(...rows)=>[[],[...headers,'Tồn khả dụng'],...rows];
+  const values=stockTable([...row(1146,'MIENNAM',113),0],[...row(1146,'MIENBAC',113),99],[...row(1505,'MIENNAM',322),27]);
+  const result=updateCatalogue(products,values,1000).products;
+  assert.equal(result[0].availability,'out_of_stock');assert.equal(result[1].availability,'in_stock');
+  assert.equal(result[0].image,products[0].image);
+  assert.equal(Object.hasOwn(result[1],'stock'),false);
+  for(const invalid of [undefined,'',null,'0','Đủ hàng',-1,NaN]){
+    assert.equal(updateAvailability(products,stockTable([...row(1146,'MIENNAM',113),invalid]))[0].availability,'unknown');
+  }
+  const conflict=updateAvailability(result,stockTable([...row(1146,'MIENNAM',113),0],[...row(1146,'MIENNAM',113),1]));
+  assert.equal(conflict[0].availability,'unknown');assert.equal(conflict[1].availability,'unknown');
+  const restocked=updateAvailability(result,stockTable([...row(1146,'MIENNAM',113),2]));
+  assert.equal(restocked[0].availability,'in_stock');
+  assert.equal(updateCatalogue(result,values,1000).changes.length,0);
+});
 
 test('Data san imports only A:G, ignores drifting H:J, keeps old images and uses dong directly', () => {
   const original = structuredClone(products);

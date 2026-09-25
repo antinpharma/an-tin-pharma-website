@@ -23,7 +23,7 @@ Khách hàng xem sản phẩm, giá, hoạt chất, chỉ định và liên hệ
    - Tab `check`: dòng 1 là thời điểm cập nhật, dòng 2 là tiêu đề cột.
    - Đọc bằng tài khoản được cấp quyền; không yêu cầu công khai bảng nguồn.
    - Ghép chính xác `product_id` với Product ID trong catalogue, đọc giá dạng số gốc (UNFORMATTED_VALUE).
-   - Chỉ đọc A:G. Đồng bộ product_name, brand, product_category và giá; không đưa Check tồn lên website. Không đọc H:I:J trong file này vì có thể lệch dòng sau cập nhật hệ thống.
+   - Chỉ đọc A:G. Đồng bộ product_name, brand, product_category và giá; cột G Tồn khả dụng chỉ xuất trạng thái Hết hàng khi bằng 0, không xuất số lượng tồn. Sản phẩm hết hàng không thêm vào giỏ hoặc gửi đơn, vẫn liên hệ Zalo được; ô tồn thiếu/sai/mâu thuẫn là trạng thái chưa xác định. Không đọc H:I:J trong file này vì có thể lệch dòng sau cập nhật hệ thống.
    - Hoạt chất, Chỉ định, link ảnh URL lấy từ backup: https://docs.google.com/spreadsheets/d/1AlreWSLbHiXHGP9BqdMH1WC_wVyEbV3pRREXVuD3r9k/edit ; tab `Sheet1`, tiêu đề dòng 1. Chỉ dùng Product ID + sales_region_code để ghép H:I:J; không dùng tên, giá, tồn kho trong backup.
    - Mọi lần tra cứu bổ sung sau này điền H:I trong backup, chỉ điền ô trống của đúng Product ID miền Nam. Người dùng cập nhật ảnh ở J trong backup. Không sắp xếp riêng H:I:J; phải giữ cả dòng A:J gắn với Product ID.
    - Tải URL ảnh trong backup về `images/sheet`. URL trống hoặc tải lỗi giữ ảnh cũ. Hiện hỗ trợ CDN `cdn-gcs.thuocsi.vn`; không xóa ảnh cũ. Giữ quy cách cũ trong catalogue.

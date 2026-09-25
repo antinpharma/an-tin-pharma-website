@@ -54,7 +54,7 @@ function restoreCart(){
     if(!Array.isArray(saved)) return new Map();
     return new Map(saved.filter(item=>item && typeof item.key==='string' && findProduct(item.key)
       && Number.isInteger(item.quantity) && item.quantity>0 && item.quantity<=MAX_QUANTITY)
-      .map(item=>[item.key,{quantity:item.quantity,selected:item.selected!==false}]));
+      .map(item=>[item.key,{quantity:item.quantity,selected:item.selected!==false&&findProduct(item.key).availability!=='out_of_stock'}]));
   }catch{ return new Map(); }
 }
 function saveCart(){
@@ -67,7 +67,7 @@ function saveCart(){
 function cartRows(selectedOnly=false){
   return [...cart].flatMap(([key,item])=>{
     const product=findProduct(key);
-    return product && (!selectedOnly || item.selected) ? [{key,...item,product}] : [];
+    return product && (!selectedOnly || (item.selected&&product.availability!=='out_of_stock')) ? [{key,...item,product}] : [];
   });
 }
 function totals(rows){
@@ -91,8 +91,8 @@ function quantityControl(p){
   const key=productKey(p), quantity=cart.get(key)?.quantity || 0;
   return `<div class="quantity-control" data-quantity-key="${esc(key)}">
     <button type="button" data-cart-action="decrease" data-key="${esc(key)}" aria-label="Giảm số lượng ${esc(p.name)}" ${quantity===0?'disabled':''}>−</button>
-    <input type="number" min="0" max="${MAX_QUANTITY}" step="1" inputmode="numeric" value="${quantity}" data-cart-action="quantity" data-key="${esc(key)}" aria-label="Số lượng ${esc(p.name)}">
-    <button type="button" data-cart-action="increase" data-key="${esc(key)}" aria-label="Tăng số lượng ${esc(p.name)}" ${quantity===MAX_QUANTITY?'disabled':''}>+</button>
+    <input type="number" min="0" max="${MAX_QUANTITY}" step="1" inputmode="numeric" value="${quantity}" data-cart-action="quantity" data-key="${esc(key)}" aria-label="Số lượng ${esc(p.name)}" ${p.availability==='out_of_stock'?'disabled':''}>
+    <button type="button" data-cart-action="increase" data-key="${esc(key)}" aria-label="Tăng số lượng ${esc(p.name)}" ${quantity===MAX_QUANTITY||p.availability==='out_of_stock'?'disabled':''}>+</button>
   </div>`;
 }
 function syncQuantityControls(){
@@ -100,7 +100,7 @@ function syncQuantityControls(){
     const quantity=cart.get(control.dataset.quantityKey)?.quantity || 0;
     control.querySelector('input').value=quantity;
     control.querySelector('[data-cart-action="decrease"]').disabled=quantity===0;
-    control.querySelector('[data-cart-action="increase"]').disabled=quantity===MAX_QUANTITY;
+    control.querySelector('[data-cart-action="increase"]').disabled=quantity===MAX_QUANTITY||findProduct(control.dataset.quantityKey)?.availability==='out_of_stock';
     control.closest('.card')?.classList.toggle('in-cart',quantity>0);
   });
 }
@@ -108,6 +108,9 @@ function setQuantity(key,quantity){
   if(orderSending) return;
   const product=findProduct(key);
   if(!product) return;
+  if(product.availability==='out_of_stock'&&quantity>(cart.get(key)?.quantity||0)){
+    syncQuantityControls();document.getElementById('cartAnnouncement').textContent='Sản phẩm đã hết hàng. Bạn có thể liên hệ Zalo để hỏi hàng.';return;
+  }
   const existed=cart.has(key);
   if(!Number.isInteger(quantity) || quantity<0 || quantity>MAX_QUANTITY){
     syncQuantityControls();
@@ -131,7 +134,7 @@ function orderText(rows){
   return `Chào An Tín Pharma, tôi muốn hỏi đặt các sản phẩm sau:\n\n${lines.join('\n\n')}\n\nSố loại: ${rows.length} | Tổng số lượng: ${summary.quantity}\nTạm tính${summary.unknown?' (chỉ sản phẩm có giá)':''}: ${totalLabel(rows)}${summary.unknown?`\nCó ${summary.unknown} sản phẩm cần báo giá.`:''}\nVui lòng xác nhận giá và tình trạng hàng. Cảm ơn!`;
 }
 function renderCart(refreshItems=true){
-  const rows=cartRows(), selected=rows.filter(row=>row.selected), summary=totals(selected), allTotals=totals(rows);
+  const rows=cartRows(), available=rows.filter(row=>row.product.availability!=='out_of_stock'),selected=available.filter(row=>row.selected), summary=totals(selected), allTotals=totals(rows);
   const active=document.activeElement;
   const focus=refreshItems && active?.closest('#cartItems') ? {key:active.dataset.key,action:active.dataset.cartAction} : null;
   document.getElementById('cartBadge').textContent=allTotals.quantity;
@@ -139,14 +142,14 @@ function renderCart(refreshItems=true){
   document.getElementById('cartBar').hidden=!rows.length;
   document.body.classList.toggle('has-cart',rows.length>0);
   document.getElementById('cartBarCount').textContent=`${rows.length} loại · Số lượng: ${allTotals.quantity}`;
-  document.getElementById('cartBarTotal').textContent=totalLabel(rows);
-  document.getElementById('cartBarNote').textContent=allTotals.unknown?`${allTotals.unknown} sản phẩm cần báo giá`:'Đã thêm vào giỏ hàng';
+  document.getElementById('cartBarTotal').textContent=totalLabel(available);
+  document.getElementById('cartBarNote').textContent=rows.length>available.length?`${rows.length-available.length} sản phẩm hết hàng, không cộng vào tạm tính`:allTotals.unknown?`${allTotals.unknown} sản phẩm cần báo giá`:'Đã thêm vào giỏ hàng';
   document.getElementById('cartSubtitle').textContent=`${rows.length} loại sản phẩm trong giỏ hàng`;
   document.getElementById('cartLineCount').textContent=`(${rows.length})`;
   const selectAll=document.getElementById('selectAll');
-  selectAll.checked=rows.length>0 && selected.length===rows.length;
-  selectAll.indeterminate=selected.length>0 && selected.length<rows.length;
-  selectAll.disabled=!rows.length;
+  selectAll.checked=available.length>0 && selected.length===available.length;
+  selectAll.indeterminate=selected.length>0 && selected.length<available.length;
+  selectAll.disabled=!available.length;
   const groups=new Map();
   rows.forEach(row=>{
     const brand=row.product.brand || 'Sản phẩm khác';
@@ -156,10 +159,11 @@ function renderCart(refreshItems=true){
   if(refreshItems) document.getElementById('cartItems').innerHTML=rows.length?[...groups].map(([brand,items])=>`
     <section class="cart-group"><h3>${esc(brand)}</h3>${items.map(row=>`
       <article class="cart-item" data-row-key="${esc(row.key)}">
-        <input class="item-check" type="checkbox" data-cart-action="select" data-key="${esc(row.key)}" aria-label="Chọn ${esc(row.product.name)}" ${row.selected?'checked':''}>
+        <input class="item-check" type="checkbox" data-cart-action="select" data-key="${esc(row.key)}" aria-label="Chọn ${esc(row.product.name)}" ${row.selected&&row.product.availability!=='out_of_stock'?'checked':''} ${row.product.availability==='out_of_stock'?'disabled':''}>
         <div class="cart-image">${productImage(row.product)}</div>
         <div class="cart-item-info"><h4>${esc(row.product.name)}</h4><p>${esc(row.product.spec||'Quy cách đang cập nhật')}</p>
           <div class="cart-item-price">${esc(row.product.price)}</div>
+          ${row.product.availability==='out_of_stock'?'<span class="stock-badge">Hết hàng</span>':''}
           <div class="cart-item-bottom">${quantityControl(row.product)}<button class="remove-item" type="button" data-cart-action="remove" data-key="${esc(row.key)}" aria-label="Xoá ${esc(row.product.name)} khỏi giỏ hàng">Xoá</button></div>
           <small class="line-total">Thành tiền: <b>${unitPrice(row.product)===null?'Liên hệ':money(unitPrice(row.product)*row.quantity)}</b></small>
         </div>
@@ -178,7 +182,7 @@ function renderCart(refreshItems=true){
   document.querySelectorAll('[data-row-key]').forEach(element=>{
     const row=rows.find(item=>item.key===element.dataset.rowKey);
     if(!row) return;
-    element.querySelector('.item-check').checked=row.selected;
+    element.querySelector('.item-check').checked=row.selected&&row.product.availability!=='out_of_stock';
     const price=unitPrice(row.product);
     element.querySelector('.line-total b').textContent=price===null?'Liên hệ':money(price*row.quantity);
   });
@@ -227,6 +231,8 @@ function refreshOrderForm(){
   document.querySelector('.cart-summary').classList.toggle('has-direct-order',enabled);
   document.getElementById('sendOrder').disabled=orderSending || orderSubmitted || !cartRows(true).length;
   document.getElementById('sendOrder').textContent=orderSending?'Đang gửi yêu cầu…':orderSubmitted?'Đã gửi yêu cầu':account?'Gửi yêu cầu đặt hàng':'Đăng nhập để gửi đơn';
+  document.getElementById('newOrder').hidden=!orderSubmitted;
+  document.getElementById('editOrderAccount').disabled=orderSending;
   document.getElementById('customerName').value=account?.name||'';
   document.getElementById('customerPhone').value=account?.phone||'';
   document.getElementById('orderAccountNote').textContent=account?'Đơn sẽ được gửi bằng thông tin trong tài khoản của bạn.':'Vui lòng đăng nhập hoặc đăng ký tài khoản để gửi yêu cầu đặt hàng.';
@@ -244,6 +250,10 @@ function refreshOrderForm(){
 }
 function resetOrderFeedback(){
   if(orderSending) return;
+  if(orderSubmitted){
+    memoryOrderAttempt=null;
+    try{sessionStorage.removeItem('antin-order-attempt-v1');}catch{}
+  }
   orderSubmitted=false;
   document.getElementById('orderFeedback').textContent='';
   refreshOrderForm();
@@ -253,7 +263,11 @@ async function orderAttempt(payload){
   const fingerprint=[...new Uint8Array(bytes)].map(n=>n.toString(16).padStart(2,'0')).join('');
   let saved=memoryOrderAttempt;
   try{saved=JSON.parse(sessionStorage.getItem('antin-order-attempt-v1'))||saved;}catch{ /* In-memory retry protection remains available. */ }
-  if(saved?.fingerprint!==fingerprint || !/^[a-f0-9-]{36}$/i.test(saved?.requestId||'')) saved={fingerprint,requestId:crypto.randomUUID()};
+  if(saved?.fingerprint!==fingerprint || !/^[a-f0-9-]{36}$/i.test(saved?.requestId||'')){
+    const bytes=crypto.getRandomValues(new Uint8Array(16));bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+    const hex=[...bytes].map(n=>n.toString(16).padStart(2,'0')).join('');
+    saved={fingerprint,requestId:[hex.slice(0,8),hex.slice(8,12),hex.slice(12,16),hex.slice(16,20),hex.slice(20)].join('-')};
+  }
   memoryOrderAttempt=saved;
   try{sessionStorage.setItem('antin-order-attempt-v1',JSON.stringify(saved));}catch{ /* Do not store customer data in the browser. */ }
   return saved.requestId;
@@ -261,6 +275,8 @@ async function orderAttempt(payload){
 async function sendDirectOrder(event){
   event.preventDefault();
   if(orderSending || orderSubmitted || !CONFIG.ORDER_API_URL) return;
+  await window.AntinAccount?.ready;
+  if(orderSending || orderSubmitted) return;
   const rows=cartRows(true),feedback=document.getElementById('orderFeedback');
   if(!rows.length) return;
   if(!window.AntinAccount?.profile){window.AntinAccount?.open('login');return;}
@@ -276,10 +292,11 @@ async function sendDirectOrder(event){
   const payload={customer,accountId:window.AntinAccount.profile.id,items:rows.map(row=>({productId:String(row.product.productId),quantity:row.quantity})).sort((a,b)=>a.productId.localeCompare(b.productId))};
   orderSending=true;refreshOrderForm();feedback.dataset.error='false';feedback.textContent='Đang gửi danh sách đến An Tín Pharma…';
   let requestId='';
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),180000);
   try{
     requestId=await orderAttempt(payload);
     const response=await fetch(CONFIG.ORDER_API_URL,{
-      method:'POST',headers:{'Content-Type':'application/json',...window.AntinAccount.headers()},body:JSON.stringify({requestId,...payload}),signal:AbortSignal.timeout(180000),credentials:'omit',redirect:'error'
+      method:'POST',headers:{'Content-Type':'application/json',...window.AntinAccount.headers()},body:JSON.stringify({requestId,...payload}),signal:controller.signal,credentials:'omit',redirect:'error'
     });
     const result=await response.json();
     if(!response.ok || result.ok!==true || result.requestId!==requestId){
@@ -294,6 +311,7 @@ async function sendDirectOrder(event){
     feedback.dataset.error='true';
     feedback.textContent=`Chưa xác nhận được kết quả gửi. Bạn có thể thử lại cùng nội dung hoặc liên hệ Zalo để kiểm tra.${requestId?` Mã yêu cầu: ${requestId}`:''}`;
   }finally{
+    clearTimeout(timeout);
     orderSending=false;refreshOrderForm();
     ['deleteCart','checkoutCart'].forEach(id=>document.getElementById(id).disabled=!cartRows(true).length);
   }
@@ -345,6 +363,7 @@ function renderProducts(){
   grid.innerHTML=filtered.map(p=>`<article class="card ${cart.has(productKey(p))?'in-cart':''}">
     <div class="product-img">
       ${productImage(p)}
+      ${p.availability==='out_of_stock'?'<span class="stock-badge">Hết hàng</span>':''}
     </div>
     <div class="card-body">
       <h3>${esc(p.name)}</h3>
@@ -352,8 +371,11 @@ function renderProducts(){
       ${p.brand?`<div class="meta"><b>Hãng:</b> ${esc(p.brand)}</div>`:''}
       <div class="meta"><b>Quy cách:</b> ${esc(p.spec||'Đang cập nhật')}</div>
       <div class="price">${esc(p.price)}</div>
-      <div class="meta"><b>Hoạt chất:</b> ${esc(p.active||'Đang cập nhật')}</div>
-      <div class="indication"><b>Chỉ định:</b> ${esc(p.indication||'Đang cập nhật')}</div>
+      <details class="product-details" ${window.matchMedia('(min-width: 641px)').matches?'open':''}>
+        <summary>Thông tin sản phẩm</summary>
+        <div class="meta"><b>Hoạt chất:</b> ${esc(p.active||'Đang cập nhật')}</div>
+        <div class="indication"><b>Chỉ định:</b> ${esc(p.indication||'Đang cập nhật')}</div>
+      </details>
       <div class="product-quantity"><span>Số lượng</span>${quantityControl(p)}</div>
       <div class="actions">
         <button class="btn zalo" data-contact="Zalo" data-key="${esc(productKey(p))}">Zalo</button>
@@ -426,7 +448,7 @@ document.addEventListener('change',event=>{
   }
   if(cartAction==='select' && cart.has(key)){
     if(orderSending) return;
-    cart.get(key).selected=event.target.checked;
+    cart.get(key).selected=event.target.checked&&findProduct(key)?.availability!=='out_of_stock';
     resetOrderFeedback();
     saveCart(); renderCart(false);
   }
@@ -438,7 +460,7 @@ document.getElementById('continueShopping').addEventListener('click',closeCart);
 document.getElementById('cartDialog').addEventListener('close',()=>document.body.classList.remove('cart-open'));
 document.getElementById('selectAll').addEventListener('change',event=>{
   if(orderSending) return;
-  cart.forEach(item=>item.selected=event.target.checked);
+  cart.forEach((item,key)=>item.selected=event.target.checked&&findProduct(key)?.availability!=='out_of_stock');
   resetOrderFeedback();
   saveCart(); renderCart(false);
 });
@@ -451,6 +473,11 @@ document.getElementById('deleteCart').addEventListener('click',()=>{
 });
 document.getElementById('copyOrder').addEventListener('click',copyOrder);
 document.getElementById('directOrderForm').addEventListener('submit',sendDirectOrder);
+document.getElementById('newOrder').addEventListener('click',()=>{
+  if(!orderSubmitted||orderSending)return;
+  cartRows(true).forEach(row=>cart.delete(row.key));
+  resetOrderFeedback();saveCart();renderCart();closeCart();
+});
 document.getElementById('editOrderAccount').addEventListener('click',()=>window.AntinAccount?.open('profile'));
 window.addEventListener('antin-account-changed',event=>{
   const nextId=event.detail?.id||null;

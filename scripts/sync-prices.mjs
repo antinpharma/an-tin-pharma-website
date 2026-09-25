@@ -84,8 +84,29 @@ export function updateCatalogue(products,values,multiplier){
     merged.push({productId,...source,category:source.category||'Khác',active:'',indication:'',spec:'',price:'Liên hệ',image:'',visible:true});added++;
   }
   const priced=updatePrices(merged,values,multiplier);
+  priced.products=updateAvailability(priced.products,values);
   const changes=priced.products.filter(p=>JSON.stringify(original.get(p.productId))!==JSON.stringify(p)).map(p=>({productId:p.productId}));
   return {...priced,changes,added};
+}
+
+export function updateAvailability(products,values){
+  const headers=values?.[1]||[];
+  const idCol=headers.indexOf('product_id'),regionCol=headers.indexOf('sales_region_code');
+  const stocks=new Map();
+  if(idCol<0||regionCol<0)throw new Error('Missing stock matching headers.');
+  // Publish a status only, never the source quantity or internal inventory notes.
+  if(headers[6]==='Tồn khả dụng')for(const row of values.slice(2)){
+    if(row[regionCol]!=='MIENNAM')continue;
+    const id=String(row[idCol]??'').trim(),raw=row[6];
+    const valid=typeof raw==='number'&&Number.isFinite(raw)&&raw>=0;
+    const status=valid?(raw===0?'out_of_stock':'in_stock'):'unknown';
+    if(!stocks.has(id))stocks.set(id,new Set());
+    stocks.get(id).add(status);
+  }
+  return products.map(product=>{
+    const candidates=stocks.get(String(product.productId));
+    return {...product,availability:candidates?.size===1?[...candidates][0]:'unknown'};
+  });
 }
 
 export function readProductDetails(values) {

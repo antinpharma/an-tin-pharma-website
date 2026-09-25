@@ -27,6 +27,8 @@ test('authoritative prices and uncertain prices; rejects unavailable products',(
   assert.match(text,/Chưa gồm 1 sản phẩm cần báo giá/);
   assert.match(text,/Tạm tính: 226.000đ/);
   assert.throws(()=>buildMessages(order,products.slice(0,1)));
+  assert.throws(()=>buildMessages(validateOrder(body()),[{...products[0],availability:'out_of_stock'}]),/hết hàng/);
+  assert.ok(buildMessages(validateOrder(body()),[{...products[0],availability:'unknown'}]).length);
 });
 test('large orders split into messages below the Zalo length limit',()=>{
   const many=Array.from({length:30},(_,i)=>({...products[0],productId:String(i),name:'Sản phẩm '.repeat(25),spec:'Quy cách '.repeat(25)}));
@@ -77,6 +79,16 @@ test('network ambiguity never reports success or blindly resends; token stays ou
   assert.ok(!JSON.stringify(result).includes(env.ZALO_BOT_TOKEN));
   assert.equal((await receiver.fetch(request())).status,409);
   assert.equal(calls,1);
+});
+
+test('stale carts cannot send sold-out products to Zalo',async t=>{
+  let providerCalls=0;
+  t.mock.method(globalThis,'fetch',async url=>{
+    if(url===env.CATALOGUE_URL)return new Response('window.ANTIN_PRODUCTS = '+JSON.stringify([{...products[0],availability:'out_of_stock'}])+';');
+    providerCalls++;return Response.json({ok:true,result:{message_id:'unexpected'}});
+  });
+  const receiver=new OrderReceiver(state(),env),response=await receiver.fetch(request());
+  assert.equal(response.status,409);assert.match((await response.json()).error,/hết hàng/);assert.equal(providerCalls,0);
 });
 
 test('a 50-product order sends every part outside the short lock, even with overlapping retries',async t=>{

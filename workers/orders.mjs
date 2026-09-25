@@ -45,6 +45,7 @@ export function buildMessages(order,products){
   const lines=order.items.map((item,index)=>{
     const p=products.find(p=>p.visible && String(p.productId)===item.productId);
     if(!p || !p.name) throw new OrderError('Một sản phẩm không còn khả dụng. Vui lòng tải lại danh mục.',409);
+    if(p.availability==='out_of_stock') throw new OrderError(`${singleLine(p.name).slice(0,150)} đã hết hàng. Vui lòng tải lại trang và bỏ sản phẩm này khỏi đơn, hoặc liên hệ Zalo để hỏi hàng.`,409);
     const raw=String(p.price??'').trim();
     const amount=/^(?:\d+|\d{1,3}(?:\.\d{3})+)\s*(?:đ|₫|VND)$/i.test(raw)?Number(raw.replace(/\D/g,'')):NaN;
     const price=Number.isSafeInteger(amount) && amount>0 && Number.isSafeInteger(amount*item.quantity)?amount:null;

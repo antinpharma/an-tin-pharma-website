@@ -15,7 +15,7 @@ Repository: `antinpharma/an-tin-pharma-website`.
 
 ## Đồng bộ danh mục và giá tự động
 
-- [Data sàn](https://docs.google.com/spreadsheets/d/1TEOQde1O0JoikDJJnIbe6sdpGl3GL76kJf1hQ_MapCU/edit), tab `check`, tiêu đề dòng 2: chỉ đọc A:G để lấy mã, miền, tên, hãng, danh mục và giá. Không xuất `Check tồn` lên website.
+- [Data sàn](https://docs.google.com/spreadsheets/d/1TEOQde1O0JoikDJJnIbe6sdpGl3GL76kJf1hQ_MapCU/edit), tab `check`, tiêu đề dòng 2: chỉ đọc A:G để lấy mã, miền, tên, hãng, danh mục và giá. Cột G `Tồn khả dụng`: MIENNAM có giá trị số 0 hiển thị “Hết hàng” và không được thêm vào giỏ/gửi đơn; vẫn liên hệ Zalo được. Không xuất số lượng tồn. Ô trống, không hợp lệ hoặc mâu thuẫn thì trạng thái chưa xác định.
 - [Data sàn backup 1](https://docs.google.com/spreadsheets/d/1AlreWSLbHiXHGP9BqdMH1WC_wVyEbV3pRREXVuD3r9k/edit), tab `Sheet1`, tiêu đề dòng 1: đọc A:J nhưng chỉ dùng Product ID + miền để ghép H `Hoạt chất`, I `Chỉ định`, J `link ảnh URL`. Bỏ qua tên, giá và tồn kho cũ trong backup. Tuyệt đối không dùng H:J của Data sàn vì thứ tự dòng có thể thay đổi.
 - Lịch: mỗi 15 phút (phút 07, 22, 37, 52 mỗi giờ), đồng thời chạy khi push lên `main`. Đây là đồng bộ định kỳ, không phải thời gian thực từng giây; GitHub có thể chạy trễ. Lần chạy theo lịch không có thay đổi sẽ bỏ qua triển khai Pages.
 - Chạy ngay: GitHub → Actions → **Update prices and deploy website** → **Run workflow** → nhánh `main`.

@@ -6,7 +6,7 @@
   try{token=sessionStorage.getItem(key)||'';}catch{}
   const apiBase=new URL(window.ANTIN_CONFIG.ORDER_API_URL).origin;
   const $=id=>document.getElementById(id);
-  const report=(message,error=false)=>{feedback.textContent=message;feedback.dataset.error=String(error);};
+  const report=(message,error=false)=>{feedback.textContent=message;feedback.dataset.error=String(error);if(error&&dialog.open)feedback.scrollIntoView({block:'nearest'});};
   function emit(){
     $('accountLabel').textContent=profile?'Tài khoản':'Đăng nhập';
     $('accountToggle').title=profile?'Tài khoản của '+profile.name:'Đăng nhập hoặc đăng ký';
@@ -23,16 +23,19 @@
     emit();
   }
   async function request(action,body={}){
+    const sessionToken=token,controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),20000);
+    try{
     const response=await fetch(apiBase+'/auth/'+action,{
-      method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},
-      body:JSON.stringify(body),credentials:'omit',redirect:'error',signal:AbortSignal.timeout(20000)
+      method:'POST',headers:{'Content-Type':'application/json',...(sessionToken?{Authorization:'Bearer '+sessionToken}:{})},
+      body:JSON.stringify(body),credentials:'omit',redirect:'error',signal:controller.signal
     });
     const result=await response.json();
     if(!response.ok||!result.ok){
-      if(response.status===401&&!['login','register'].includes(action))clear();
+      if(response.status===401&&!['login','register'].includes(action)&&token===sessionToken)clear();
       const error=new Error(result.error||'Chưa thực hiện được yêu cầu. Vui lòng thử lại.');error.status=response.status;throw error;
     }
     return result;
+    }finally{clearTimeout(timeout);}
   }
   function addOptions(select,rows,placeholder){
     select.replaceChildren(new Option(placeholder,''),...rows.map(row=>new Option(row.name,row.code)));
@@ -44,10 +47,14 @@
   }
   async function locations(){
     if(locationData)return locationData;
-    if(!locationPromise)locationPromise=fetch('data/locations.json?v=20260923',{signal:AbortSignal.timeout(15000)})
+    if(!locationPromise){
+      const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),15000);
+      locationPromise=fetch('data/locations.json?v=20260923',{signal:controller.signal})
       .then(async response=>{if(!response.ok)throw new Error();return response.json();})
       .then(data=>{locationData=data;for(const prefix of ['register','profile'])addOptions($(prefix+'Province'),data.provinces,'Chọn tỉnh/thành phố');return data;})
-      .catch(()=>{locationPromise=null;throw new Error('Chưa tải được tỉnh/thành phố. Vui lòng đóng và mở lại cửa sổ tài khoản.');});
+      .catch(()=>{locationPromise=null;throw new Error('Chưa tải được tỉnh/thành phố. Vui lòng đóng và mở lại cửa sổ tài khoản.');})
+      .finally(()=>clearTimeout(timeout));
+    }
     return locationPromise;
   }
   async function view(name){
@@ -124,6 +131,7 @@
     $(input.dataset.showPassword).querySelectorAll('input[autocomplete="current-password"],input[autocomplete="new-password"]').forEach(field=>field.type=input.checked?'text':'password');
   }));
   document.querySelector('.forgot-password').href='https://zalo.me/'+window.ANTIN_CONFIG.ZALO_PHONE;
-  window.AntinAccount={open,get profile(){return profile;},headers:()=>token?{Authorization:'Bearer '+token}:{},expire:clear};
-  if(token)request('me').then(accept).catch(()=>{ /* Invalid sessions are cleared by request; transient failures can be retried by signing in. */ });
+  const initialToken=token;
+  const ready=token?request('me').then(data=>{if(token===initialToken)accept(data);}).catch(()=>{ /* Invalid sessions are cleared; a failed connection must not clear a newer login. */ }):Promise.resolve();
+  window.AntinAccount={open,ready,get profile(){return profile;},headers:()=>token?{Authorization:'Bearer '+token}:{},expire:clear};
 })();
