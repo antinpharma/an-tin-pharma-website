@@ -40,6 +40,27 @@ export function readCatalogue(source){
   return products;
 }
 
+async function fetchCatalogue(url){
+  // Retry only this read, before reserving a delivery. Never retry Zalo sends.
+  for(let attempt=0;attempt<2;attempt++){
+    let source;
+    try{
+      const res=await fetch(url,{signal:AbortSignal.timeout(8000),redirect:'manual',cache:'no-store'});
+      if(!res.ok){
+        await res.body?.cancel();
+        if(attempt===0 && [408,429,500,502,503,504].includes(res.status)) continue;
+        break;
+      }
+      source=await res.text();
+    }catch{
+      if(attempt===0) continue;
+      break;
+    }
+    return readCatalogue(source);
+  }
+  throw new OrderError('Chưa tải được danh mục để kiểm tra giá và tồn kho. Đơn chưa được gửi; vui lòng thử lại sau ít giây.',503);
+}
+
 export function buildMessages(order,products){
   let total=0,unknown=0,quantity=0;
   const lines=order.items.map((item,index)=>{
@@ -136,7 +157,11 @@ export default {
         if(path==='/orders'&&(env.REQUIRE_ACCOUNT_LOGIN==='true'||headers.Authorization)){
           const accounts=env.ACCOUNTS.get(env.ACCOUNTS.idFromName('customer-accounts'));
           const auth=await accounts.fetch(new Request('https://internal/auth/me',{method:'POST',headers,body:'{}'}));
-          if(!auth.ok)throw new OrderError('Vui lòng đăng nhập tài khoản để gửi yêu cầu đặt hàng.',auth.status===429?429:401);
+          if(!auth.ok){
+            if(auth.status>=500)throw new OrderError('Chưa kiểm tra được tài khoản. Đơn chưa được gửi; vui lòng thử lại sau ít giây.',503);
+            if(auth.status===429)throw new OrderError('Bạn đã gửi nhiều yêu cầu. Vui lòng chờ một phút.',429);
+            throw new OrderError('Vui lòng đăng nhập tài khoản để gửi yêu cầu đặt hàng.',401);
+          }
           const {profile}=await auth.json();
           body.accountId=profile.id;
           body.customer={name:profile.name,phone:profile.phone,address:[profile.address,profile.ward,profile.province].join(', ')};
@@ -205,9 +230,7 @@ export class OrderReceiver {
     if(rate && now-rate.time<60000 && rate.count>=3) throw new OrderError('Bạn đã gửi nhiều yêu cầu. Vui lòng chờ một phút.',429);
     await this.state.storage.put(rateKey,{time:rate && now-rate.time<60000?rate.time:now,count:rate && now-rate.time<60000?rate.count+1:1});
     if(!await this.state.storage.getAlarm()) await this.state.storage.setAlarm(now+DAY);
-    const res=await fetch(this.env.CATALOGUE_URL,{signal:AbortSignal.timeout(5000),redirect:'manual',cache:'no-store'});
-    if(!res.ok) throw new OrderError('Chưa kiểm tra được danh mục hiện hành.',503);
-    const messages=buildMessages(order,readCatalogue(await res.text()));
+    const messages=buildMessages(order,await fetchCatalogue(this.env.CATALOGUE_URL));
     await this.state.storage.put(key,{hash:fingerprint,status:'sending',time:now});
     return {key,owner,messages,time:now};
   }

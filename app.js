@@ -302,7 +302,7 @@ async function sendDirectOrder(event){
     if(!response.ok || result.ok!==true || result.requestId!==requestId){
       if(response.status===401){window.AntinAccount.expire();window.AntinAccount.open('login');}
       feedback.dataset.error='true';
-      feedback.textContent=(typeof result.error==='string'?result.error:'Chưa xác nhận gửi thành công. Vui lòng liên hệ Zalo để kiểm tra.')+(result.uncertain?` Mã yêu cầu: ${requestId}`:'');
+      feedback.textContent=(typeof result.error==='string'?result.error:'Chưa xác nhận gửi thành công. Vui lòng liên hệ Zalo để kiểm tra.')+(result.uncertain||response.status>=500?` Mã yêu cầu: ${requestId}`:'');
       return;
     }
     orderSubmitted=true;

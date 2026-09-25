@@ -66,6 +66,68 @@ test('concurrent duplicate submission sends only once and reports confirmed deli
   const conflict=await receiver.fetch(request({...body(),customer:{...body().customer,name:'Another'}}));
   assert.equal(conflict.status,409);
 });
+test('transient catalogue failures recover before a single delivery',async t=>{
+  for(const failure of ['network','body',503]){
+    let reads=0,sends=0;
+    t.mock.method(globalThis,'fetch',async url=>{
+      if(url===env.CATALOGUE_URL){
+        if(++reads===1){
+          if(failure==='network')throw new TypeError('Network unavailable');
+          if(failure==='body')return {ok:true,text:async()=>{throw new DOMException('Timed out','TimeoutError');}};
+          return new Response('',{status:failure});
+        }
+        return new Response('window.ANTIN_PRODUCTS = '+JSON.stringify(products)+';');
+      }
+      sends++;return Response.json({ok:true,result:{message_id:'receipt'}});
+    });
+    const receiver=new OrderReceiver(state(),env);
+    assert.equal((await receiver.fetch(request())).status,200);
+    assert.equal((await receiver.fetch(request())).status,200);
+    assert.equal(reads,2);assert.equal(sends,1);
+    t.mock.restoreAll();
+  }
+});
+
+test('exhausted catalogue reads leave no delivery receipt and allow the same request to recover',async t=>{
+  let reads=0,sends=0,healthy=false;
+  t.mock.method(globalThis,'fetch',async url=>{
+    if(url===env.CATALOGUE_URL){
+      reads++;if(!healthy)throw new TypeError('Private upstream details');
+      return new Response('window.ANTIN_PRODUCTS = '+JSON.stringify(products)+';');
+    }
+    sends++;return Response.json({ok:true,result:{message_id:'receipt'}});
+  });
+  const storage=state(),receiver=new OrderReceiver(storage,env),response=await receiver.fetch(request());
+  assert.equal(response.status,503);
+  assert.match((await response.json()).error,/Đơn chưa được gửi/);
+  assert.equal(reads,2);assert.equal(sends,0);
+  assert.equal(await storage.storage.get('order:'+id),undefined);
+  healthy=true;
+  assert.equal((await receiver.fetch(request())).status,200);
+  assert.equal(sends,1);
+});
+
+test('permanent HTTP errors and malformed catalogues are not retried or sent',async t=>{
+  for(const status of [404,200]){
+    let reads=0;
+    t.mock.method(globalThis,'fetch',async url=>{
+      assert.equal(url,env.CATALOGUE_URL);reads++;
+      return new Response('invalid catalogue',{status});
+    });
+    assert.equal((await new OrderReceiver(state(),env).fetch(request())).status,503);
+    assert.equal(reads,1);t.mock.restoreAll();
+  }
+});
+
+test('account service outages do not expire a valid login or forward an order',async()=>{
+  for(const status of [503,429,401]){
+    const settings={...env,REQUIRE_ACCOUNT_LOGIN:'true',ACCOUNTS:{idFromName:()=>1,get:()=>({fetch:async()=>Response.json({error:'unavailable'},{status})})},ORDERS:{get:()=>assert.fail('Must not forward unauthenticated order')}};
+    const response=await worker.fetch(new Request('https://worker.test/orders',{method:'POST',headers:{Origin:env.ALLOWED_ORIGIN},body:JSON.stringify(body())}),settings);
+    assert.equal(response.status,status);
+    if(status===503)assert.match((await response.json()).error,/Đơn chưa được gửi/);
+  }
+});
+
 test('network ambiguity never reports success or blindly resends; token stays out of errors',async t=>{
   let calls=0;
   t.mock.method(globalThis,'fetch',async url=>{
