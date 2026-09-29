@@ -9,6 +9,7 @@ let categories = ['Tất cả'];
 let activeCategory = 'Tất cả';
 let activeGroup = 'all';
 let activeDepartment = 'all';
+let openFilterToggle = null;
 const GROUPS = window.ANTIN_GROUPS;
 const DEPARTMENTS = window.ANTIN_DEPARTMENTS;
 let CART_STORAGE_KEY = 'antin-cart-v1';
@@ -196,15 +197,17 @@ function renderCart(refreshItems=true){
 }
 function renderGroups(){
   const button=(id,label)=>`<button type="button" class="group-button" data-group="${esc(id)}" aria-pressed="false"><span>${esc(label)}</span><span class="group-count" data-group-count="${esc(id)}">0</span></button>`;
-  document.getElementById('productGroups').innerHTML=button('all','Tất cả sản phẩm')+GROUPS.sections.map(section=>{
+  const markup=button('all','Tất cả sản phẩm')+GROUPS.sections.map(section=>{
     const children=section.children.filter(group=>products.some(p=>p.visible&&GROUPS.matches(p,group.id)));
     if(!children.length)return '';
     return `<details class="group-section" data-section="${section.id}" ${section.id==='medicines'?'open':''}><summary><span>${esc(section.label)}</span><span class="group-count" data-group-count="${section.id}"></span></summary><div>${button(section.id,'Tất cả '+section.label.toLocaleLowerCase('vi'))}${children.map(group=>button(group.id,group.label)).join('')}</div></details>`;
   }).join('')+button('unassigned','Chưa phân nhóm');
+  document.querySelectorAll('[data-group-options]').forEach(element=>element.innerHTML=markup);
 }
 function renderDepartments(){
   const options=[{id:'all',label:'Tất cả khoa'},...DEPARTMENTS.definitions];
-  document.getElementById('productDepartments').innerHTML=options.map(department=>`<button type="button" class="group-button" data-department="${esc(department.id)}" aria-pressed="false"><span>${esc(department.label)}</span><span class="group-count" data-department-count="${esc(department.id)}">0</span></button>`).join('');
+  const markup=options.map(department=>`<button type="button" class="group-button" data-department="${esc(department.id)}" aria-pressed="false"><span>${esc(department.label)}</span><span class="group-count" data-department-count="${esc(department.id)}">0</span></button>`).join('');
+  document.querySelectorAll('[data-department-options]').forEach(element=>element.innerHTML=markup);
 }
 function refreshGroupFilters(candidates,resultCount){
   const counts=new Map([['all',candidates.length]]);
@@ -241,6 +244,10 @@ function refreshGroupFilters(candidates,resultCount){
   document.getElementById('filterStatus').hidden=!labels.length;
   document.getElementById('filterDescription').textContent=labels.join(' · ');
   document.getElementById('mobileGroupLabel').textContent=activeGroup==='all'?'Tất cả nhóm':GROUPS.labelFor(activeGroup);
+  document.getElementById('departmentToggle').classList.toggle('has-selection',activeDepartment!=='all');
+  document.getElementById('departmentToggle').setAttribute('aria-label',activeDepartment==='all'?'Lọc theo khoa':`Lọc theo khoa, đang chọn ${DEPARTMENTS.labelFor(activeDepartment)}`);
+  document.getElementById('groupToggle').classList.toggle('has-selection',activeGroup!=='all');
+  document.getElementById('groupToggle').setAttribute('aria-label',activeGroup==='all'?'Nhóm sản phẩm':`Nhóm sản phẩm, đang chọn ${GROUPS.labelFor(activeGroup)}`);
 }
 function refreshOrderForm(){
   const enabled=Boolean(CONFIG.ORDER_API_URL);
@@ -420,24 +427,66 @@ async function loadProducts(){
   rebuildCategories(); renderCategories(); renderGroups(); renderDepartments(); renderProducts();
 }
 
-document.getElementById('productGroups').addEventListener('click',event=>{
-  const button=event.target.closest('[data-group]');
+function closeFilterMenu(restoreFocus=false){
+  const toggle=openFilterToggle;
+  if(!toggle)return;
+  document.getElementById(toggle.getAttribute('aria-controls')).hidden=true;
+  toggle.setAttribute('aria-expanded','false');
+  openFilterToggle=null;
+  document.getElementById('filterBackdrop').hidden=true;
+  document.body.classList.remove('filters-open');
+  if(restoreFocus)toggle.focus({preventScroll:true});
+}
+function openFilterMenu(toggle){
+  closeFilterMenu();
+  openFilterToggle=toggle;
+  const panel=document.getElementById(toggle.getAttribute('aria-controls'));
+  panel.hidden=false;
+  panel.scrollTop=0;
+  toggle.setAttribute('aria-expanded','true');
+  updateHeaderHeight();
+  document.getElementById('filterBackdrop').hidden=false;
+  document.body.classList.add('filters-open');
+}
+document.querySelectorAll('.filter-toggle').forEach(toggle=>{
+  toggle.addEventListener('click',()=>openFilterToggle===toggle?closeFilterMenu():openFilterMenu(toggle));
+  toggle.addEventListener('keydown',event=>{
+    if(event.key!=='ArrowDown')return;
+    event.preventDefault();
+    openFilterMenu(toggle);
+    const panel=document.getElementById(toggle.getAttribute('aria-controls'));
+    const selected=panel.querySelector('.group-button[aria-pressed="true"]');
+    if(selected){
+      for(let parent=selected.parentElement;parent&&parent!==panel;parent=parent.parentElement){
+        if(parent.tagName==='DETAILS')parent.open=true;
+      }
+      selected.focus({preventScroll:true});
+      selected.scrollIntoView({block:'nearest',behavior:'instant'});
+    }
+  });
+});
+document.querySelectorAll('[data-close-filter]').forEach(button=>button.addEventListener('click',()=>closeFilterMenu(true)));
+document.addEventListener('click',event=>{
+  if(openFilterToggle&&!event.target.closest('.filter-bar'))closeFilterMenu();
+});
+document.addEventListener('focusin',event=>{
+  if(!openFilterToggle)return;
+  const panel=document.getElementById(openFilterToggle.getAttribute('aria-controls'));
+  if(!panel.contains(event.target)&&!event.target.closest('.filter-toggle'))closeFilterMenu();
+});
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&openFilterToggle){event.preventDefault();closeFilterMenu(true);}
+});
+document.querySelectorAll('[data-group-options], [data-department-options]').forEach(element=>element.addEventListener('click',event=>{
+  const button=event.target.closest('[data-group], [data-department]');
   if(!button)return;
-  activeGroup=button.dataset.group;
-  activeDepartment='all';
+  activeGroup=button.dataset.group||'all';
+  activeDepartment=button.dataset.department||'all';
+  closeFilterMenu();
   renderProducts();
   document.querySelector('.catalogue-results').focus({preventScroll:true});
   revealSearchResults();
-});
-document.getElementById('productDepartments').addEventListener('click',event=>{
-  const button=event.target.closest('[data-department]');
-  if(!button)return;
-  activeDepartment=button.dataset.department;
-  activeGroup='all';
-  renderProducts();
-  document.querySelector('.catalogue-results').focus({preventScroll:true});
-  revealSearchResults();
-});
+}));
 document.getElementById('clearFilters').addEventListener('click',()=>{
   activeGroup='all';activeDepartment='all';activeCategory='Tất cả';
   document.getElementById('searchInput').value='';

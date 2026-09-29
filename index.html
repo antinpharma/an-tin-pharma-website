@@ -7,7 +7,7 @@
   <meta name="description" content="Danh mục sản phẩm An Tín Pharma - tìm kiếm sản phẩm, xem giá, hoạt chất và liên hệ tư vấn.">
   <title>An Tín Pharma | Danh mục sản phẩm</title>
   <link rel="icon" href="logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20260929-departments-1">
+  <link rel="stylesheet" href="style.css?v=20260930-filter-bar-1">
 </head>
 <body>
 <header class="header">
@@ -34,7 +34,22 @@
       <span>Giỏ hàng</span><span class="cart-badge" id="cartBadge">0</span>
     </button>
   </div>
+  <nav class="filter-bar" aria-label="Lọc nhanh sản phẩm">
+    <div class="wrap filter-bar-inner">
+      <button class="filter-toggle" id="departmentToggle" type="button" aria-expanded="false" aria-controls="departmentMenu"><span>Lọc theo khoa</span><span class="filter-chevron" aria-hidden="true"></span></button>
+      <button class="filter-toggle" id="groupToggle" type="button" aria-expanded="false" aria-controls="groupMenu"><span>Nhóm sản phẩm</span><span class="filter-chevron" aria-hidden="true"></span></button>
+      <section class="filter-popover" id="departmentMenu" aria-labelledby="departmentMenuTitle" hidden>
+        <div class="filter-popover-heading"><h2 id="departmentMenuTitle">Lọc theo khoa</h2><button class="icon-button" type="button" data-close-filter aria-label="Đóng danh sách khoa">×</button></div>
+        <nav class="quick-departments" id="quickDepartments" data-department-options aria-label="Chọn khoa"></nav>
+      </section>
+      <section class="filter-popover" id="groupMenu" aria-labelledby="groupMenuTitle" hidden>
+        <div class="filter-popover-heading"><h2 id="groupMenuTitle">Nhóm sản phẩm</h2><button class="icon-button" type="button" data-close-filter aria-label="Đóng danh sách nhóm sản phẩm">×</button></div>
+        <nav id="quickGroups" data-group-options aria-label="Chọn nhóm sản phẩm"></nav>
+      </section>
+    </div>
+  </nav>
 </header>
+<button class="filter-backdrop" id="filterBackdrop" type="button" tabindex="-1" aria-label="Đóng bộ lọc" hidden></button>
 
 <main id="top">
   <section class="hero">
@@ -80,11 +95,11 @@
       <section class="department-panel" id="departmentPanel" aria-labelledby="departmentTitle">
         <h2 id="departmentTitle">Duyệt theo khoa</h2>
         <p>Một sản phẩm có thể xuất hiện ở nhiều khoa. Xem chỉ định, độ tuổi và hướng dẫn của từng sản phẩm.</p>
-        <nav id="productDepartments" aria-label="Khoa chuyên môn"></nav>
+        <nav id="productDepartments" data-department-options aria-label="Khoa chuyên môn"></nav>
       </section>
       <details class="group-panel" id="groupPanel" open>
         <summary><span>Nhóm sản phẩm</span><small id="mobileGroupLabel">Tất cả nhóm</small></summary>
-        <nav id="productGroups" aria-label="Nhóm thuốc và loại sản phẩm"></nav>
+        <nav id="productGroups" data-group-options aria-label="Nhóm thuốc và loại sản phẩm"></nav>
       </details>
     </section>
     <div class="note">Thông tin sản phẩm trên website dùng để tham khảo. Vui lòng liên hệ An Tín Pharma để được hỗ trợ thêm về sản phẩm và giá tại thời điểm đặt hàng.</div>
@@ -213,6 +228,6 @@
 <script src="product-groups.js?v=20260924-groups-2"></script>
 <script src="product-departments.js?v=20260929-departments-1"></script>
 <script src="accounts.js?v=20260925-session-2"></script>
-<script src="app.js?v=20260929-departments-1"></script>
+<script src="app.js?v=20260930-filter-bar-1"></script>
 </body>
 </html>
