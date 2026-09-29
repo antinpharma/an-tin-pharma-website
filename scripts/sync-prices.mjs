@@ -1,9 +1,10 @@
-import { readFile, writeFile, appendFile, access } from 'node:fs/promises';
+import { readFile, writeFile, appendFile, access, mkdir } from 'node:fs/promises';
 import { resolve, relative, isAbsolute } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { runInNewContext, Script } from 'node:vm';
 import { createHash } from 'node:crypto';
 import { syncImages } from './sync-images.mjs';
+import {buildAudit, readSheetsJson} from './price-audit.mjs';
 
 export function readWindow(source, key) {
   const context = { window: {} };
@@ -64,7 +65,6 @@ export function updateCatalogue(products,values,multiplier){
     const productId=String(row[columns.product_id]??'').trim();
     if(!productId)throw new Error('A MIENNAM product is missing its Product ID. Catalogue was not changed.');
     const details={name:text(row[columns.product_name]),brand:text(row[columns.brand]),category:text(row[columns.product_category])};
-    if(!details.name)throw new Error(`Product ${productId} has no source name. Catalogue was not changed.`);
     if(byId.has(productId)&&JSON.stringify(byId.get(productId))!==JSON.stringify(details))throw new Error(`Product ${productId} has conflicting source details. Catalogue was not changed.`);
     byId.set(productId,details);
   }
@@ -81,7 +81,7 @@ export function updateCatalogue(products,values,multiplier){
   let added=0;
   for(const [productId,source] of byId){
     if(original.has(productId))continue;
-    merged.push({productId,...source,category:source.category||'Khác',active:'',indication:'',spec:'',price:'Liên hệ',image:'',visible:true});added++;
+    merged.push({productId,...source,name:source.name||'Đang cập nhật',category:source.category||'Khác',active:'',indication:'',spec:'',price:'Liên hệ',image:'',visible:true});added++;
   }
   const priced=updatePrices(merged,values,multiplier);
   priced.products=updateAvailability(priced.products,values);
@@ -172,13 +172,7 @@ async function fetchSheetValues(sheetUrl, sheetName, columns, token, fetchImpl) 
   const range = "'" + sheetName.replaceAll("'", "''") + "'!A1:" + columns;
   const url = new URL(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(range)}`);
   url.searchParams.set('valueRenderOption', 'UNFORMATTED_VALUE');
-  const response = await fetchImpl(url, {
-    headers: { Authorization: `Bearer ${token}` },
-    signal: AbortSignal.timeout(60000),
-  });
-  // Do not print tokens, response bodies, or unrelated source rows to public logs.
-  if (!response.ok) throw new Error(`Google Sheets read failed (HTTP ${response.status}). Catalogue was not changed.`);
-  const data = await response.json();
+  const data = await readSheetsJson(url, token, fetchImpl);
   if (!Array.isArray(data.values)) throw new Error('Empty Sheets response. Catalogue was not changed.');
   return data.values;
 }
@@ -236,10 +230,16 @@ export async function syncPrices({ root = process.cwd(), token = process.env.GOO
   result.changes = result.products.filter(p => JSON.stringify(products.find(old => old.productId === p.productId)) !== JSON.stringify(p)).map(p => ({productId:p.productId}));
   const output = renderUpdate(source, html, result);
   await validateAssets(root, output.html, result.products);
+  let previous = {};
+  try { previous = JSON.parse(await read('data/catalogue-status.json')); }
+  catch (error) { if (error.code !== 'ENOENT') throw error; }
+  result.audit = buildAudit(products, result, values, output.catalogue, new Date(), previous);
   if (result.changes.length) {
     await writeFile(resolve(root, 'catalogue.js'), output.catalogue, 'utf8');
     await writeFile(resolve(root, 'index.html'), output.html, 'utf8');
   }
+  await mkdir(resolve(root, 'data'), {recursive: true});
+  await writeFile(resolve(root, 'data/catalogue-status.json'), JSON.stringify(result.audit, null, 2) + '\n');
   return result;
 }
 
@@ -252,6 +252,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
     for (const failure of result.imageFailures) console.log(`::warning::Product ${failure.productId}: image update failed (${failure.reason}); previous image retained.`);
     for (const id of result.uncertain) console.log(`::warning::Product ${id}: price missing, invalid, or conflicting; using Lien he.`);
     if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, summary + '\n');
+    console.log(`Source timestamp: ${result.audit.sourceLabel || 'unknown'}; freshness: ${result.audit.freshness}; actual price changes: ${result.audit.priceChanged}.`);
+    if (result.audit.freshness !== 'fresh') console.log('::warning::Source timestamp is stale, unknown or in the future; check Data san. A successful read does not prove fresh prices.');
+    if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY,
+      `\nSource: ${result.audit.sourceLabel || 'unknown'} (${result.audit.freshness}). Price changes: ${result.audit.priceChanged}. Stock-status changes: ${result.audit.stockStatusChanged}.\n`);
+    if (process.env.GITHUB_OUTPUT) await appendFile(process.env.GITHUB_OUTPUT,
+      `report=${JSON.stringify(result.audit)}\ncatalogue_sha=${result.audit.catalogueSha256}\nchecked_at=${result.audit.checkedAt}\n`);
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;

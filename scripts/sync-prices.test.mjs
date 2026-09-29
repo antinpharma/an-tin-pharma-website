@@ -182,15 +182,21 @@ test('sync uses authenticated unformatted read; failure leaves files intact; rep
     };
     assert.equal((await syncPrices({ root, token: 'test-only', fetchImpl })).changes.length, 2);
     const after = await readFile(join(root, 'catalogue.js'), 'utf8');
+    const status = JSON.parse(await readFile(join(root, 'data/catalogue-status.json'), 'utf8'));
+    assert.equal(status.status, 'checked');
+    assert.equal(status.priceChanged, 1);
+    assert.equal(status.total, 2);
     assert.equal(readWindow(after, 'ANTIN_PRODUCTS')[0].price, '113.000đ');
     assert.equal((await syncPrices({ root, token: 'test-only', fetchImpl })).changes.length, 0);
     assert.equal(await readFile(join(root, 'catalogue.js'), 'utf8'), after);
     // A backup-only failure must also leave the previous catalogue and cache intact.
     const afterHtml = await readFile(join(root,'index.html'),'utf8');
+    const afterStatus = await readFile(join(root,'data/catalogue-status.json'),'utf8');
     for (const backupResponse of [{ok:false,status:403},{ok:true,json:async()=>({values:[['bad header']]})}]) {
       await assert.rejects(syncPrices({root,token:'test-only',fetchImpl:(url,options)=>url.pathname.includes('/backup-id/')?Promise.resolve(backupResponse):fetchImpl(url,options)}));
       assert.equal(await readFile(join(root,'catalogue.js'),'utf8'),after);
       assert.equal(await readFile(join(root,'index.html'),'utf8'),afterHtml);
+      assert.equal(await readFile(join(root,'data/catalogue-status.json'),'utf8'),afterStatus);
     }
   } finally {
     await rm(root, { recursive: true, force: true });

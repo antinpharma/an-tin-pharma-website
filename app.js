@@ -511,3 +511,24 @@ loadProducts().then(()=>{
   cart=restoreCart();
   renderProducts(); renderCart();
 });
+
+async function showPriceSyncStatus(){
+  const element=document.getElementById('priceSyncStatus');
+  if(!element)return;
+  try{
+    const response=await fetch('data/catalogue-status.json?t='+Date.now(),{cache:'no-store',signal:AbortSignal.timeout(10000)});
+    if(!response.ok)throw new Error();
+    const status=await response.json();
+    const checked=Date.parse(status.checkedAt),source=Date.parse(status.sourceUpdatedAt);
+    if(status.status!=='checked'||!Number.isFinite(checked)||!/^[a-f0-9]{64}$/.test(status.catalogueSha256))throw new Error();
+    const script=[...document.scripts].find(item=>new URL(item.src||location.href).pathname.endsWith('/catalogue.js'));
+    const version=script&&new URL(script.src).searchParams.get('v');
+    if(version!==status.catalogueSha256.slice(0,12)){
+      element.textContent='Có bảng giá mới. Tải lại trang để xem giá mới nhất.';return;
+    }
+    const format=value=>new Date(value).toLocaleString('vi-VN',{timeZone:'Asia/Ho_Chi_Minh',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'});
+    element.textContent='Kiểm tra giá: '+format(checked)+(Number.isFinite(source)?' · Nguồn: '+format(source):' · Chưa xác định thời điểm nguồn');
+    if(Date.now()-checked>36*3600000||status.freshness!=='fresh'||Date.now()-source>36*3600000)element.textContent+=' · Vui lòng xác nhận giá qua Zalo.';
+  }catch{element.textContent='Chưa xác minh được thời điểm kiểm tra giá. Liên hệ Zalo để xác nhận.';}
+}
+void showPriceSyncStatus();

@@ -3,10 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test scripts/sync-prices.test.mjs scripts/product-groups.test.mjs workers/orders.test.mjs workers/accounts.test.mjs"
+    "test": "node --test scripts/sync-prices.test.mjs scripts/price-audit.test.mjs scripts/product-groups.test.mjs workers/orders.test.mjs workers/accounts.test.mjs"
   },
   "dependencies": {
     "@noble/hashes": "2.4.0",
+    "nodemailer": "10.0.12",
     "sharp": "0.35.4"
   }
 }

@@ -2,7 +2,8 @@ name: Update prices and deploy website
 
 on:
   schedule:
-    - cron: '0 4 * * *' # Daily at 11:00 Vietnam time (UTC+7); GitHub may queue runs.
+    - cron: '17 4 * * *' # 11:17 Vietnam; avoid the busy start of the hour.
+    - cron: '47 8 * * *' # 15:47 backup if no fresh sync has been deployed today.
   workflow_dispatch:
   push:
     branches: [main]
@@ -15,12 +16,34 @@ permissions:
   contents: read
 
 jobs:
-  sync:
+  preflight:
     if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      due: ${{ steps.window.outputs.due }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - id: window
+        env:
+          SYNC_SCHEDULE: ${{ github.event.schedule }}
+        run: node scripts/check-sync-window.mjs
+
+  sync:
+    needs: preflight
+    if: needs.preflight.outputs.due == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
       publish: ${{ steps.catalogue.outputs.publish }}
+      report: ${{ steps.source.outputs.report }}
+      catalogue_sha: ${{ steps.source.outputs.catalogue_sha }}
+      checked_at: ${{ steps.source.outputs.checked_at }}
     permissions:
       contents: write
       id-token: write
@@ -31,7 +54,7 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24'
-      - name: Install password hashing dependency
+      - name: Install locked dependencies
         run: npm ci --ignore-scripts
       - name: Test catalogue, prices, orders and accounts
         run: npm test
@@ -45,6 +68,7 @@ jobs:
           access_token_scopes: https://www.googleapis.com/auth/spreadsheets.readonly
           create_credentials_file: false
       - name: Read Data san A-G and backup product details
+        id: source
         env:
           GOOGLE_ACCESS_TOKEN: ${{ steps.google.outputs.access_token }}
         run: node scripts/sync-prices.mjs
@@ -55,10 +79,10 @@ jobs:
         run: |
           git diff --check
           publish=false
-          if [ -n "$(git status --porcelain -- catalogue.js index.html images/sheet)" ]; then
+          if [ -n "$(git status --porcelain -- catalogue.js index.html images/sheet data/catalogue-status.json)" ]; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add -- catalogue.js index.html images/sheet
+            git add -- catalogue.js index.html images/sheet data/catalogue-status.json
             git commit -m "Sync MIENNAM prices and backup product details"
             git push origin HEAD:main
             publish=true
@@ -93,3 +117,42 @@ jobs:
       - name: Deploy website
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+
+  verify:
+    needs: [sync, deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - name: Verify the catalogue served by GitHub Pages
+        env:
+          EXPECTED_CATALOGUE_SHA: ${{ needs.sync.outputs.catalogue_sha }}
+          EXPECTED_CHECKED_AT: ${{ needs.sync.outputs.checked_at }}
+        run: node scripts/verify-published-prices.mjs
+
+  notify:
+    needs: [preflight, sync, deploy, verify]
+    if: always() && github.ref == 'refs/heads/main' && (needs.preflight.outputs.due == 'true' || needs.preflight.result == 'failure')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - run: npm ci --ignore-scripts
+      - name: Email the result, including failed sync or deployment
+        env:
+          SYNC_REPORT: ${{ needs.sync.outputs.report }}
+          SYNC_RESULT: ${{ needs.sync.result }}
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+          VERIFY_RESULT: ${{ needs.verify.result }}
+          PRICE_REPORT_APP_PASSWORD: ${{ secrets.PRICE_REPORT_APP_PASSWORD }}
+        run: node scripts/notify-prices.mjs

@@ -17,7 +17,10 @@ Repository: `antinpharma/an-tin-pharma-website`.
 
 - [Data sàn](https://docs.google.com/spreadsheets/d/1TEOQde1O0JoikDJJnIbe6sdpGl3GL76kJf1hQ_MapCU/edit), tab `check`, tiêu đề dòng 2: chỉ đọc A:G để lấy mã, miền, tên, hãng, danh mục và giá. Cột G `Tồn khả dụng`: MIENNAM có giá trị số 0 hiển thị “Hết hàng” và không được thêm vào giỏ/gửi đơn; vẫn liên hệ Zalo được. Không xuất số lượng tồn. Ô trống, không hợp lệ hoặc mâu thuẫn thì trạng thái chưa xác định.
 - [Data sàn backup 1](https://docs.google.com/spreadsheets/d/1AlreWSLbHiXHGP9BqdMH1WC_wVyEbV3pRREXVuD3r9k/edit), tab `Sheet1`, tiêu đề dòng 1: đọc A:J nhưng chỉ dùng Product ID + miền để ghép H `Hoạt chất`, I `Chỉ định`, J `link ảnh URL`. Bỏ qua tên, giá và tồn kho cũ trong backup. Tuyệt đối không dùng H:J của Data sàn vì thứ tự dòng có thể thay đổi.
-- Lịch: 11:00 hằng ngày theo giờ Việt Nam (04:00 UTC, cron `0 4 * * *`), đồng thời chạy khi push lên `main` hoặc chạy thủ công. Giá và trạng thái tồn lấy cùng dữ liệu A:G của tab `check`, ghép theo Product ID + MIENNAM, không theo số dòng. GitHub có thể chạy trễ. Lần chạy theo lịch không có thay đổi sẽ bỏ qua triển khai Pages.
+- Lịch: **11:17 hằng ngày** theo giờ Việt Nam (cron `17 4 * * *`), tránh phút đầu giờ thường đông tải. Lịch dự phòng **15:47** (`47 8 * * *`) chạy nếu chưa có bản đồng bộ nguồn mới được xuất bản trong ngày. Đồng thời chạy khi push lên `main` hoặc chạy thủ công. GitHub có thể chạy trễ hoặc bỏ lượt; cả hai lịch không phải bảo đảm thời gian thực.
+- Google Sheets API được thử lại tối đa 3 lần với lỗi mạng, HTTP 429/500/502/503/504. Lỗi quyền, cấu trúc và đơn vị giá vẫn dừng; không thử đoán giá hoặc tự đổi hệ số.
+- Sau mỗi lượt đọc thành công, `data/catalogue-status.json` ghi thời điểm kiểm tra, thời điểm nguồn ở A1, số sản phẩm mới, số giá thay đổi, số trạng thái tồn thay đổi, số giá “Liên hệ” và SHA-256 catalogue. Không ghi số lượng tồn. Nguồn quá 36 giờ/không nhận diện được thời điểm/thời điểm ở tương lai có cảnh báo riêng. Thời điểm kiểm tra không đồng nghĩa nguồn đã được cập nhật.
+- Website hiển thị thời điểm kiểm tra và nguồn ở cuối trang. Dấu thời gian được triển khai ngay cả khi giá không đổi. Nếu lỗi đồng bộ, giữ dấu thời gian của lần thành công trước. Sau triển khai, workflow đối chiếu trực tiếp catalogue, phiên bản cache trong index và thời điểm status trên GitHub Pages; không chỉ dựa vào nút xanh của bước deploy.
 - Chạy ngay: GitHub → Actions → **Update prices and deploy website** → **Run workflow** → nhánh `main`.
 - Chỉ ghép chính xác Product ID và `sales_region_code = MIENNAM`; nguồn mới trả giá theo nghìn đồng, nhân 1.000 (người dùng xác nhận lại ngày 24/09/2026): 113 → 113.000đ, 322 → 322.000đ. Nếu phần lớn giá đột ngột tăng/giảm khoảng 1.000 lần, dừng đồng bộ và xác nhận lại hệ số, không tự đoán.
 - Dòng MIENNAM mới trong Data sàn tự thêm sản phẩm. Đồng bộ tên (`product_name`), hãng (`brand`), nhóm (`product_category`) từ Data sàn; hoạt chất, chỉ định từ backup. Ô trống hoặc không có mã trong backup giữ thông tin cũ; sản phẩm mới thiếu thông tin hiển thị “Đang cập nhật”. Giữ quy cách hiện có. Không đoán dữ liệu thuốc.
@@ -25,7 +28,19 @@ Repository: `antinpharma/an-tin-pharma-website`.
 - Khi bổ sung nội dung: tìm Product ID ở backup rồi điền H:I:J trên cùng dòng. Có thể sắp xếp **toàn bộ A:J**, không sắp xếp riêng H:I:J. Không cần giữ thứ tự dòng giữa hai file giống nhau. Nếu mã miền Nam bị trùng nhưng nội dung khác nhau, dừng đồng bộ để tránh gán nhầm.
 - Giá thiếu/không hợp lệ/mâu thuẫn dùng “Liên hệ”. Nguồn không đọc được, không có dữ liệu miền Nam hoặc sai tiêu đề thì workflow thất bại và giữ website đã triển khai.
 - Danh mục hoặc giá thay đổi sẽ tạo commit cho `catalogue.js` và cache trong `index.html`. Trình duyệt chỉ đọc catalogue đã xuất bản; không đọc CSV công khai hoặc quay về Sheet `San pham` cũ. Workflow tự triển khai Pages bằng artifact chỉ chứa file website, kể cả khi commit của bot không kích hoạt lần build mới.
-- Xem kết quả và số sản phẩm thay đổi trong Actions → lần chạy → Summary. Kiểm tra cài đặt thông báo GitHub Actions nếu muốn nhận email khi chạy lỗi.
+- Xem kết quả và số sản phẩm thay đổi trong Actions → lần chạy → Summary. Số sản phẩm thay đổi tổng hợp có thể gồm giá, trạng thái tồn, metadata và ảnh; báo cáo ghi riêng số **giá** thay đổi.
+
+### Email báo cáo hằng ngày
+
+Địa chỉ nhận/gửi: **nguyenphuockhaimkn@gmail.com**. Job `notify` chạy sau kết quả đồng bộ, triển khai và xác minh, kể cả khi bước trước lỗi. Lịch dự phòng được bỏ qua khi đã có bản nguồn mới trong ngày thì không gửi thêm email. Chạy thủ công/push cũng gửi báo cáo để kiểm chứng. Nguồn cũ hoặc website chưa xác minh được không được báo là cập nhật thành công.
+
+Thiết lập một lần:
+
+1. Đăng nhập đúng Gmail trên, bật Xác minh 2 bước, tạo [Mật khẩu ứng dụng](https://myaccount.google.com/apppasswords) tên `An Tin daily prices`. Xem [hướng dẫn Google](https://support.google.com/mail/answer/185833). Không dùng mật khẩu đăng nhập Gmail thông thường.
+2. Mở [Repository Secrets](https://github.com/antinpharma/an-tin-pharma-website/settings/secrets/actions) → **New repository secret**. Tên **PRICE_REPORT_APP_PASSWORD**, giá trị là mật khẩu ứng dụng vừa tạo. Không gửi mã qua chat, commit hoặc ghi vào config.js.
+3. Chạy **Update prices and deploy website → Run workflow → main**. Job `notify` phải ghi `Gmail accepted the daily report for delivery`; kiểm tra cả thư rác. Đây là xác nhận Gmail nhận gửi, không phải biên nhận người dùng đã đọc.
+
+Chưa có secret: Summary ghi rõ **Daily email NOT enabled**, đồng bộ giá vẫn chạy. Email được gửi bằng SMTP Gmail TLS, không ghi nội dung lỗi SMTP nhạy cảm vào log và không tự gửi lại khi kết quả gửi không rõ. Nếu mật khẩu ứng dụng bị thu hồi, thay secret. Nếu lịch GitHub hoàn toàn không được kích hoạt, job email cũng không chạy; cần hệ giám sát lịch độc lập nếu muốn bảo đảm phát hiện trường hợp này.
 
 ## Xác thực Google
 
