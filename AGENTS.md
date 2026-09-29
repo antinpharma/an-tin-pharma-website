@@ -36,6 +36,7 @@ Khách hàng xem sản phẩm, giá, hoạt chất, chỉ định và liên hệ
 6. Chỉ dùng sales_region_code = MIENNAM.
 7. Nguồn Data sàn cập nhật lại dùng nghìn đồng: PRICE_MULTIPLIER = 1000. Người dùng xác nhận ngày 24/09/2026: 113 → 113.000đ, 322 → 322.000đ. Quy ước này thay thế xác nhận ngày 23/09. Không tự suy đoán hệ số khi nguồn đổi; kiểm tra chặn thay đổi giá hàng loạt 1.000 lần trước khi xuất bản.
 8. Nếu không chắc giá, dùng "Liên hệ", không đoán.
+   - Ngoại lệ được người dùng xác nhận ngày 30/09/2026: Candid cream Glenmark 20g, Product ID 2986, giá bán 21.100đ. Lưu ở `config.js` → `PRICE_FALLBACKS_VND` (đơn vị đồng), chỉ áp dụng khi nguồn thiếu dòng MIENNAM. Nếu có dòng MIENNAM thì dùng giá nguồn; giá nguồn sai hoặc mâu thuẫn vẫn là "Liên hệ". Không tự thêm ngoại lệ hoặc lấy giá miền Bắc cho sản phẩm khác.
 9. Ảnh public của website được mirror vào repository GitHub.
 
 ## Important files

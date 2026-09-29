@@ -131,7 +131,7 @@ function orderText(rows){
   if(!rows.length) return '';
   const lines=rows.map((row,index)=>{
     const p=row.product, price=unitPrice(p);
-    return `${index+1}. ${p.name}${p.productId?` (Mã: ${p.productId})`:''}\n   Quy cách: ${p.spec||'Cần xác nhận'}\n   Số lượng: ${row.quantity} | Đơn giá: ${price===null?'Liên hệ':money(price)} | Thành tiền: ${price===null?'Liên hệ':money(price*row.quantity)}`;
+    return `${index+1}. ${p.name}${p.productId?` (Mã: ${p.productId})`:''}\n   Số lượng: ${row.quantity} | Đơn giá: ${price===null?'Liên hệ':money(price)} | Thành tiền: ${price===null?'Liên hệ':money(price*row.quantity)}`;
   });
   const summary=totals(rows);
   return `Chào An Tín Pharma, tôi muốn hỏi đặt các sản phẩm sau:\n\n${lines.join('\n\n')}\n\nSố loại: ${rows.length} | Tổng số lượng: ${summary.quantity}\nTạm tính${summary.unknown?' (chỉ sản phẩm có giá)':''}: ${totalLabel(rows)}${summary.unknown?`\nCó ${summary.unknown} sản phẩm cần báo giá.`:''}\nVui lòng xác nhận giá và tình trạng hàng. Cảm ơn!`;
@@ -164,7 +164,7 @@ function renderCart(refreshItems=true){
       <article class="cart-item" data-row-key="${esc(row.key)}">
         <input class="item-check" type="checkbox" data-cart-action="select" data-key="${esc(row.key)}" aria-label="Chọn ${esc(row.product.name)}" ${row.selected&&row.product.availability!=='out_of_stock'?'checked':''} ${row.product.availability==='out_of_stock'?'disabled':''}>
         <div class="cart-image">${productImage(row.product)}</div>
-        <div class="cart-item-info"><h4>${esc(row.product.name)}</h4><p>${esc(row.product.spec||'Quy cách đang cập nhật')}</p>
+        <div class="cart-item-info"><h4>${esc(row.product.name)}</h4>
           <div class="cart-item-price">${esc(row.product.price)}</div>
           ${row.product.availability==='out_of_stock'?'<span class="stock-badge">Hết hàng</span>':''}
           <div class="cart-item-bottom">${quantityControl(row.product)}<button class="remove-item" type="button" data-cart-action="remove" data-key="${esc(row.key)}" aria-label="Xoá ${esc(row.product.name)} khỏi giỏ hàng">Xoá</button></div>
@@ -395,7 +395,6 @@ function renderProducts(){
       <h3>${esc(p.name)}</h3>
       <div class="product-group-label">${esc(GROUPS.groupFor(p).label)}</div>
       ${p.brand?`<div class="meta"><b>Hãng:</b> ${esc(p.brand)}</div>`:''}
-      <div class="meta"><b>Quy cách:</b> ${esc(p.spec||'Đang cập nhật')}</div>
       <div class="price">${esc(p.price)}</div>
       <details class="product-details">
         <summary>Thông tin sản phẩm</summary>

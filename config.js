@@ -12,6 +12,9 @@ window.ANTIN_CONFIG = {
   PRICE_SHEET_NAME: "check",
   PRICE_REGION: "MIENNAM",
   PRICE_MULTIPLIER: 1000,
+  // Giá bán do chủ website xác nhận ngày 30/09/2026, đơn vị đồng.
+  // Chỉ dùng khi không có dòng MIENNAM; không tự lấy giá từ miền khác.
+  PRICE_FALLBACKS_VND: { "2986": 21100 },
 
   // H:I:J chỉ đọc từ backup, ghép theo Product ID; tiêu đề ở dòng 1.
   DETAIL_SOURCE_SHEET_URL: "https://docs.google.com/spreadsheets/d/1AlreWSLbHiXHGP9BqdMH1WC_wVyEbV3pRREXVuD3r9k/edit",

@@ -12,8 +12,12 @@ export function readWindow(source, key) {
   return JSON.parse(JSON.stringify(context.window[key]));
 }
 
-export function updatePrices(products, values, multiplier=1000) {
+export function updatePrices(products, values, multiplier=1000, fallbacks={}) {
   if(![1,1000].includes(multiplier))throw new Error('Expected an explicit price multiplier of 1 or 1000.');
+  if (!fallbacks || typeof fallbacks !== 'object' || Array.isArray(fallbacks)
+    || Object.entries(fallbacks).some(([id,price]) => !/^\d+$/.test(id) || !Number.isSafeInteger(price) || price <= 0)) {
+    throw new Error('Expected explicitly confirmed fallback prices in whole VND by Product ID.');
+  }
   if (!Array.isArray(products) || !products.length) throw new Error('Catalogue is empty.');
   const ids = products.map(p => String(p.productId ?? '').trim());
   if (ids.some(id => !id) || new Set(ids).size !== ids.length) {
@@ -43,7 +47,10 @@ export function updatePrices(products, values, multiplier=1000) {
   const uncertain = [];
   const updated = products.map((product, index) => {
     const candidates = byId.get(ids[index]);
-    const number = candidates?.size === 1 ? [...candidates][0] : null;
+    // A confirmed fallback only covers an absent southern row. Invalid or
+    // conflicting source prices still require contact; never borrow northern prices.
+    const number = candidates ? (candidates.size === 1 ? [...candidates][0] : null)
+      : (Object.hasOwn(fallbacks, ids[index]) ? fallbacks[ids[index]] : null);
     const price = number == null ? 'Liên hệ' : number.toLocaleString('vi-VN') + 'đ';
     if (number == null) uncertain.push(ids[index]);
     if (price !== product.price) changes.push({ productId: ids[index], before: product.price, after: price });
@@ -52,7 +59,7 @@ export function updatePrices(products, values, multiplier=1000) {
   return { products: updated, changes, uncertain };
 }
 
-export function updateCatalogue(products,values,multiplier){
+export function updateCatalogue(products,values,multiplier,fallbacks={}){
   // Data san owns A:G only. Its manually maintained H:J can drift after refresh.
   const headers=values?.[1]?.slice(0,7);
   const required=['product_id','sales_region_code','product_name','brand','product_category','retail_price_value'];
@@ -83,7 +90,7 @@ export function updateCatalogue(products,values,multiplier){
     if(original.has(productId))continue;
     merged.push({productId,...source,name:source.name||'Đang cập nhật',category:source.category||'Khác',active:'',indication:'',spec:'',price:'Liên hệ',image:'',visible:true});added++;
   }
-  const priced=updatePrices(merged,values,multiplier);
+  const priced=updatePrices(merged,values,multiplier,fallbacks);
   priced.products=updateAvailability(priced.products,values);
   const changes=priced.products.filter(p=>JSON.stringify(original.get(p.productId))!==JSON.stringify(p)).map(p=>({productId:p.productId}));
   return {...priced,changes,added};
@@ -218,7 +225,7 @@ export async function syncPrices({ root = process.cwd(), token = process.env.GOO
     fetchPriceValues(config, token, fetchImpl), fetchDetailValues(config, token, fetchImpl),
   ]);
   const details = readProductDetails(detailValues);
-  const result = updateCatalogue(products, values, config.PRICE_MULTIPLIER);
+  const result = updateCatalogue(products, values, config.PRICE_MULTIPLIER, config.PRICE_FALLBACKS_VND);
   validatePriceScale(products, result.products);
   result.products = updateProductDetails(result.products, details);
   const imageValues = [[], ['product_id','sales_region_code','link ảnh URL'],

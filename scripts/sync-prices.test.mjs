@@ -128,6 +128,26 @@ test('decimal prices retain dong precision', () => {
   assert.equal(updatePrices([products[0]], table(row(1146, 'MIENNAM', 108.401))).products[0].price, '108.401đ');
 });
 
+test('confirmed VND fallback survives daily sync only while the exact southern row is absent', () => {
+  const original = [{...products[0], productId:'2986'}, products[1]];
+  const fallback = {'2986':21100};
+  const source = table(row(2986,'MIENBAC',999),row(1505,'MIENNAM',322));
+  const first = updateCatalogue(original,source,1000,fallback);
+  assert.equal(first.products[0].price,'21.100đ');
+  assert.equal(first.products[0].availability,'unknown');
+  assert.deepEqual(first.uncertain,[]);
+  assert.equal(updateCatalogue(first.products,source,1000,fallback).changes.length,0);
+  assert.equal(updatePrices(original,[...source,row(2986,'MIENNAM',22)],1000,fallback).products[0].price,'22.000đ');
+  for (const invalid of ['',0,'22']) {
+    assert.equal(updatePrices(original,[...source,row(2986,'MIENNAM',invalid)],1000,fallback).products[0].price,'Liên hệ');
+  }
+  assert.equal(updatePrices(original,[...source,row(2986,'MIENNAM',22),row(2986,'MIENNAM',23)],1000,fallback).products[0].price,'Liên hệ');
+  assert.equal(updatePrices(original,source,1000,{'29860':21100}).products[0].price,'Liên hệ');
+  for (const bad of [null,[],{'2986':'21100'},{'2986':21.1},{'2986':0},{'2986':-1},{'2986':Infinity}]) {
+    assert.throws(()=>updatePrices(original,source,1000,bad));
+  }
+});
+
 test('missing, invalid, and conflicting prices become contact, never zero or guessed', () => {
   for (const value of [undefined, '', '113,000', '113', '#N/A', 0, -1, NaN, Infinity, 1e20]) {
     const result = updatePrices(products, table(row(1146, 'MIENNAM', value)));
