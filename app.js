@@ -371,7 +371,7 @@ function renderProducts(){
       ${p.brand?`<div class="meta"><b>Hãng:</b> ${esc(p.brand)}</div>`:''}
       <div class="meta"><b>Quy cách:</b> ${esc(p.spec||'Đang cập nhật')}</div>
       <div class="price">${esc(p.price)}</div>
-      <details class="product-details" ${window.matchMedia('(min-width: 641px)').matches?'open':''}>
+      <details class="product-details">
         <summary>Thông tin sản phẩm</summary>
         <div class="meta"><b>Hoạt chất:</b> ${esc(p.active||'Đang cập nhật')}</div>
         <div class="indication"><b>Chỉ định:</b> ${esc(p.indication||'Đang cập nhật')}</div>
