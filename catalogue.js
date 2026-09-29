@@ -1203,7 +1203,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Clotrimazol 1%.",
     "indication": "Điều trị nấm da, Candida ngoài da và lang ben.",
     "spec": "",
-    "price": "Liên hệ",
+    "price": "21.100đ",
     "image": "images/sheet/1f996b8eb5f972e408375549e8f4d3f6.webp",
     "visible": true,
     "availability": "unknown"
