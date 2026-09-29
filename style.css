@@ -39,6 +39,9 @@ h1 span{color:var(--orange)}
 .categories{display:flex;gap:10px;flex-wrap:wrap;padding:26px 0 8px}
 .catalogue-layout{display:grid;grid-template-columns:254px minmax(0,1fr);gap:24px;align-items:start;padding-top:20px}
 .catalogue-results{min-width:0}
+.catalogue-results.is-searching{min-height:calc(100dvh - var(--header-height,140px) - 12px)}
+.catalogue-results.is-searching .section-title{display:none}
+.catalogue-results.is-searching .filter-status{margin-bottom:12px}
 .catalogue-results .section-title{margin-top:0;gap:16px}
 .catalogue-results .section-title small{white-space:nowrap}
 .catalogue-results .grid{grid-template-columns:repeat(3,minmax(0,1fr))}

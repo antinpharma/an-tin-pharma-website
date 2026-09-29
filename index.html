@@ -7,7 +7,7 @@
   <meta name="description" content="Danh mục sản phẩm An Tín Pharma - tìm kiếm sản phẩm, xem giá, hoạt chất và liên hệ tư vấn.">
   <title>An Tín Pharma | Danh mục sản phẩm</title>
   <link rel="icon" href="logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20260929-wide-catalogue-1">
+  <link rel="stylesheet" href="style.css?v=20260929-search-results-1">
 </head>
 <body>
 <header class="header">
@@ -16,10 +16,10 @@
       <img src="logo.svg" alt="Logo An Tín Pharma">
       <div class="brand"><strong>An Tín Pharma</strong><span>An Tâm - Uy Tín</span></div>
     </a>
-    <div class="search">
-      <input id="searchInput" type="search" autocomplete="off" placeholder="Tìm tên thuốc, hoạt chất, hãng..." aria-label="Tìm sản phẩm">
-      <button id="searchButton" type="button">Tìm</button>
-    </div>
+    <form class="search" id="searchForm" role="search">
+      <input id="searchInput" type="search" enterkeyhint="search" aria-controls="productGrid" autocomplete="off" placeholder="Tìm tên thuốc, hoạt chất, hãng..." aria-label="Tìm sản phẩm">
+      <button id="searchButton" type="submit">Tìm</button>
+    </form>
     <nav class="links" aria-label="Điều hướng chính">
       <a href="#top">Trang chủ</a>
       <a href="#products">Sản phẩm</a>
@@ -203,6 +203,6 @@
 <script src="catalogue.js?v=7cd2dde13879"></script>
 <script src="product-groups.js?v=20260924-groups-2"></script>
 <script src="accounts.js?v=20260925-session-2"></script>
-<script src="app.js?v=20260929-wide-catalogue-1"></script>
+<script src="app.js?v=20260929-search-results-1"></script>
 </body>
 </html>

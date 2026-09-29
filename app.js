@@ -200,7 +200,7 @@ function renderGroups(){
     return `<details class="group-section" data-section="${section.id}" ${section.id==='medicines'?'open':''}><summary><span>${esc(section.label)}</span><span class="group-count" data-group-count="${section.id}"></span></summary><div>${button(section.id,'Tất cả '+section.label.toLocaleLowerCase('vi'))}${children.map(group=>button(group.id,group.label)).join('')}</div></details>`;
   }).join('')+button('unassigned','Chưa phân nhóm');
 }
-function refreshGroupFilters(candidates){
+function refreshGroupFilters(candidates,resultCount){
   const counts=new Map([['all',candidates.length]]);
   for(const product of candidates){
     const group=GROUPS.groupFor(product);
@@ -219,7 +219,7 @@ function refreshGroupFilters(candidates){
     el.classList.toggle('has-selection',activeGroup===section.id||section.children.some(g=>g.id===activeGroup));
   });
   const query=document.getElementById('searchInput').value.trim();
-  const labels=[activeGroup!=='all'?GROUPS.labelFor(activeGroup):'',activeCategory!=='Tất cả'?activeCategory:'',query?`Tìm: “${query}”`:''].filter(Boolean);
+  const labels=[query?`“${query}” — ${resultCount} sản phẩm`:'',activeGroup!=='all'?GROUPS.labelFor(activeGroup):'',activeCategory!=='Tất cả'?activeCategory:''].filter(Boolean);
   document.getElementById('filterStatus').hidden=!labels.length;
   document.getElementById('filterDescription').textContent=labels.join(' · ');
   document.getElementById('mobileGroupLabel').textContent=activeGroup==='all'?'Tất cả nhóm':GROUPS.labelFor(activeGroup);
@@ -356,7 +356,8 @@ function renderProducts(){
     return inCat&&(!needle||hay.includes(needle));
   });
   const filtered=candidates.filter(p=>GROUPS.matches(p,activeGroup));
-  refreshGroupFilters(candidates);
+  document.querySelector('.catalogue-results').classList.toggle('is-searching',Boolean(q));
+  refreshGroupFilters(candidates,filtered.length);
   document.getElementById('count').textContent=`${filtered.length} sản phẩm`;
   const grid=document.getElementById('productGrid');
   if(!filtered.length){grid.innerHTML='<div class="empty">Không tìm thấy sản phẩm phù hợp. Bạn có thể xóa bộ lọc hoặc thử từ khóa khác.</div>';return}
@@ -418,10 +419,36 @@ document.getElementById('clearFilters').addEventListener('click',()=>{
   activeGroup='all';activeCategory='Tất cả';
   document.getElementById('searchInput').value='';
   renderCategories();renderProducts();
-  document.getElementById('searchInput').focus();
+  document.getElementById('searchInput').focus({preventScroll:true});
+  revealSearchResults();
 });
-document.getElementById('searchInput').addEventListener('input',renderProducts);
-document.getElementById('searchButton').addEventListener('click',renderProducts);
+const searchHeader=document.querySelector('.header');
+function updateHeaderHeight(){
+  const height=searchHeader.getBoundingClientRect().height;
+  document.documentElement.style.setProperty('--header-height',`${height}px`);
+  return height;
+}
+new ResizeObserver(updateHeaderHeight).observe(searchHeader);
+function revealSearchResults(){
+  const headerHeight=updateHeaderHeight();
+  const results=document.querySelector('.catalogue-results');
+  window.scrollTo({top:Math.max(0,results.getBoundingClientRect().top+window.scrollY-headerHeight-12),behavior:'instant'});
+}
+document.getElementById('searchInput').addEventListener('input',event=>{
+  if(event.isComposing)return;
+  renderProducts();
+  revealSearchResults();
+});
+document.getElementById('searchInput').addEventListener('compositionend',()=>{
+  renderProducts();
+  revealSearchResults();
+});
+document.getElementById('searchForm').addEventListener('submit',event=>{
+  event.preventDefault();
+  renderProducts();
+  document.getElementById('searchInput').blur();
+  revealSearchResults();
+});
 document.getElementById('year').textContent=new Date().getFullYear();
 document.addEventListener('error',event=>{
   if(event.target.matches?.('.product-img img, .cart-image img')){
