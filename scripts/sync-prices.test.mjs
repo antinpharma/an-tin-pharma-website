@@ -58,6 +58,8 @@ test('stock status uses only column G and exact southern IDs, with no leaked sto
   }
   const conflict=updateAvailability(result,stockTable([...row(1146,'MIENNAM',113),0],[...row(1146,'MIENNAM',113),1]));
   assert.equal(conflict[0].availability,'unknown');assert.equal(conflict[1].availability,'unknown');
+  const positiveConflict=updateAvailability(result,stockTable([...row(1146,'MIENNAM',113),5],[...row(1146,'MIENNAM',113),10]));
+  assert.equal(positiveConflict[0].availability,'unknown');
   const restocked=updateAvailability(result,stockTable([...row(1146,'MIENNAM',113),2]));
   assert.equal(restocked[0].availability,'in_stock');
   assert.equal(updateCatalogue(result,values,1000).changes.length,0);

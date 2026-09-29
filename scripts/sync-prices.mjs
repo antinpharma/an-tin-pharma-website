@@ -99,13 +99,13 @@ export function updateAvailability(products,values){
     if(row[regionCol]!=='MIENNAM')continue;
     const id=String(row[idCol]??'').trim(),raw=row[6];
     const valid=typeof raw==='number'&&Number.isFinite(raw)&&raw>=0;
-    const status=valid?(raw===0?'out_of_stock':'in_stock'):'unknown';
     if(!stocks.has(id))stocks.set(id,new Set());
-    stocks.get(id).add(status);
+    stocks.get(id).add(valid?raw:null);
   }
   return products.map(product=>{
     const candidates=stocks.get(String(product.productId));
-    return {...product,availability:candidates?.size===1?[...candidates][0]:'unknown'};
+    const value=candidates?.size===1?[...candidates][0]:null;
+    return {...product,availability:value==null?'unknown':value===0?'out_of_stock':'in_stock'};
   });
 }
 

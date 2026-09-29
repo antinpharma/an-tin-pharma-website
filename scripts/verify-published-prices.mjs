@@ -3,10 +3,10 @@ import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {delay} from './price-audit.mjs';
 
-export async function verifyPublished({hash, checkedAt, fetchImpl = fetch, sleep = delay}) {
+export async function verifyPublished({hash, checkedAt, fetchImpl = fetch, sleep = delay, attempts = 8}) {
   if (!/^[a-f0-9]{64}$/.test(hash || '') || !Number.isFinite(Date.parse(checkedAt))) throw new Error('Missing expected publication identity.');
   const base = 'https://antinpharma.github.io/an-tin-pharma-website/';
-  for (let attempt = 0; attempt < 8; attempt++) {
+  for (let attempt = 0; attempt < attempts; attempt++) {
     try {
       const nonce = `${Date.now()}-${attempt}`;
       const [catalogue, status, home] = await Promise.all(['catalogue.js', 'data/catalogue-status.json', 'index.html'].map(file =>
@@ -17,7 +17,7 @@ export async function verifyPublished({hash, checkedAt, fetchImpl = fetch, sleep
       if (actual === hash && audit.catalogueSha256 === hash && audit.checkedAt === checkedAt &&
           html.includes(`catalogue.js?v=${hash.slice(0, 12)}`)) return {verified: true};
     } catch { /* CDN propagation or transient network error; retry GET only. */ }
-    if (attempt < 7) await sleep(5000);
+    if (attempt < attempts - 1) await sleep(5000);
   }
   throw new Error('Published catalogue/index/status do not match this sync. Website update NOT verified.');
 }
