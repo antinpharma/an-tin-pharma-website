@@ -45,6 +45,7 @@ Khách hàng xem sản phẩm, giá, hoạt chất, chỉ định và liên hệ
 - config.js: Facebook, Zalo và cấu hình
 - catalogue.js: dữ liệu catalogue public
 - product-groups.js: nhóm duyệt sản phẩm theo Product ID, độc lập với product_category trong Sheet; mã chưa được rà soát vào “Chưa phân nhóm”. Khi thêm nhóm mới, cập nhật kiểm thử scripts/product-groups.test.mjs.
+- product-departments.js: gợi ý duyệt theo khoa, cho phép một Product ID ở nhiều khoa; dùng nhóm đã rà soát và danh sách ID được đối chiếu với catalogue. Không suy ra dùng cho trẻ em/phụ nữ mang thai từ tên, dạng bào chế hoặc từ khóa. Kiểm thử cùng scripts/product-groups.test.mjs; thêm file này vào gói GitHub Pages. Nhóm và khoa nằm dưới danh sách sản phẩm, có liên kết nhảy nhanh ở đầu.
 - images/: ảnh sản phẩm public
 
 ## Contact

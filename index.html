@@ -7,7 +7,7 @@
   <meta name="description" content="Danh mục sản phẩm An Tín Pharma - tìm kiếm sản phẩm, xem giá, hoạt chất và liên hệ tư vấn.">
   <title>An Tín Pharma | Danh mục sản phẩm</title>
   <link rel="icon" href="logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20260929-cart-actions-1">
+  <link rel="stylesheet" href="style.css?v=20260929-departments-1">
 </head>
 <body>
 <header class="header">
@@ -59,14 +59,12 @@
 
   <section class="wrap" id="products">
     <div class="categories" id="categories" aria-label="Danh mục sản phẩm"></div>
+    <nav class="browse-shortcuts" aria-label="Chọn cách duyệt sản phẩm">
+      <a href="#departmentPanel">Duyệt theo khoa ↓</a>
+      <a href="#groupPanel">Nhóm sản phẩm ↓</a>
+    </nav>
     <div class="catalogue-layout">
-      <aside class="group-sidebar" aria-label="Lọc theo nhóm sản phẩm">
-        <details class="group-panel" id="groupPanel" open>
-          <summary><span>Nhóm sản phẩm</span><small id="mobileGroupLabel">Tất cả nhóm</small></summary>
-          <nav id="productGroups" aria-label="Nhóm thuốc và loại sản phẩm"></nav>
-        </details>
-      </aside>
-      <div class="catalogue-results">
+      <div class="catalogue-results" tabindex="-1" aria-label="Danh sách sản phẩm">
     <div class="section-title">
       <div><h2>Sản phẩm</h2><p>Chọn số lượng bằng nút − / +, rồi mở giỏ hàng để gửi yêu cầu đặt hàng.</p></div>
       <small id="count"></small>
@@ -76,9 +74,20 @@
       <button id="clearFilters" type="button">Xóa bộ lọc</button>
     </div>
     <section class="grid" id="productGrid" aria-live="polite"></section>
-    <div class="note">Thông tin sản phẩm trên website dùng để tham khảo. Vui lòng liên hệ An Tín Pharma để được hỗ trợ thêm về sản phẩm và giá tại thời điểm đặt hàng.</div>
       </div>
     </div>
+    <section class="browse-products" aria-label="Duyệt sản phẩm theo khoa và nhóm">
+      <section class="department-panel" id="departmentPanel" aria-labelledby="departmentTitle">
+        <h2 id="departmentTitle">Duyệt theo khoa</h2>
+        <p>Một sản phẩm có thể xuất hiện ở nhiều khoa. Xem chỉ định, độ tuổi và hướng dẫn của từng sản phẩm.</p>
+        <nav id="productDepartments" aria-label="Khoa chuyên môn"></nav>
+      </section>
+      <details class="group-panel" id="groupPanel" open>
+        <summary><span>Nhóm sản phẩm</span><small id="mobileGroupLabel">Tất cả nhóm</small></summary>
+        <nav id="productGroups" aria-label="Nhóm thuốc và loại sản phẩm"></nav>
+      </details>
+    </section>
+    <div class="note">Thông tin sản phẩm trên website dùng để tham khảo. Vui lòng liên hệ An Tín Pharma để được hỗ trợ thêm về sản phẩm và giá tại thời điểm đặt hàng.</div>
   </section>
 </main>
 
@@ -202,7 +211,8 @@
 <script src="config.js?v=20260924-backup-1"></script>
 <script src="catalogue.js?v=7cd2dde13879"></script>
 <script src="product-groups.js?v=20260924-groups-2"></script>
+<script src="product-departments.js?v=20260929-departments-1"></script>
 <script src="accounts.js?v=20260925-session-2"></script>
-<script src="app.js?v=20260929-cart-actions-1"></script>
+<script src="app.js?v=20260929-departments-1"></script>
 </body>
 </html>
