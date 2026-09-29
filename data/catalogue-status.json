@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "status": "checked",
+  "checkedAt": "2026-09-29T05:46:35.573Z",
+  "sourceUpdatedAt": "2026-09-29T03:00:00.000Z",
+  "sourceLabel": "Update: 10h 29/9",
+  "freshness": "fresh",
+  "lastChangedAt": "2026-09-29T05:46:35.573Z",
+  "catalogueSha256": "7cd2dde13879ec045d0992acfc138227e6922b7d01b960b3f88762bb97d70bca",
+  "total": 542,
+  "changed": 137,
+  "added": 4,
+  "priceChanged": 70,
+  "stockStatusChanged": 79,
+  "contactPrices": 18,
+  "imageFailures": 0
+}
