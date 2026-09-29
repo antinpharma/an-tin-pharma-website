@@ -128,7 +128,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible,t
 .cart-open{overflow:hidden}
 .cart-dialog{width:min(1060px,calc(100% - 48px));max-width:none;max-height:90dvh;border:0;border-radius:24px;padding:0;color:var(--text);background:#fff;box-shadow:0 24px 90px #0003;overflow:auto;overscroll-behavior:contain}
 .cart-dialog::backdrop{background:rgba(29,35,41,.5);backdrop-filter:blur(3px)}
-.cart-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:24px 28px;border-bottom:1px solid var(--line);background:white;position:sticky;top:0;z-index:2}
+.cart-heading{display:grid;grid-template-columns:minmax(0,1fr) auto 44px;align-items:center;gap:12px 16px;padding:24px 28px;border-bottom:1px solid var(--line);background:white;position:sticky;top:0;z-index:2}
+.cart-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;max-width:560px}
+.cart-actions .btn{min-height:44px;font-size:14px}
+.order-submit{background:#087b46;color:#fff}
+.cart-zalo{background:#fff;color:#087b46;border:1px solid #a9d0bb}
+.cart-heading .order-feedback{grid-column:1/-1;margin:0;max-height:25dvh;overflow-y:auto}
+.cart-heading .order-feedback:empty{display:none}
 .cart-heading h2{margin:0;font-size:28px}
 .cart-heading p{margin:6px 0 0;color:var(--muted);font-size:13px}
 .icon-button{width:44px;height:44px;flex-shrink:0;border:1px solid var(--line);background:#fff8ef;border-radius:50%;font-size:28px;cursor:pointer;color:var(--text)}
@@ -160,10 +166,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible,t
 .summary-total{border-top:1px solid var(--line);padding-top:20px;margin-top:20px;font-weight:700}
 .summary-total strong{color:var(--orange);font-size:24px;overflow-wrap:anywhere}
 .price-note{font-size:12px;line-height:1.6;color:#85633c;margin:8px 0 20px}
-.cart-buttons{display:grid;grid-template-columns:1fr;gap:10px}
-.cart-buttons .btn{min-height:46px}
 .delete-button{background:#fff;color:#b52d27;border:1px solid #e6bcb8}
-.zalo-checkout{background:#087b46;color:white;grid-row:1}
 .checkout-help{font-size:12px;line-height:1.7;color:var(--muted);margin:16px 0}
 .cart-summary details{font-size:12px;line-height:1.6}
 .cart-summary summary{cursor:pointer;color:#a14c26;min-height:36px}
@@ -175,10 +178,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible,t
 .direct-order label{display:block;font-size:13px;font-weight:600;margin:12px 0 6px}
 .direct-order input{width:100%;min-width:0;border:1px solid #dbc7b4;border-radius:9px;padding:11px;background:white;color:var(--text);font-size:16px}
 .direct-order p{font-size:12px;line-height:1.6;color:var(--muted)}
-.direct-order .btn{width:100%;min-height:46px}
 .order-feedback{font-size:13px;line-height:1.7;overflow-wrap:anywhere;margin-top:12px;color:#086b40}
 .order-feedback[data-error="true"]{color:#a12b23}
-.cart-summary.has-direct-order .cart-buttons .zalo-checkout{background:#fff;color:#087b46;border:1px solid #a9d0bb;grid-row:auto}
+@media(max-width:850px){
+  .cart-heading{grid-template-columns:minmax(0,1fr) 44px}
+  .cart-heading #closeCart{grid-column:2;grid-row:1}
+  .cart-actions{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:1fr 1fr;max-width:none}
+  .cart-actions #sendOrder,.cart-actions #newOrder{grid-column:1/-1}
+}
 @media(min-width:981px) and (max-width:1170px){.links{display:none}}
 @media(max-width:980px){
   .catalogue-layout{grid-template-columns:minmax(0,1fr);gap:20px}
@@ -233,15 +240,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible,t
   .cart-item h4{font-size:14px}
   .cart-item-bottom{gap:6px}
   .cart-summary{padding:20px 16px calc(20px + env(safe-area-inset-bottom));border-left:0;border-top:1px solid var(--line)}
-  .cart-buttons{grid-template-columns:1fr 1.4fr}
-  .zalo-checkout{grid-row:auto}
   .cart-summary h3{font-size:18px;margin-bottom:16px}
 }
 @media(min-width:641px) and (max-width:850px){
   .cart-layout{grid-template-columns:1fr}
   .cart-summary{border-left:0;border-top:1px solid var(--line)}
-  .cart-buttons{grid-template-columns:1fr 1fr}
-  .zalo-checkout{grid-row:auto}
 }
 @media(max-width:360px){
   .cart-toggle>span:not(.cart-badge){display:none}
@@ -309,7 +312,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible,t
   .card .product-quantity{flex-wrap:wrap}
   .card .actions .btn{padding:11px 6px;font-size:14px;text-align:center}
 }
-#newOrder{margin-top:12px}
 @media(max-width:640px){
   .catalogue-results .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start}
   .card{border-radius:12px;min-width:0;height:100%}

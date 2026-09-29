@@ -228,7 +228,7 @@ function refreshOrderForm(){
   const enabled=Boolean(CONFIG.ORDER_API_URL);
   const account=window.AntinAccount?.profile;
   document.getElementById('directOrderForm').hidden=!enabled;
-  document.querySelector('.cart-summary').classList.toggle('has-direct-order',enabled);
+  document.getElementById('sendOrder').hidden=!enabled;
   document.getElementById('sendOrder').disabled=orderSending || orderSubmitted || !cartRows(true).length;
   document.getElementById('sendOrder').textContent=orderSending?'Đang gửi yêu cầu…':orderSubmitted?'Đã gửi yêu cầu':account?'Gửi yêu cầu đặt hàng':'Đăng nhập để gửi đơn';
   document.getElementById('newOrder').hidden=!orderSubmitted;

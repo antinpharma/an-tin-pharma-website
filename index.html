@@ -7,7 +7,7 @@
   <meta name="description" content="Danh mục sản phẩm An Tín Pharma - tìm kiếm sản phẩm, xem giá, hoạt chất và liên hệ tư vấn.">
   <title>An Tín Pharma | Danh mục sản phẩm</title>
   <link rel="icon" href="logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20260929-search-results-1">
+  <link rel="stylesheet" href="style.css?v=20260929-cart-actions-1">
 </head>
 <body>
 <header class="header">
@@ -101,7 +101,14 @@
 <dialog class="cart-dialog" id="cartDialog" aria-labelledby="cartTitle">
   <div class="cart-heading">
     <div><h2 id="cartTitle">Giỏ hàng</h2><p id="cartSubtitle">Các sản phẩm bạn đã chọn</p></div>
+    <div class="cart-actions" role="group" aria-label="Thao tác giỏ hàng">
+      <button class="btn order-submit" id="sendOrder" type="submit" form="directOrderForm" disabled hidden>Gửi yêu cầu đặt hàng</button>
+      <button class="btn delete-button" id="deleteCart" type="button" disabled>Xoá hàng</button>
+      <button class="btn cart-zalo" id="checkoutCart" type="button" disabled>Liên hệ Zalo</button>
+      <button class="btn primary" id="newOrder" type="button" hidden>Chọn đơn hàng mới</button>
+    </div>
     <button class="icon-button" id="closeCart" type="button" aria-label="Đóng giỏ hàng" autofocus>×</button>
+    <div id="orderFeedback" class="order-feedback" role="status" aria-live="polite"></div>
   </div>
   <div class="cart-layout">
     <section class="cart-products" aria-label="Sản phẩm trong giỏ hàng">
@@ -125,14 +132,7 @@
         <p id="orderAddress" hidden></p>
         <button class="account-link" id="editOrderAccount" type="button" hidden>Cập nhật thông tin nhận hàng</button>
         <p>Tên, số điện thoại và danh sách sản phẩm sẽ được gửi đến An Tín Pharma để liên hệ xác nhận yêu cầu.</p>
-        <button class="btn zalo-checkout" id="sendOrder" type="submit" disabled>Gửi yêu cầu đặt hàng</button>
-        <div id="orderFeedback" class="order-feedback" role="status" aria-live="polite"></div>
-        <button class="btn primary" id="newOrder" type="button" hidden>Chọn đơn hàng mới</button>
       </form>
-      <div class="cart-buttons">
-        <button class="btn delete-button" id="deleteCart" type="button" disabled>Xoá hàng</button>
-        <button class="btn zalo-checkout" id="checkoutCart" type="button" disabled>Liên hệ Zalo</button>
-      </div>
       <p class="checkout-help">Nếu muốn trao đổi trực tiếp, chọn “Liên hệ Zalo” để sao chép danh sách và mở cuộc trò chuyện. Bạn có thể dán danh sách để được tư vấn.</p>
       <details id="orderPreview">
         <summary>Xem nội dung gửi Zalo</summary>
@@ -203,6 +203,6 @@
 <script src="catalogue.js?v=7cd2dde13879"></script>
 <script src="product-groups.js?v=20260924-groups-2"></script>
 <script src="accounts.js?v=20260925-session-2"></script>
-<script src="app.js?v=20260929-search-results-1"></script>
+<script src="app.js?v=20260929-cart-actions-1"></script>
 </body>
 </html>
