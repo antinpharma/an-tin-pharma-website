@@ -16,7 +16,7 @@ export async function inspectPublication(now, fetchImpl = fetch) {
   const nonce = now.getTime();
   const get = async file => {
     const response = await fetchImpl(`${site}${file}?watchdog=${nonce}`, {
-      cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(12000)
+      cache: 'no-store', redirect: 'manual', signal: AbortSignal.timeout(12000)
     });
     if (!response.ok) throw Error('publication_unavailable');
     return response;
@@ -36,12 +36,14 @@ export async function inspectPublication(now, fetchImpl = fetch) {
   return {verified: true, checkedAt: status.checkedAt, sourceUpdatedAt: status.sourceUpdatedAt};
 }
 
-export async function runCheck({env, storage, now = new Date(), fetchImpl = fetch, sendMail}) {
-  if (!inWindow(now)) return {outcome: 'outside_window'};
+export async function runCheck({env, storage, now = new Date(), fetchImpl = fetch, sendMail, manual = false, forceDispatch = false, testMail = false}) {
+  if (!manual && !inWindow(now)) return {outcome: 'outside_window'};
   const today = day(now.toISOString());
   const previous = await storage.get('state');
   const state = previous?.day === today ? {...previous} : {day: today, attempts: 0, mail: {}};
   state.lastCheckAt = now.toISOString();
+  state.lastTrigger = manual ? 'manual' : 'cron';
+  if (!manual) state.lastCronAt = now.toISOString();
   state.githubConfigured = Boolean(env.GITHUB_SCHEDULER_TOKEN?.trim());
   state.emailConfigured = Boolean(env.PRICE_REPORT_APP_PASSWORD?.trim());
   let publication;
@@ -49,7 +51,7 @@ export async function runCheck({env, storage, now = new Date(), fetchImpl = fetc
   catch { publication = {verified: false}; }
   state.publication = publication;
   state.outcome = publication.verified ? 'verified' : 'awaiting_update';
-  if (!publication.verified) {
+  if (!publication.verified || forceDispatch) {
     if (!state.githubConfigured) state.outcome = 'missing_github_token';
     else {
       const headers = {Authorization: `Bearer ${env.GITHUB_SCHEDULER_TOKEN.trim()}`,
@@ -58,9 +60,9 @@ export async function runCheck({env, storage, now = new Date(), fetchImpl = fetc
       try {
         // Fail closed when the run list is unavailable; never blindly create another run.
         const response = await fetchImpl(`${workflow}/runs?branch=main&per_page=30`, {
-          headers, redirect: 'error', signal: AbortSignal.timeout(12000)
+          headers, redirect: 'manual', signal: AbortSignal.timeout(12000)
         });
-        if (!response.ok) throw Error();
+        if (!response.ok) { state.githubHttpStatus = response.status; throw Error(); }
         const result = await response.json();
         if (!Array.isArray(result.workflow_runs)) throw Error();
         const active = result.workflow_runs.find(run => run.head_branch === 'main' && run.status !== 'completed');
@@ -78,7 +80,8 @@ export async function runCheck({env, storage, now = new Date(), fetchImpl = fetc
           await storage.put('state', state);
           const dispatched = await fetchImpl(`${workflow}/dispatches`, {method: 'POST',
             headers: {...headers, 'Content-Type': 'application/json'},
-            body: JSON.stringify({ref: 'main'}), redirect: 'error', signal: AbortSignal.timeout(12000)});
+            body: JSON.stringify({ref: 'main'}), redirect: 'manual', signal: AbortSignal.timeout(12000)});
+          state.githubHttpStatus = dispatched.status;
           if (dispatched.status !== 204) throw Error();
           state.outcome = 'dispatch_accepted';
           state.lastDispatchAt = now.toISOString();
@@ -87,15 +90,15 @@ export async function runCheck({env, storage, now = new Date(), fetchImpl = fetc
     }
   }
   const localHour = new Date(now.getTime() + 7 * 3600000).getUTCHours();
-  const kind = publication.verified ? 'verified' : localHour >= 12 ? 'warning' : null;
+  const kind = manual && testMail ? 'test' : publication.verified ? 'verified' : localHour >= 12 ? 'warning' : null;
   if (kind && state.emailConfigured && !state.mail[kind]) {
     // At most one attempt per kind/day; do not duplicate an SMTP send after an uncertain result.
     state.mail[kind] = {at: now.toISOString(), outcome: 'pending'};
     await storage.put('state', state);
     const format = value => new Date(value).toLocaleString('vi-VN', {timeZone: 'Asia/Ho_Chi_Minh'});
-    const subject = `[An Tín Pharma] ${kind === 'verified' ? 'GIÁM SÁT: ĐÃ XÁC MINH WEBSITE' : 'CẢNH BÁO: CHƯA CẬP NHẬT HÔM NAY'} — ${today}`;
+    const subject = `[An Tín Pharma] ${kind === 'test' ? 'KIỂM TRA BỘ HẸN GIỜ' : kind === 'verified' ? 'GIÁM SÁT: ĐÃ XÁC MINH WEBSITE' : 'CẢNH BÁO: CHƯA CẬP NHẬT HÔM NAY'} — ${today}`;
     const text = [`Kiểm tra độc lập từ Cloudflare: ${format(now.toISOString())}.`,
-      kind === 'verified'
+      publication.verified
         ? `Đã đối chiếu catalogue, phiên bản trang và ngày nguồn. Nguồn: ${format(publication.sourceUpdatedAt)}; đồng bộ: ${format(publication.checkedAt)}.`
         : 'Chưa xác minh được website đã nhận nguồn của hôm nay. Bộ hẹn giờ tiếp tục kiểm tra trong khung 11:17–18:57; kiểm tra quyền GitHub, nguồn Sheet và nhật ký nếu tình trạng kéo dài.',
       `Trạng thái kiểm tra: ${state.outcome}.`, `Website: ${site}`,
@@ -104,7 +107,10 @@ export async function runCheck({env, storage, now = new Date(), fetchImpl = fetc
     ].join('\n\n');
     try {
       const accepted = await sendMail({to: recipient, subject, text}, env.PRICE_REPORT_APP_PASSWORD);
-      state.mail[kind].outcome = accepted === true ? 'smtp_accepted' : 'unconfirmed';
+      state.mail[kind].outcome = accepted === true || accepted?.accepted === true ? 'smtp_accepted' : 'unconfirmed';
+      if (['EAUTH','ESOCKET','ETIMEDOUT','ECONNECTION','EDNS','EENVELOPE','EMESSAGE','RUNTIME_TYPE_ERROR','SMTP_UNCONFIRMED'].includes(accepted?.failure)) {
+        state.mail[kind].failure = accepted.failure;
+      }
     } catch { state.mail[kind].outcome = 'unconfirmed'; }
   }
   await storage.put('state', state);

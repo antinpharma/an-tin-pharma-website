@@ -15,6 +15,7 @@ function fixture(options = {}) {
     async put(k,v) { records.set(k,structuredClone(v)); }, async delete(k) { records.delete(k); },
     async transaction(fn) { return fn(storage); }};
   const fetchImpl = async (url, init = {}) => {
+    assert.equal(init.redirect,'manual'); // Workers supports manual/follow, not redirect:error.
     calls.push({url, method: init.method || 'GET'});
     if (url.includes('api.github.com')) {
       if (options.apiError) throw Error('private-secret-must-not-leak');
@@ -120,10 +121,55 @@ test('persistent lease prevents concurrent Cron checks; public endpoint cannot d
 });
 test('SMTP uses TLS, exact recipient, and closes transport on failure', async () => {
   let closed=false;
-  await assert.rejects(sendSchedulerMail({},'test-only', options=>{
+  const result=await sendSchedulerMail({},'test-only', options=>{
     assert.equal(options.secure,true); assert.equal(options.port,465);
     assert.equal(options.auth.user,'nguyenphuockhaimkn@gmail.com');
     return {sendMail:async()=>{throw Error('smtp');}, close(){closed=true;}};
-  }));
+  });
+  assert.equal(result.accepted,false);
   assert.equal(closed,true);
+});
+
+test('explicit admin dispatch tests credentials on a fresh site but respects active runs and cooldown', async () => {
+  const f=fixture();
+  assert.equal((await runCheck({...f,manual:true,forceDispatch:true})).outcome,'dispatch_accepted');
+  assert.equal((await runCheck({...f,manual:true,forceDispatch:true})).outcome,'retry_cooldown');
+  assert.equal(f.calls.filter(c=>c.method==='POST').length,1);
+  const active=fixture({runs:[{id:1,head_branch:'main',status:'in_progress'}]});
+  assert.equal((await runCheck({...active,manual:true,forceDispatch:true})).outcome,'workflow_active');
+});
+
+test('admin routes require the exact secret and only forward fixed internal operations', async () => {
+  let called=0;
+  const env={SCHEDULER_ADMIN_KEY:'test-admin',SCHEDULER:{idFromName:()=>1,get:()=>({fetch:async url=>{
+    called++; assert.equal(url,'https://internal/check?manual=1&dispatch=1'); return Response.json({ok:true});
+  }})}};
+  for(const auth of ['', 'Bearer bad', 'Bearer test-admiN']) {
+    const r=await worker.fetch(new Request('https://test/admin/dispatch-check',{method:'POST',headers:{Authorization:auth}}),env);
+    assert.equal(r.status,401);
+  }
+  assert.equal(called,0);
+  const r=await worker.fetch(new Request('https://test/admin/dispatch-check',{method:'POST',headers:{Authorization:'Bearer test-admin'}}),env);
+  assert.equal(r.status,200); assert.equal(called,1);
+});
+
+test('manual mail test is separately labelled, deduplicated and does not retry uncertain daily mail', async () => {
+  const f=fixture();
+  await f.storage.put('state',{day:'2026-09-30',attempts:0,mail:{verified:{outcome:'unconfirmed'}}});
+  for(let i=0;i<2;i++) await runCheck({...f,manual:true,testMail:true});
+  assert.equal(f.mails.length,1);
+  assert.match(f.mails[0].subject,/KIỂM TRA BỘ HẸN GIỜ/);
+  const state=await f.storage.get('state');
+  assert.equal(state.mail.test.outcome,'smtp_accepted');
+  assert.equal(state.mail.verified.outcome,'unconfirmed');
+});
+
+test('health evidence distinguishes real cron from operator checks', async () => {
+  const f=fixture();
+  const cron=await runCheck(f);
+  assert.equal(cron.lastTrigger,'cron');
+  assert.equal(cron.lastCronAt,now.toISOString());
+  const manual=await runCheck({...f,manual:true,now:new Date(now.getTime()+60000)});
+  assert.equal(manual.lastTrigger,'manual');
+  assert.equal(manual.lastCronAt,cron.lastCronAt);
 });
