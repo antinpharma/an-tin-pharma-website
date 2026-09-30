@@ -13,6 +13,11 @@ Khách hàng xem sản phẩm, giá, hoạt chất, chỉ định và liên hệ
 - Mỗi lượt đồng bộ thành công ghi `data/catalogue-status.json` với thời điểm kiểm tra, thời điểm nguồn, số thay đổi và SHA-256 catalogue (không ghi số lượng tồn). Triển khai cả dấu thời gian này khi giá không đổi; lỗi đọc nguồn không cập nhật dấu thời gian. Sau Pages, kiểm tra catalogue/index/status đang phục vụ khớp lần chạy.
 - Báo cáo email sau đồng bộ/triển khai/xác minh gửi tới `nguyenphuockhaimkn@gmail.com` khi có GitHub Secret `PRICE_REPORT_APP_PASSWORD` của chính Gmail này. Chưa có secret thì ghi cảnh báo chưa bật email, không báo đã gửi. Email lỗi không được làm mất catalogue đã triển khai.
 
+## Independent scheduler
+- Worker riêng `antin-price-scheduler`, cấu hình `workers/wrangler-price-scheduler.jsonc`; không sửa Worker đặt hàng để hẹn giờ giá. Kiểm tra mỗi 10 phút 11:17–18:57 giờ Việt Nam; SHA-256 catalogue + index + ngày nguồn/ngày kiểm tra phải khớp trước khi bỏ qua.
+- Secret Cloudflare `GITHUB_SCHEDULER_TOKEN`: fine-grained token chỉ Actions read/write trên repo này. `PRICE_REPORT_APP_PASSWORD`: Gmail app password cho đường cảnh báo độc lập. Không đọc ngược GitHub Secrets hoặc chép credential GitHub rộng sang Cloudflare. Chưa kiểm thử credential thực tế thì không báo đã kích hoạt đầy đủ.
+- Dùng Durable Object lưu lease và cooldown; không gọi thêm nếu workflow main đang chờ/đang chạy. Sau 3 lần thử, giãn gọi lại từ 10 lên 30 phút. Từ 12h gửi cảnh báo khi chưa xác minh; email độc lập tối đa một lần thử mỗi loại/ngày, không tự retry SMTP không rõ kết quả. `/health` chỉ đọc, không chứa bí mật. Kiểm thử `workers/price-scheduler.test.mjs`.
+
 ## Product workflow
 1. Ảnh sản phẩm được upload vào Google Drive.
 2. Tên file ảnh được dùng để nhận diện sản phẩm.

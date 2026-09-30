@@ -1,0 +1,14 @@
+{
+  "name": "antin-price-scheduler",
+  "main": "price-scheduler.mjs",
+  "compatibility_date": "2026-09-22",
+  "compatibility_flags": ["nodejs_compat"],
+  "account_id": "d7c35715d5034b094edd71e3699b0800",
+  "workers_dev": true,
+  "preview_urls": false,
+  "keep_vars": true,
+  "observability": {"enabled": true},
+  "triggers": {"crons": ["7,17,27,37,47,57 4-11 * * *"]},
+  "durable_objects": {"bindings": [{"name": "SCHEDULER", "class_name": "PriceScheduler"}]},
+  "migrations": [{"tag": "v1", "new_sqlite_classes": ["PriceScheduler"]}]
+}

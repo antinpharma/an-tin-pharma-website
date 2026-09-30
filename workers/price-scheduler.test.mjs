@@ -1,0 +1,129 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {inWindow, inspectPublication, runCheck} from './price-scheduler-core.mjs';
+import worker, {PriceScheduler, sendSchedulerMail} from './price-scheduler.mjs';
+
+const now = new Date('2026-09-30T05:07:00Z');
+const catalogue = 'window.ANTIN_PRODUCTS=[];';
+const hash = createHash('sha256').update(catalogue).digest('hex');
+const audit = {status: 'checked', freshness: 'fresh', checkedAt: '2026-09-30T04:30:00Z',
+  sourceUpdatedAt: '2026-09-30T04:00:00Z', catalogueSha256: hash};
+function fixture(options = {}) {
+  const records = new Map(), calls = [], mails = [];
+  const storage = {async get(k) { return structuredClone(records.get(k)); },
+    async put(k,v) { records.set(k,structuredClone(v)); }, async delete(k) { records.delete(k); },
+    async transaction(fn) { return fn(storage); }};
+  const fetchImpl = async (url, init = {}) => {
+    calls.push({url, method: init.method || 'GET'});
+    if (url.includes('api.github.com')) {
+      if (options.apiError) throw Error('private-secret-must-not-leak');
+      assert.equal(init.headers.Authorization, 'Bearer test-placeholder');
+      if (url.endsWith('/dispatches')) {
+        assert.ok((await storage.get('state')).lastAttemptAt);
+        assert.equal(JSON.parse(init.body).ref, 'main');
+        return new Response(null, {status: options.dispatchStatus || 204});
+      }
+      return Response.json({workflow_runs: options.runs || []});
+    }
+    if (url.includes('/data/')) return Response.json(options.audit || audit);
+    if (url.includes('catalogue.js')) return new Response(options.catalogue || catalogue);
+    return new Response(`<script src="catalogue.js?v=${options.version || hash.slice(0, 12)}"></script>`);
+  };
+  const env = {GITHUB_SCHEDULER_TOKEN:'test-placeholder', PRICE_REPORT_APP_PASSWORD:'test-only'};
+  const sendMail = async mail => { mails.push(mail); if(options.mailError) throw Error('private-smtp-error'); return true; };
+  return {storage,calls,mails,env,fetchImpl,sendMail,now};
+}
+const stale = {...audit, sourceUpdatedAt: '2026-09-29T04:00:00Z'};
+
+test('VN schedule starts 11:17, stops 19:00, and handles UTC day boundaries', () => {
+  assert.equal(inWindow(new Date('2026-09-30T04:16:00Z')),false);
+  assert.equal(inWindow(new Date('2026-09-30T04:17:00Z')),true);
+  assert.equal(inWindow(new Date('2026-09-30T11:57:00Z')),true);
+  assert.equal(inWindow(new Date('2026-09-30T12:00:00Z')),false);
+  assert.equal(inWindow(new Date('2026-09-30T17:17:00Z')),false);
+});
+test('verification rejects yesterday, future timestamps, wrong bytes and wrong cache version', async () => {
+  for (const options of [{audit:stale}, {audit:{...audit,checkedAt:'2026-09-30T08:00:00Z'}},
+    {audit:{...audit,sourceUpdatedAt:'2026-09-30T06:00:00Z'}}, {catalogue:'wrong'}, {version:'wrong'}]) {
+    assert.equal((await inspectPublication(now,fixture(options).fetchImpl)).verified,false);
+  }
+  assert.equal((await inspectPublication(now,fixture().fetchImpl)).verified,true);
+});
+test('fresh verified site skips dispatch and sends one independent receipt each day', async () => {
+  const f = fixture();
+  assert.equal((await runCheck(f)).outcome,'verified');
+  await runCheck(f);
+  assert.equal(f.calls.filter(c=>c.url.includes('api.github')).length,0);
+  assert.equal(f.mails.length,1);
+  assert.match(f.mails[0].subject,/ĐÃ XÁC MINH/);
+  assert.equal((await f.storage.get('state')).mail.verified.outcome,'smtp_accepted');
+});
+test('yesterday source dispatches, persists cooldown, and warns once after noon', async () => {
+  const f=fixture({audit:stale});
+  assert.equal((await runCheck(f)).outcome,'dispatch_accepted');
+  assert.equal((await runCheck(f)).outcome,'retry_cooldown');
+  assert.equal(f.calls.filter(c=>c.method==='POST').length,1);
+  assert.equal(f.mails.length,1);
+  assert.match(f.mails[0].subject,/CẢNH BÁO/);
+  await runCheck({...f,now:new Date(now.getTime()+10*60000)});
+  assert.equal(f.calls.filter(c=>c.method==='POST').length,2);
+  assert.equal(f.mails.length,1);
+});
+test('queued/running workflow prevents duplicate, even when queue is delayed', async () => {
+  const f=fixture({audit:stale,runs:[{id:1,head_branch:'main',status:'queued'}]});
+  assert.equal((await runCheck(f)).outcome,'workflow_active');
+  assert.equal(f.calls.filter(c=>c.method==='POST').length,0);
+  assert.equal(f.mails.length,1);
+});
+test('missing/denied GitHub credential still allows independent email; errors do not leak', async () => {
+  for (const missing of [true,false]) {
+    const f=fixture({audit:stale,apiError:true});
+    if(missing) delete f.env.GITHUB_SCHEDULER_TOKEN;
+    const result=await runCheck(f);
+    assert.equal(result.outcome,missing?'missing_github_token':'github_unavailable_or_denied');
+    assert.equal(f.mails.length,1);
+    assert.ok(!JSON.stringify(result).includes('private-secret'));
+    assert.equal(f.calls.filter(c=>c.method==='POST').length,0);
+  }
+});
+test('dispatch denial is not success and ambiguous SMTP is not retried or called accepted', async () => {
+  const f=fixture({audit:stale,dispatchStatus:403,mailError:true});
+  const first=await runCheck(f);
+  assert.equal(first.outcome,'github_unavailable_or_denied');
+  assert.equal(first.lastDispatchAt,undefined);
+  assert.equal(first.mail.warning.outcome,'unconfirmed');
+  await runCheck(f);
+  assert.equal(f.mails.length,1);
+  assert.ok(!JSON.stringify(await f.storage.get('state')).includes('private-smtp'));
+});
+test('missing mail credentials never mark sent; adding them enables one receipt', async () => {
+  const f=fixture(); delete f.env.PRICE_REPORT_APP_PASSWORD;
+  assert.deepEqual((await runCheck(f)).mail,{});
+  assert.equal(f.mails.length,0);
+  f.env.PRICE_REPORT_APP_PASSWORD='test-only';
+  await runCheck(f);
+  assert.equal(f.mails.length,1);
+});
+test('after three dispatch attempts retry spacing becomes 30 minutes', async () => {
+  const f=fixture({audit:stale});
+  await f.storage.put('state',{day:'2026-09-30',attempts:3,lastAttemptAt:'2026-09-30T04:57:00Z',mail:{}});
+  assert.equal((await runCheck(f)).outcome,'retry_cooldown');
+  assert.equal(f.calls.filter(c=>c.method==='POST').length,0);
+});
+test('persistent lease prevents concurrent Cron checks; public endpoint cannot dispatch', async () => {
+  const f=fixture(); await f.storage.put('leaseUntil',Date.now()+60000);
+  const instance=new PriceScheduler({storage:f.storage},f.env);
+  assert.equal((await (await instance.fetch(new Request('https://internal/check',{method:'POST'}))).json()).outcome,'check_active');
+  assert.equal((await worker.fetch(new Request('https://example.test/check',{method:'POST'}),{})).status,405);
+  assert.equal((await worker.fetch(new Request('https://example.test/check'),{})).status,404);
+});
+test('SMTP uses TLS, exact recipient, and closes transport on failure', async () => {
+  let closed=false;
+  await assert.rejects(sendSchedulerMail({},'test-only', options=>{
+    assert.equal(options.secure,true); assert.equal(options.port,465);
+    assert.equal(options.auth.user,'nguyenphuockhaimkn@gmail.com');
+    return {sendMail:async()=>{throw Error('smtp');}, close(){closed=true;}};
+  }));
+  assert.equal(closed,true);
+});

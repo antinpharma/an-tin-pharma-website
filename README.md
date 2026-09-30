@@ -42,6 +42,27 @@ Thiết lập một lần:
 
 Chưa có secret: Summary ghi rõ **Daily email NOT enabled**, đồng bộ giá vẫn chạy. Email được gửi bằng SMTP Gmail TLS, không ghi nội dung lỗi SMTP nhạy cảm vào log và không tự gửi lại khi kết quả gửi không rõ. Nếu mật khẩu ứng dụng bị thu hồi, thay secret. Nếu lịch GitHub hoàn toàn không được kích hoạt, job email cũng không chạy; cần hệ giám sát lịch độc lập nếu muốn bảo đảm phát hiện trường hợp này.
 
+### Bộ hẹn giờ và giám sát độc lập trên Cloudflare
+
+Worker `antin-price-scheduler` dùng `workers/wrangler-price-scheduler.jsonc`, tách khỏi Worker đặt hàng. Cloudflare kiểm tra mỗi 10 phút từ **11:17 đến 18:57 giờ Việt Nam**; lượt cron 11:07 không làm gì. Giữ lịch GitHub làm đường dự phòng. Cron của cả hai nền tảng vẫn không phải cam kết chạy đúng từng phút.
+
+- Khi ngày nguồn và ngày kiểm tra là hôm nay, chỉ coi hoàn tất sau khi SHA-256 catalogue và phiên bản cache trong index khớp status đang phục vụ.
+- Nếu chưa đạt, đọc danh sách lượt chạy trên nhánh `main`. Đang chờ/đang chạy thì không tạo lượt khác; lỗi API thì không gọi mù. Khi không có lượt đang chạy, gọi `workflow_dispatch` trên `main`.
+- Lưu thời điểm thử trước khi gọi, dùng lease trong Durable Object để tránh hai cron cùng xử lý. Ba lần đầu cách ít nhất 10 phút; sau đó cách ít nhất 30 phút để tránh liên tục chạy lại khi nguồn chưa đổi. Kiểm tra website vẫn mỗi 10 phút trong khung giờ trên.
+- Từ 12h nếu chưa xác minh được bản của hôm nay, gửi một email cảnh báo trực tiếp qua SMTP Gmail từ Cloudflare, không phụ thuộc job email trên GitHub. Khi xác minh được, gửi một thư xác nhận riêng. Tối đa một lần thử mỗi loại/ngày; kết quả SMTP không rõ thì không tự gửi lại, tránh trùng thư. `smtp_accepted` chỉ xác nhận máy chủ Gmail nhận thư, không xác nhận đã vào Inbox.
+- `/health` chỉ đọc: trạng thái cấu hình, lần kiểm tra, lần yêu cầu cập nhật, kết quả xác minh và gửi mail. Không có URL công khai để gọi chạy hoặc gửi thư.
+
+**Cần cấu hình hai Secret trước khi coi hệ thống sẵn sàng:** mở Cloudflare → Workers & Pages → `antin-price-scheduler` → Settings → Variables and Secrets → Add → Type **Secret** → Deploy.
+
+| Tên Secret | Giá trị |
+| --- | --- |
+| `GITHUB_SCHEDULER_TOKEN` | Fine-grained token riêng của GitHub, owner `antinpharma`, chỉ repository `an-tin-pharma-website`, quyền **Actions: Read and write**. Theo dõi ngày hết hạn và thay token trước ngày đó. |
+| `PRICE_REPORT_APP_PASSWORD` | Mật khẩu ứng dụng của `nguyenphuockhaimkn@gmail.com`. Có thể tạo mật khẩu ứng dụng riêng tên `An Tin Cloudflare monitor`; không dùng mật khẩu đăng nhập Gmail. Secret trên GitHub không thể đọc lại để chuyển sang đây. |
+
+Triển khai code: `wrangler deploy --config workers/wrangler-price-scheduler.jsonc`. Giữ secrets trên Cloudflare; không đưa vào mã hoặc file cấu hình. Sau khi thêm secret, đợi một lượt trong khung giờ để xác minh `/health`, quyền dispatch và thư nhận thực tế; có secret chưa chứng minh nó hợp lệ. Chưa có secret thì bộ hẹn giờ chưa đầy đủ chức năng. Thay code ở GitHub không tự triển khai Worker này.
+
+Tài liệu: [Cloudflare Cron](https://developers.cloudflare.com/workers/configuration/cron-triggers/), [Secrets](https://developers.cloudflare.com/workers/configuration/secrets/), [GitHub workflow dispatch](https://docs.github.com/en/rest/actions/workflows#create-a-workflow-dispatch-event).
+
 ## Xác thực Google
 
 Service account: `antin-price-reader@learned-surge-310713.iam.gserviceaccount.com`.
