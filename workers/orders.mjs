@@ -1,4 +1,5 @@
 import {CustomerAccounts} from './accounts.mjs';
+import {ServiceError,priceVnd,historySnapshot,listHistory,validateFeedback,feedbackMessage} from './customer-services.mjs';
 export {CustomerAccounts};
 
 const MAX_BODY = 16000;
@@ -67,9 +68,7 @@ export function buildMessages(order,products){
     const p=products.find(p=>p.visible && String(p.productId)===item.productId);
     if(!p || !p.name) throw new OrderError('Một sản phẩm không còn khả dụng. Vui lòng tải lại danh mục.',409);
     if(p.availability==='out_of_stock') throw new OrderError(`${singleLine(p.name).slice(0,150)} đã hết hàng. Vui lòng tải lại trang và bỏ sản phẩm này khỏi đơn, hoặc liên hệ Zalo để hỏi hàng.`,409);
-    const raw=String(p.price??'').trim();
-    const amount=/^(?:\d+|\d{1,3}(?:\.\d{3})+)\s*(?:đ|₫|VND)$/i.test(raw)?Number(raw.replace(/\D/g,'')):NaN;
-    const price=Number.isSafeInteger(amount) && amount>0 && Number.isSafeInteger(amount*item.quantity)?amount:null;
+    const price=priceVnd(p,item.quantity);
     if(price===null) unknown++; else total+=price*item.quantity;
     quantity+=item.quantity;
     return `${index+1}. ${singleLine(p.name).slice(0,150)} (Mã ${item.productId})\nSL: ${item.quantity} | Giá: ${price===null?'Liên hệ':money(price)} | Thành tiền: ${price===null?'Liên hệ':money(price*item.quantity)}`;
@@ -146,7 +145,7 @@ export default {
       if(request.method!=='POST') throw new OrderError('Chỉ hỗ trợ POST.',405);
       if(admin && (!env.ZALO_SETUP_KEY || request.headers.get('Authorization')!==`Bearer ${env.ZALO_SETUP_KEY}`)) throw new OrderError('Không có quyền truy cập.',403);
       const authPaths=['/auth/register','/auth/login','/auth/me','/auth/logout','/auth/profile','/auth/password','/auth/delete'];
-      if(!['/orders','/admin/check','/admin/pair',...authPaths].includes(path)) throw new OrderError('Không tìm thấy.',404);
+      if(!['/orders','/orders/history','/feedback','/admin/check','/admin/pair',...authPaths].includes(path)) throw new OrderError('Không tìm thấy.',404);
       const body=await boundedJson(request);
       const headers={'Content-Type':'application/json','X-Client-Key':await hash(request.headers.get('CF-Connecting-IP')||'unknown'),Authorization:request.headers.get('Authorization')||''};
       if(authPaths.includes(path)){
@@ -154,13 +153,13 @@ export default {
         response=await accounts.fetch(new Request('https://internal'+path,{method:'POST',headers,body:JSON.stringify(body)}));
       }else{
         delete body.accountId;
-        if(path==='/orders'&&(env.REQUIRE_ACCOUNT_LOGIN==='true'||headers.Authorization)){
+        if(path==='/orders/history'||path==='/orders'&&(env.REQUIRE_ACCOUNT_LOGIN==='true'||headers.Authorization)||path==='/feedback'&&headers.Authorization){
           const accounts=env.ACCOUNTS.get(env.ACCOUNTS.idFromName('customer-accounts'));
           const auth=await accounts.fetch(new Request('https://internal/auth/me',{method:'POST',headers,body:'{}'}));
           if(!auth.ok){
             if(auth.status>=500)throw new OrderError('Chưa kiểm tra được tài khoản. Đơn chưa được gửi; vui lòng thử lại sau ít giây.',503);
             if(auth.status===429)throw new OrderError('Bạn đã gửi nhiều yêu cầu. Vui lòng chờ một phút.',429);
-            throw new OrderError('Vui lòng đăng nhập tài khoản để gửi yêu cầu đặt hàng.',401);
+            throw new OrderError('Vui lòng đăng nhập tài khoản để tiếp tục.',401);
           }
           const {profile}=await auth.json();
           body.accountId=profile.id;
@@ -182,6 +181,18 @@ export class OrderReceiver {
   async fetch(request){
     try{
       const path=new URL(request.url).pathname,body=await request.json();
+      if(path==='/orders/history') return json(await listHistory(this.state.storage,body));
+      if(path==='/feedback') {
+        const feedback=validateFeedback(body),fingerprint=await hash(JSON.stringify(feedback));
+        const id='feedback:'+feedback.requestId,active=this.inFlight.get(id);
+        if(active){
+          if(active.fingerprint!==fingerprint)throw new ServiceError('Mã góp ý đã được dùng cho nội dung khác.',409);
+          return (await active.promise).clone();
+        }
+        const promise=this.receiveFeedback(feedback,request.headers.get('X-Client-Key'),fingerprint);
+        this.inFlight.set(id,{fingerprint,promise});
+        try{return (await promise).clone();}finally{this.inFlight.delete(id);}
+      }
       if(path==='/admin/check'){
         const bot=await zalo(this.env,'getMe',{});
         if(String(bot.id)!==this.env.EXPECTED_BOT_ID) return json({ok:false,error:'ID do API Zalo trả về khác ID đang cấu hình.',botId:String(bot.id),accountName:singleLine(bot.account_name),paired:!!await this.state.storage.get('owner')},409);
@@ -213,7 +224,7 @@ export class OrderReceiver {
       this.inFlight.set(order.requestId,{fingerprint,promise});
       try{return (await promise).clone();}
       finally{this.inFlight.delete(order.requestId);}
-    }catch(error){return json({error:error instanceof OrderError?error.message:'Dịch vụ tạm thời chưa sẵn sàng.'},error instanceof OrderError?error.status:503);}
+    }catch(error){return json({error:error instanceof OrderError||error instanceof ServiceError?error.message:'Dịch vụ tạm thời chưa sẵn sàng.'},error instanceof OrderError||error instanceof ServiceError?error.status:503);}
   }
   async reserve(order,clientKey,fingerprint){
     const owner=await this.state.storage.get('owner');
@@ -230,9 +241,11 @@ export class OrderReceiver {
     if(rate && now-rate.time<60000 && rate.count>=3) throw new OrderError('Bạn đã gửi nhiều yêu cầu. Vui lòng chờ một phút.',429);
     await this.state.storage.put(rateKey,{time:rate && now-rate.time<60000?rate.time:now,count:rate && now-rate.time<60000?rate.count+1:1});
     if(!await this.state.storage.getAlarm()) await this.state.storage.setAlarm(now+DAY);
-    const messages=buildMessages(order,await fetchCatalogue(this.env.CATALOGUE_URL));
+    const products=await fetchCatalogue(this.env.CATALOGUE_URL);
+    const messages=buildMessages(order,products),history=historySnapshot(order,products,now);
     await this.state.storage.put(key,{hash:fingerprint,status:'sending',time:now});
-    return {key,owner,messages,time:now};
+    if(history)await this.state.storage.put(history.key,history.record);
+    return {key,owner,messages,time:now,history};
   }
   async receive(order,clientKey,fingerprint){
     // Only reserve under the 30-second lock. A long order must not reset the object
@@ -242,26 +255,54 @@ export class OrderReceiver {
       catch(error){return json({error:error instanceof OrderError?error.message:'Dịch vụ tạm thời chưa sẵn sàng.'},error instanceof OrderError?error.status:503);}
     });
     if(plan instanceof Response) return plan;
-    const {key,owner,messages,time}=plan;
+    const {key,owner,messages,time,history}=plan;
     try{
       for(const text of messages){
         const result=await zalo(this.env,'sendMessage',{chat_id:owner,text});
         if(!result?.message_id) throw new Error('Missing receipt');
       }
+      if(history)await this.state.storage.put(history.key,{...history.record,status:'sent'});
       await this.state.storage.put(key,{hash:fingerprint,status:'sent',time});
       return json({ok:true,requestId:order.requestId});
     }catch{
+      if(history)try{await this.state.storage.put(history.key,{...history.record,status:'uncertain'});}catch{}
       return json({error:'Chưa xác nhận gửi đủ danh sách. Vui lòng liên hệ Zalo và cung cấp mã yêu cầu để kiểm tra.',requestId:order.requestId,uncertain:true},502);
     }
+  }
+  async receiveFeedback(feedback,clientKey,fingerprint){
+    const key='feedback:'+feedback.requestId;
+    const plan=await this.state.blockConcurrencyWhile(async()=>{
+      const previous=await this.state.storage.get(key);
+      if(previous){
+        if(previous.hash!==fingerprint)throw new ServiceError('Mã góp ý đã được dùng cho nội dung khác.',409);
+        return json(previous.status==='sent'?{ok:true,requestId:feedback.requestId}:{error:'Chưa xác nhận góp ý đã gửi. Vui lòng liên hệ Zalo và cung cấp mã góp ý.',uncertain:true,requestId:feedback.requestId},previous.status==='sent'?200:409);
+      }
+      const owner=await this.state.storage.get('owner');
+      if(!owner)throw new ServiceError('Kênh nhận góp ý chưa sẵn sàng.',503);
+      const now=Date.now(),rateKey='feedback-rate:'+clientKey,rate=await this.state.storage.get(rateKey);
+      const fresh=rate&&now-rate.time<DAY;
+      if(fresh&&(rate.count>=10||now-rate.last<30000))throw new ServiceError('Bạn đã gửi góp ý gần đây. Vui lòng chờ trước khi gửi thêm.',429);
+      await this.state.storage.put(rateKey,{time:fresh?rate.time:now,last:now,count:fresh?rate.count+1:1});
+      await this.state.storage.put(key,{hash:fingerprint,status:'sending',time:now});
+      if(!await this.state.storage.getAlarm())await this.state.storage.setAlarm(now+DAY);
+      return {owner,time:now};
+    });
+    if(plan instanceof Response)return plan;
+    try{
+      const receipt=await zalo(this.env,'sendMessage',{chat_id:plan.owner,text:feedbackMessage(feedback)});
+      if(!receipt?.message_id)throw Error();
+      await this.state.storage.put(key,{hash:fingerprint,status:'sent',time:plan.time});
+      return json({ok:true,requestId:feedback.requestId});
+    }catch{return json({error:'Chưa xác nhận gửi góp ý thành công. Vui lòng liên hệ Zalo và cung cấp mã góp ý.',requestId:feedback.requestId,uncertain:true},502);}
   }
   async alarm(){
     const now=Date.now();
     // Receipts contain only a hash/status, never customer names, phone numbers or order contents.
-    for(const prefix of ['order:','rate:']){
+    for(const prefix of ['order:','rate:','feedback:','feedback-rate:']){
       let startAfter;
       do{
         const entries=await this.state.storage.list({prefix,limit:500,...(startAfter?{startAfter}:{})});
-        const expired=[...entries].filter(([,item])=>now-item.time>(prefix==='order:'?30*DAY:DAY)).map(([key])=>key);
+        const expired=[...entries].filter(([,item])=>now-item.time>(['order:','feedback:'].includes(prefix)?30*DAY:DAY)).map(([key])=>key);
         if(expired.length) await this.state.storage.delete(expired);
         startAfter=entries.size===500?[...entries.keys()].at(-1):null;
       }while(startAfter);

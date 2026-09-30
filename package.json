@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test scripts/sync-prices.test.mjs scripts/price-audit.test.mjs scripts/product-groups.test.mjs workers/orders.test.mjs workers/accounts.test.mjs workers/price-scheduler.test.mjs"
+    "test": "node --test scripts/sync-prices.test.mjs scripts/price-audit.test.mjs scripts/product-groups.test.mjs workers/orders.test.mjs workers/accounts.test.mjs workers/price-scheduler.test.mjs workers/customer-services.test.mjs"
   },
   "dependencies": {
     "@noble/hashes": "2.4.0",

@@ -7,7 +7,7 @@
   <meta name="description" content="Danh mục sản phẩm An Tín Pharma - tìm kiếm sản phẩm, xem giá, hoạt chất và liên hệ tư vấn.">
   <title>An Tín Pharma | Danh mục sản phẩm</title>
   <link rel="icon" href="logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20260930-filter-bar-1">
+  <link rel="stylesheet" href="style.css?v=20260930-history-feedback-1">
 </head>
 <body>
 <header class="header">
@@ -38,6 +38,7 @@
     <div class="wrap filter-bar-inner">
       <button class="filter-toggle" id="departmentToggle" type="button" aria-expanded="false" aria-controls="departmentMenu"><span>Lọc theo khoa</span><span class="filter-chevron" aria-hidden="true"></span></button>
       <button class="filter-toggle" id="groupToggle" type="button" aria-expanded="false" aria-controls="groupMenu"><span>Nhóm sản phẩm</span><span class="filter-chevron" aria-hidden="true"></span></button>
+      <button class="feedback-toggle" id="feedbackToggle" type="button" aria-haspopup="dialog" aria-controls="feedbackDialog">Báo lỗi / Góp ý</button>
       <section class="filter-popover" id="departmentMenu" aria-labelledby="departmentMenuTitle" hidden>
         <div class="filter-popover-heading"><h2 id="departmentMenuTitle">Lọc theo khoa</h2><button class="icon-button" type="button" data-close-filter aria-label="Đóng danh sách khoa">×</button></div>
         <nav class="quick-departments" id="quickDepartments" data-department-options aria-label="Chọn khoa"></nav>
@@ -126,6 +127,7 @@
   <div class="cart-heading">
     <div><h2 id="cartTitle">Giỏ hàng</h2><p id="cartSubtitle">Các sản phẩm bạn đã chọn</p></div>
     <div class="cart-actions" role="group" aria-label="Thao tác giỏ hàng">
+      <button class="btn history-button" id="orderHistoryToggle" type="button" aria-haspopup="dialog" aria-controls="orderHistoryDialog">Lịch sử đơn hàng</button>
       <button class="btn order-submit" id="sendOrder" type="submit" form="directOrderForm" disabled hidden>Gửi yêu cầu đặt hàng</button>
       <button class="btn delete-button" id="deleteCart" type="button" disabled>Xoá hàng</button>
       <button class="btn cart-zalo" id="checkoutCart" type="button" disabled>Liên hệ Zalo</button>
@@ -168,6 +170,37 @@
   </div>
 </dialog>
 <div class="sr-only" id="cartAnnouncement" role="status" aria-live="polite"></div>
+
+<dialog class="service-dialog history-dialog" id="orderHistoryDialog" aria-labelledby="orderHistoryTitle">
+  <div class="service-heading"><h2 id="orderHistoryTitle">Lịch sử đơn hàng</h2><button class="icon-button" type="button" data-close-service="orderHistoryDialog" aria-label="Đóng lịch sử">×</button></div>
+  <div class="service-content">
+    <p class="service-note">Các yêu cầu gửi qua website từ khi bật tính năng lịch sử. “Đã gửi yêu cầu” chưa có nghĩa đơn đã được xác nhận hoặc giao hàng.</p>
+    <button class="btn" id="historyLogin" type="button" hidden>Đăng nhập để xem lịch sử</button>
+    <button class="btn" id="historyRefresh" type="button">Làm mới</button>
+    <p id="historyStatus" role="status" aria-live="polite"></p>
+    <div id="orderHistoryList"></div>
+    <button class="btn" id="historyMore" type="button" hidden>Xem thêm đơn trước</button>
+  </div>
+</dialog>
+
+<dialog class="service-dialog" id="feedbackDialog" aria-labelledby="feedbackTitle">
+  <div class="service-heading"><h2 id="feedbackTitle">Báo lỗi / Góp ý</h2><button class="icon-button" type="button" data-close-service="feedbackDialog" aria-label="Đóng góp ý">×</button></div>
+  <form class="service-content feedback-form" id="feedbackForm">
+    <p class="service-note">Nội dung được gửi đến AnTinpharma Bot để An Tín tiếp nhận và hỗ trợ bạn.</p>
+    <label for="feedbackKind">Bạn muốn gửi</label>
+    <select id="feedbackKind" name="kind"><option value="bug">Báo lỗi</option><option value="suggestion">Góp ý</option></select>
+    <label for="feedbackName">Tên của bạn <small>(không bắt buộc)</small></label>
+    <input id="feedbackName" name="name" maxlength="80" autocomplete="name">
+    <label for="feedbackPhone">Số điện thoại để phản hồi <small>(không bắt buộc)</small></label>
+    <input id="feedbackPhone" name="phone" type="tel" maxlength="20" autocomplete="tel">
+    <label for="feedbackMessage">Nội dung</label>
+    <textarea id="feedbackMessage" name="message" rows="6" minlength="10" maxlength="1200" required placeholder="Mô tả lỗi bạn gặp hoặc điều bạn muốn An Tín cải thiện…"></textarea>
+    <small>Từ 10 đến 1.200 ký tự. Không gửi mật khẩu hoặc mã xác thực.</small>
+    <button class="btn order-submit" id="sendFeedback" type="submit">Gửi đến AnTinpharma Bot</button>
+    <button class="btn" id="newFeedback" type="button" hidden>Gửi góp ý khác</button>
+    <p id="feedbackStatus" role="status" aria-live="polite"></p>
+  </form>
+</dialog>
 
 <dialog class="account-dialog" id="accountDialog" aria-labelledby="accountTitle">
   <div class="account-heading"><div><small>AN TÍN PHARMA</small><h2 id="accountTitle">Đăng nhập</h2></div><button class="icon-button" id="closeAccount" type="button" aria-label="Đóng tài khoản">×</button></div>
@@ -228,6 +261,7 @@
 <script src="product-groups.js?v=20260924-groups-2"></script>
 <script src="product-departments.js?v=20260929-departments-1"></script>
 <script src="accounts.js?v=20260925-session-2"></script>
+<script src="customer-tools.js?v=20260930-history-feedback-1"></script>
 <script src="app.js?v=20260930-order-check-1"></script>
 </body>
 </html>

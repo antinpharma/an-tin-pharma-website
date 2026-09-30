@@ -106,8 +106,16 @@ Giỏ hàng lưu sản phẩm trên trình duyệt. Khách có thể chọn/bỏ
 - Worker tự đọc catalogue đã xuất bản và tính giá; không tin giá, nội dung thông báo hoặc người nhận do trình duyệt gửi lên. Giá chưa xác định giữ “Liên hệ”. Đây là yêu cầu liên hệ xác nhận hàng, chưa phải thanh toán hoặc xác nhận đơn bán.
 - Cùng một mã yêu cầu và nội dung được chống gửi trùng trong 30 ngày. Khi phản hồi Zalo không rõ ràng, website báo chưa xác nhận; khách liên hệ kèm mã yêu cầu để kiểm tra, không tự gửi lại thông báo có thể đã được nhận.
 - Tối đa 3 yêu cầu mới/phút/địa chỉ IP và 50 loại sản phẩm/yêu cầu; danh sách tự chia thành các tin nhắn Zalo có đánh số phần. Bước gửi Zalo nằm ngoài khóa 30 giây của Durable Object; các lần gửi lặp đang xử lý cùng chờ một kết quả, không gửi lại. Trình duyệt chờ tối đa 3 phút cho đơn dài. Kiểm tra Origin và giới hạn IP chỉ giảm gửi nhầm/spam cơ bản, không thay thế cơ chế xác thực khách hàng.
-- Durable Object lưu tài khoản nhận, mã băm nội dung và trạng thái gửi; không lưu tên, số điện thoại hoặc nội dung đơn. Thông báo có các thông tin khách cung cấp được chuyển tới Zalo. Log Worker mặc định tắt.
+- Durable Object lưu tài khoản nhận, mã băm nội dung và trạng thái gửi. Từ khi bật lịch sử, lưu thêm mã tài khoản, mã đơn, thời gian, danh sách sản phẩm/số lượng/giá tại lúc gửi và trạng thái gửi; không chép tên, điện thoại, địa chỉ khách vào bản lịch sử. Thông báo có các thông tin khách cung cấp được chuyển tới Zalo. Log Worker mặc định tắt.
 - Khi cần tạm ngừng, để trống `ORDER_API_URL` rồi triển khai lại website; khách vẫn sử dụng chức năng sao chép và mở Zalo.
+
+### Lịch sử đơn hàng và Báo lỗi / Góp ý
+
+- Nút **Lịch sử đơn hàng** nằm cạnh nút gửi đơn trong giỏ hàng. API `POST /orders/history` luôn yêu cầu phiên đăng nhập, lấy mã tài khoản từ máy chủ; không tin mã tài khoản do trình duyệt cung cấp. Phân trang 20 đơn, mới nhất trước; lịch sử dùng được giữa các thiết bị và không lưu vào localStorage. Các đơn trước khi bật tính năng chỉ có mã băm xác nhận nên không thể khôi phục chi tiết.
+- Lịch sử phản ánh yêu cầu đã gửi đến Bot, chưa phải trạng thái xác nhận bán hàng/giao hàng. Giá được chụp từ catalogue máy chủ lúc gửi. Lỗi/thiếu xác nhận Zalo hiển thị chưa xác nhận gửi đủ. Lịch sử không bị xóa theo lịch dọn mã chống trùng 30 ngày.
+- **Báo lỗi / Góp ý** ở bên phải thanh lọc mở hộp nhập nội dung 10–1.200 ký tự. Khách chưa đăng nhập vẫn gửi được; tên/điện thoại không bắt buộc. Khách đăng nhập dùng thông tin tài khoản đã xác thực. Góp ý được gửi qua `POST /feedback` đến đúng tài khoản nhận đã ghép với AnTinpharma Bot; trình duyệt không chọn người nhận.
+- Giới hạn góp ý 1 lần/30 giây và 10 lần/24 giờ/IP. Mã yêu cầu chống trùng 30 ngày; chỉ báo đã gửi khi có `message_id` từ Zalo. Không lưu nội dung góp ý tại máy chủ ngoài tin nhắn đã chuyển tới Bot; chỉ giữ mã băm và trạng thái chống trùng. Không tự gửi lại khi phản hồi chưa rõ.
+- Giao diện trong `customer-tools.js`, API trong `workers/orders.mjs` và `workers/customer-services.mjs`. Triển khai Worker đặt hàng trước khi xuất bản giao diện mới; GitHub Pages phải đóng gói cả `customer-tools.js`. Kiểm thử `workers/customer-services.test.mjs` kiểm tra phân quyền, phân trang, giá chụp lúc gửi và chống trùng/lỗi mạng.
 
 ## Tài khoản khách hàng
 
