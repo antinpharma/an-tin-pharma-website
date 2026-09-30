@@ -22,6 +22,7 @@ test('catalogue source is data, never executed; production catalogue remains rea
 test('authoritative prices and uncertain prices; rejects unavailable products',()=>{
   let text=buildMessages(validateOrder(body()),products).join('\n');
   assert.match(text,/226.000đ/);
+  assert.doesNotMatch(text,/Quy cách/);
   const order=validateOrder({...body(),items:[...body().items,{productId:'1505',quantity:3}]});
   text=buildMessages(order,products).join('\n');
   assert.match(text,/Chưa gồm 1 sản phẩm cần báo giá/);

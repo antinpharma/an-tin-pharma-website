@@ -52,6 +52,17 @@ test('backup runs only when a same-day fresh sync is not available; manual and p
   assert.equal(syncDue(status, options), false);
   assert.equal(syncDue({...status, freshness: 'stale'}, options), true);
   assert.equal(syncDue({...status, checkedAt: '2026-09-28T04:00:00Z'}, options), true);
+  // Yesterday's 10:00 source is only 29 hours old at the afternoon retry:
+  // the old 36-hour rule incorrectly skipped this run after a morning read.
+  for (const schedule of ['47 4 * * *','17 5 * * *','47 8 * * *']) {
+    const retry={...options,schedule,now:new Date('2026-09-29T08:47:00Z')};
+    assert.equal(syncDue({...status,sourceUpdatedAt:'2026-09-28T03:00:00Z'},retry),true);
+    assert.equal(syncDue(status,retry),false);
+    assert.equal(syncDue({...status,sourceUpdatedAt:'invalid'},retry),true);
+  }
+  const midnight={...options,now:new Date('2026-09-29T17:30:00Z')};
+  assert.equal(syncDue({...status,checkedAt:'2026-09-29T17:10:00Z'},midnight),true);
+  assert.equal(syncDue({...status,checkedAt:'2026-09-29T17:10:00Z',sourceUpdatedAt:'2026-09-29T17:05:00Z'},midnight),false);
   assert.equal(syncDue(null, options), true);
   assert.equal(syncDue(status, {...options, event: 'workflow_dispatch'}), true);
   assert.equal(syncDue(status, {...options, schedule: '17 4 * * *'}), true);
@@ -73,6 +84,8 @@ test('reports never claim success after deployment/verification failure or stale
   assert.match(makePriceMail(args).subject, /ĐÃ KIỂM TRA/);
   assert.match(makePriceMail({...args, verifyResult: 'failure'}).subject, /LỖI/);
   assert.match(makePriceMail({...args, report: {...args.report, freshness: 'stale'}}).subject, /CẢNH BÁO/);
+  assert.match(makePriceMail({...args, report: {...args.report, sourceUpdatedAt:'2026-09-28T03:00:00Z'}}).subject, /CẢNH BÁO/);
+  assert.match(makePriceMail({...args, report: {...args.report, checkedAt:'2026-09-29T17:30:00Z',sourceUpdatedAt:'2026-09-29T17:05:00Z'}}).subject, /ĐÃ KIỂM TRA/);
   assert.match(makePriceMail({...args, report: null, syncResult: 'failure'}).text, /Chưa xác nhận/);
 });
 

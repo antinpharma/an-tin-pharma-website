@@ -4,13 +4,14 @@ import {pathToFileURL} from 'node:url';
 import {verifyPublished} from './verify-published-prices.mjs';
 
 export function syncDue(status, {event, schedule, now = new Date()}) {
-  if (event !== 'schedule' || schedule !== '47 8 * * *') return true;
+  if (event !== 'schedule' || !['47 4 * * *','17 5 * * *','47 8 * * *'].includes(schedule)) return true;
   if (status?.status !== 'checked' || status.freshness !== 'fresh') return true;
   const checked = Date.parse(status.checkedAt), source = Date.parse(status.sourceUpdatedAt);
   const localDay = date => new Date(date + 7 * 3600000).toISOString().slice(0, 10);
   if (!Number.isFinite(checked) || !Number.isFinite(source)) return true;
   return checked > now.getTime() || source > now.getTime() + 3600000 ||
-    localDay(checked) !== localDay(now.getTime()) || now - source > 36 * 3600000;
+    source > checked + 3600000 || localDay(checked) !== localDay(now.getTime()) ||
+    localDay(source) !== localDay(now.getTime()) || now - source > 36 * 3600000;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

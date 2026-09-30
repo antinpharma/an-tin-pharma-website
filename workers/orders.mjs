@@ -72,7 +72,7 @@ export function buildMessages(order,products){
     const price=Number.isSafeInteger(amount) && amount>0 && Number.isSafeInteger(amount*item.quantity)?amount:null;
     if(price===null) unknown++; else total+=price*item.quantity;
     quantity+=item.quantity;
-    return `${index+1}. ${singleLine(p.name).slice(0,150)} (Mã ${item.productId})\nQuy cách: ${singleLine(p.spec||'Cần xác nhận').slice(0,150)}\nSL: ${item.quantity} | Giá: ${price===null?'Liên hệ':money(price)} | Thành tiền: ${price===null?'Liên hệ':money(price*item.quantity)}`;
+    return `${index+1}. ${singleLine(p.name).slice(0,150)} (Mã ${item.productId})\nSL: ${item.quantity} | Giá: ${price===null?'Liên hệ':money(price)} | Thành tiền: ${price===null?'Liên hệ':money(price*item.quantity)}`;
   });
   if(!Number.isSafeInteger(total)) throw new OrderError('Tạm tính vượt giới hạn. Vui lòng liên hệ trực tiếp.');
   const heading=`YÊU CẦU ĐẶT HÀNG AN TÍN\nMã: ${order.requestId}\nKhách: ${order.customer.name}\nSĐT: ${order.customer.phone}${order.customer.address?'\nĐịa chỉ: '+order.customer.address:''}${order.accountId?'\nMã khách: '+order.accountId:''}`;

@@ -8,7 +8,10 @@ const time = value => Number.isFinite(Date.parse(value)) ? new Date(value).toLoc
 
 export function makePriceMail({report, syncResult, deployResult, verifyResult, runUrl}) {
   const verified = syncResult === 'success' && deployResult === 'success' && verifyResult === 'success' && report?.status === 'checked';
-  const fresh = report?.freshness === 'fresh';
+  const day = value => Number.isFinite(Date.parse(value))
+    ? new Date(Date.parse(value) + 7 * 3600000).toISOString().slice(0,10) : null;
+  const fresh = report?.freshness === 'fresh' && day(report?.checkedAt) !== null
+    && day(report?.sourceUpdatedAt) === day(report?.checkedAt);
   const outcome = !verified ? 'LỖI / CHƯA XÁC MINH WEBSITE' : !fresh ? 'CẢNH BÁO NGUỒN DỮ LIỆU' : 'ĐÃ KIỂM TRA';
   const lines = [`An Tín Pharma — ${outcome}`, '',
     `Thời điểm kiểm tra: ${time(report?.checkedAt)}`,
@@ -19,9 +22,9 @@ export function makePriceMail({report, syncResult, deployResult, verifyResult, r
     `Giá cần liên hệ: ${report.contactPrices}; ảnh tải lỗi (giữ ảnh cũ): ${report.imageFailures}.`);
   if (verified) lines.push('', 'Đã đối chiếu catalogue đang phục vụ trên website bằng SHA-256 và thời điểm kiểm tra.');
   else lines.push('', 'Chưa xác nhận website đã nhận dữ liệu lần này. Mở nhật ký bên dưới để kiểm tra; không coi báo cáo này là cập nhật giá thành công.');
-  if (!fresh) lines.push('Nguồn cũ hơn 36 giờ, không nhận diện được thời điểm hoặc thời điểm ở tương lai. Cần kiểm tra tab check của Data sàn.');
+  if (!fresh) lines.push('Chưa xác nhận nguồn của đúng ngày kiểm tra theo giờ Việt Nam: nguồn khác ngày, quá 36 giờ, không nhận diện được thời điểm hoặc ở tương lai. Cần kiểm tra tab check của Data sàn.');
   lines.push('', 'Website: https://antinpharma.github.io/an-tin-pharma-website/', `Nhật ký: ${runUrl}`,
-    '', 'Giá lấy theo Product ID + MIENNAM, hệ số ×1.000. Không đưa số lượng tồn vào báo cáo.');
+    '', 'Giá nguồn lấy theo Product ID + MIENNAM, hệ số ×1.000. Giá xác nhận riêng chỉ dùng khi thiếu dòng MIENNAM. Không đưa số lượng tồn vào báo cáo.');
   return {to: recipient, subject: `[An Tín Pharma] ${outcome} — ${time(report?.checkedAt)}`, text: lines.join('\n')};
 }
 

@@ -305,6 +305,11 @@ async function sendDirectOrder(event){
   const rows=cartRows(true),feedback=document.getElementById('orderFeedback');
   if(!rows.length) return;
   if(!window.AntinAccount?.profile){window.AntinAccount?.open('login');return;}
+  if(rows.length>50){
+    feedback.dataset.error='true';
+    feedback.textContent='Mỗi yêu cầu tối đa 50 loại sản phẩm. Vui lòng bỏ chọn bớt sản phẩm và gửi thành nhiều đơn.';
+    return;
+  }
   const account=window.AntinAccount.profile;
   const customer={name:account.name,phone:account.phone,address:[account.address,account.ward,account.province].join(', ')};
   feedback.dataset.error='true';
