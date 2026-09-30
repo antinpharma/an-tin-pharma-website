@@ -33,7 +33,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Mỗi viên: hydroxyapatit vi tinh thể 500 mg (calci 120 mg, phospho 55 mg), vitamin D3 2 microgam, vitamin K1 8 microgam.",
     "indication": "Bổ sung khi thiếu canxi hoặc nhu cầu tăng; dùng phối hợp trong điều trị loãng xương.",
     "spec": "",
-    "price": "356.000đ",
+    "price": "357.000đ",
     "image": "images/sheet/43075df7e58fac82129565b89412f1de.webp",
     "visible": true,
     "availability": "in_stock"
@@ -72,7 +72,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Fluocinolon acetonid 0,025% (0,25 mg/g).",
     "indication": "Điều trị ngắn hạn các bệnh viêm da không nhiễm khuẩn đáp ứng với corticosteroid, như chàm, viêm da dị ứng, viêm da tiết bã và vảy nến, theo đơn.",
     "spec": "",
-    "price": "47.200đ",
+    "price": "46.500đ",
     "image": "images/sheet/9b6b2e5686dd85ef1288151f6623519c.webp",
     "visible": true,
     "availability": "in_stock"
@@ -85,7 +85,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Erythromycin 400 mg + dịch chiết nghệ tương đương 2 g nghệ tươi/tuýp 10 g.",
     "indication": "Điều trị mụn trứng cá và hỗ trợ liền da tại vùng tổn thương, theo hướng dẫn thuốc.",
     "spec": "",
-    "price": "15.800đ",
+    "price": "16.500đ",
     "image": "images/sheet/88d00c1868a27cee4c99cbce78e1b03f.webp",
     "visible": true,
     "availability": "in_stock"
@@ -137,7 +137,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Etifoxin hydroclorid 50 mg/viên.",
     "indication": "Điều trị các biểu hiện lo âu theo đơn bác sĩ.",
     "spec": "",
-    "price": "217.800đ",
+    "price": "230.000đ",
     "image": "images/sheet/6eec6b886b1356713f15e78719c858b9.webp",
     "visible": true,
     "availability": "in_stock"
@@ -267,7 +267,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Esomeprazol 20 mg/viên.",
     "indication": "Điều trị bệnh trào ngược dạ dày–thực quản; dự phòng tái phát viêm thực quản đã lành và một số bệnh tăng tiết acid theo đơn.",
     "spec": "",
-    "price": "305.000đ",
+    "price": "303.400đ",
     "image": "images/sheet/9268f31efc393ccf7cca9fc0b8ac0c98.webp",
     "visible": true,
     "availability": "out_of_stock"
@@ -293,7 +293,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Alpha-amylase 100 mg + papain 100 mg + simethicon 30 mg/viên.",
     "indication": "Hỗ trợ tiêu hóa, giảm đầy hơi, chướng bụng và khó tiêu.",
     "spec": "",
-    "price": "260.000đ",
+    "price": "245.000đ",
     "image": "images/sheet/b903ae74ea9a47c38bff2ad1aa6ac6bb.webp",
     "visible": true,
     "availability": "in_stock"
@@ -410,7 +410,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Betamethason dipropionat 0,064%; clotrimazol 1%; gentamicin 0,1%.",
     "indication": "Điều trị viêm da đáp ứng corticoid kèm nhiễm khuẩn hoặc nhiễm nấm nhạy cảm, theo đơn.",
     "spec": "",
-    "price": "14.200đ",
+    "price": "13.900đ",
     "image": "images/sheet/fdffc7a493d8009a6bf6c60a324cd01f.webp",
     "visible": true,
     "availability": "in_stock"
@@ -514,7 +514,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Thành phần nổi bật: eucalyptol, menthol, methyl salicylat và thymol.",
     "indication": "Làm sạch khoang miệng, hỗ trợ giảm vi khuẩn, mảng bám và hôi miệng.",
     "spec": "",
-    "price": "34.400đ",
+    "price": "40.400đ",
     "image": "images/sheet/726e54f1b70655b386d9060a01b7d264.webp",
     "visible": true,
     "availability": "in_stock"
@@ -605,7 +605,7 @@ window.ANTIN_PRODUCTS = [
     "active": "",
     "indication": "",
     "spec": "",
-    "price": "129.400đ",
+    "price": "128.700đ",
     "image": "images/sheet/aa395cf1df52c597ae2ffdd784d59682.webp",
     "visible": true,
     "availability": "in_stock"
@@ -631,7 +631,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Cefixim 100 mg/gói.",
     "indication": "Điều trị nhiễm khuẩn nhạy cảm ở đường hô hấp, tai giữa hoặc tiết niệu theo đơn bác sĩ.",
     "spec": "",
-    "price": "17.400đ",
+    "price": "16.600đ",
     "image": "images/sheet/89ff032ba8d2dc8f8f6da69a534ace54.webp",
     "visible": true,
     "availability": "in_stock"
@@ -670,7 +670,7 @@ window.ANTIN_PRODUCTS = [
     "active": "",
     "indication": "",
     "spec": "",
-    "price": "16.500đ",
+    "price": "16.300đ",
     "image": "images/sheet/dfb99a6d792c4aa1395585ac8b8b51d4.webp",
     "visible": true,
     "availability": "in_stock"
@@ -709,7 +709,7 @@ window.ANTIN_PRODUCTS = [
     "active": "",
     "indication": "",
     "spec": "",
-    "price": "62.300đ",
+    "price": "62.200đ",
     "image": "images/sheet/80ed09365884db965247ba60a54dd4e2.webp",
     "visible": true,
     "availability": "in_stock"
@@ -722,7 +722,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Bacillus subtilis 10⁷–10⁸ CFU/gói 1 g.",
     "indication": "Điều trị tiêu chảy, viêm ruột cấp hoặc mạn, rối loạn tiêu hóa và đi ngoài phân sống.",
     "spec": "",
-    "price": "22.000đ",
+    "price": "21.500đ",
     "image": "images/sheet/887fe2ad44195dd7e209a6ac3d92e4f6.webp",
     "visible": true,
     "availability": "in_stock"
@@ -826,7 +826,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Saccharomyces boulardii CNCM I-745 100 mg/gói.",
     "indication": "Điều trị tiêu chảy cấp kết hợp bù nước; phòng tiêu chảy do kháng sinh và tái phát tiêu chảy do C. difficile.",
     "spec": "",
-    "price": "117.000đ",
+    "price": "116.700đ",
     "image": "images/sheet/75bdd24ef6059392c5a48f7f4dfad0e7.webp",
     "visible": true,
     "availability": "in_stock"
@@ -1063,7 +1063,7 @@ window.ANTIN_PRODUCTS = [
     "price": "132.600đ",
     "image": "images/sheet/2272ac2c60337614b83dc62844806af8.webp",
     "visible": true,
-    "availability": "in_stock"
+    "availability": "out_of_stock"
   },
   {
     "productId": "2790",
@@ -1154,7 +1154,7 @@ window.ANTIN_PRODUCTS = [
     "price": "93.500đ",
     "image": "images/sheet/2a2e47ccdc0faa5065f74f5d8cf79e76.webp",
     "visible": true,
-    "availability": "out_of_stock"
+    "availability": "in_stock"
   },
   {
     "productId": "2931",
@@ -1255,7 +1255,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Cefalexin 500 mg/viên (dạng monohydrat).",
     "indication": "Điều trị nhiễm khuẩn nhạy cảm mức độ nhẹ–vừa ở hô hấp, tiết niệu, da và mô mềm.",
     "spec": "",
-    "price": "99.000đ",
+    "price": "100.000đ",
     "image": "images/sheet/8a9dee85c7aa529529a925b237b704df.webp",
     "visible": true,
     "availability": "in_stock"
@@ -1294,7 +1294,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Colchicin 1 mg/viên.",
     "indication": "Điều trị cơn gút cấp và dự phòng tái phát cơn gút theo đơn bác sĩ.",
     "spec": "",
-    "price": "50.000đ",
+    "price": "50.500đ",
     "image": "images/sheet/c59dcfb4f5a6df3440ec5ae92bcd3ed2.webp",
     "visible": true,
     "availability": "out_of_stock"
@@ -1398,7 +1398,7 @@ window.ANTIN_PRODUCTS = [
     "active": "",
     "indication": "",
     "spec": "",
-    "price": "72.700đ",
+    "price": "72.500đ",
     "image": "images/sheet/fd507d04e75842221c6d2289c1695df3.webp",
     "visible": true,
     "availability": "in_stock"
@@ -1437,7 +1437,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Cao đặc rễ đinh lăng 300 mg (tương đương cao khô 240 mg) + cao khô lá bạch quả 100 mg/viên.",
     "indication": "Dùng trong suy giảm trí nhớ, kém tập trung, thiểu năng tuần hoàn não và hội chứng tiền đình theo hướng dẫn thuốc.",
     "spec": "",
-    "price": "140.000đ",
+    "price": "141.500đ",
     "image": "images/sheet/72710e963036cf95f1bbeb5656d466f4.webp",
     "visible": true,
     "availability": "in_stock"
@@ -1463,7 +1463,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Mupirocin 2%.",
     "indication": "Điều trị nhiễm khuẩn da như chốc lở, viêm nang lông và nhọt do vi khuẩn nhạy cảm, theo đơn.",
     "spec": "",
-    "price": "35.999đ",
+    "price": "35.200đ",
     "image": "images/sheet/509038d8deaa1f4f06731e274e8e81d9.webp",
     "visible": true,
     "availability": "in_stock"
@@ -1531,7 +1531,7 @@ window.ANTIN_PRODUCTS = [
     "price": "87.300đ",
     "image": "images/sheet/1f14b211c32daa153214fcddba263194.webp",
     "visible": true,
-    "availability": "in_stock"
+    "availability": "out_of_stock"
   },
   {
     "productId": "3826",
@@ -1593,7 +1593,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Húng chanh 1 g, mạch môn 1 g, cát cánh 0,5 g, quất 0,42 g, mật ong 0,42 g, đường phèn 0,42 g và chiết xuất gừng 0,17 g/gói 5 ml.",
     "indication": "Hỗ trợ giảm ho, tiêu đờm, giảm hắt hơi, nghẹt mũi, sổ mũi do cảm; hỗ trợ sức đề kháng. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
-    "price": "96.700đ",
+    "price": "97.800đ",
     "image": "images/sheet/bf7d9c2a4cd25b5d25deb3ca12e81e5c.webp",
     "visible": true,
     "availability": "in_stock"
@@ -1866,7 +1866,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Amoxicilin 500 mg (dưới dạng amoxicilin trihydrat)/viên.",
     "indication": "Điều trị nhiễm khuẩn nhạy cảm ở đường hô hấp, tiết niệu, đường mật, da và mô mềm theo đơn.",
     "spec": "",
-    "price": "130.000đ",
+    "price": "136.500đ",
     "image": "images/sheet/078a3aa01b64d39151211536c8cdc28e.webp",
     "visible": true,
     "availability": "in_stock"
@@ -1879,7 +1879,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Cao đặc rễ đinh lăng 150 mg + cao khô lá bạch quả 5 mg/viên.",
     "indication": "Dùng trong suy giảm trí nhớ, kém tập trung, căng thẳng thần kinh và hội chứng tiền đình theo hướng dẫn thuốc.",
     "spec": "",
-    "price": "128.600đ",
+    "price": "124.900đ",
     "image": "images/sheet/09b35c8d0924ade129513ef801e03b01.webp",
     "visible": true,
     "availability": "in_stock"
@@ -1944,7 +1944,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Tadalafil 20 mg/viên.",
     "indication": "Điều trị rối loạn cương dương ở nam giới trưởng thành theo đơn.",
     "spec": "",
-    "price": "27.900đ",
+    "price": "27.500đ",
     "image": "images/sheet/805ee5acec9a8e7a4dfab6bd224a16d6.webp",
     "visible": true,
     "availability": "in_stock"
@@ -2282,7 +2282,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Clotrimazol 1%.",
     "indication": "Điều trị nấm ngoài da như nấm chân, nấm bẹn, nấm da thân, lang ben và Candida da.",
     "spec": "",
-    "price": "21.900đ",
+    "price": "21.800đ",
     "image": "images/sheet/057b1ac80e19758fc9b179fed4c51e1d.webp",
     "visible": true,
     "availability": "in_stock"
@@ -2373,7 +2373,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Clotrimazol 100 mg/viên đặt âm đạo.",
     "indication": "Điều trị tại chỗ nhiễm Candida âm hộ - âm đạo.",
     "spec": "",
-    "price": "32.400đ",
+    "price": "32.200đ",
     "image": "images/sheet/c050c20ec9d19c102302a9c720b63d79.webp",
     "visible": true,
     "availability": "in_stock"
@@ -2425,7 +2425,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Fexofenadin hydroclorid 180 mg/viên.",
     "indication": "Giảm triệu chứng viêm mũi dị ứng và mày đay mạn tính vô căn.",
     "spec": "",
-    "price": "55.000đ",
+    "price": "58.000đ",
     "image": "images/sheet/aa45e45a0d67cf477bfd7ceeac4ac229.webp",
     "visible": true,
     "availability": "in_stock"
@@ -2594,7 +2594,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Bách bộ, tỳ bà diệp, tang bạch bì, bán hạ, cát cánh, bạc hà, mơ muối, thiên môn đông, bạch linh, xạ can, cam thảo, bạch phàn và tinh dầu bạc hà.",
     "indication": "Chữa ho, tiêu đờm; dùng trong ho cảm, ho gió, ho khan và viêm phế quản.",
     "spec": "",
-    "price": "58.000đ",
+    "price": "59.500đ",
     "image": "images/sheet/e6e1e00fc48b7b87c81b77d18b1b1c5a.webp",
     "visible": true,
     "availability": "in_stock"
@@ -2633,7 +2633,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Tyrothricin 4 mg, cetrimonium bromid 2 mg và lidocain 1 mg/viên ngậm.",
     "indication": "Điều trị đau họng, viêm họng và nhiễm khuẩn vùng miệng, họng, nướu.",
     "spec": "",
-    "price": "42.900đ",
+    "price": "43.400đ",
     "image": "images/sheet/5140fa4f462b3d7f27b151b65d1a1b16.webp",
     "visible": true,
     "availability": "out_of_stock"
@@ -2659,7 +2659,7 @@ window.ANTIN_PRODUCTS = [
     "active": "",
     "indication": "",
     "spec": "",
-    "price": "224.000đ",
+    "price": "211.600đ",
     "image": "images/sheet/807aff6b92de831c9610b23a2a5d8c16.webp",
     "visible": true,
     "availability": "in_stock"
@@ -2685,7 +2685,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Dẫn xuất vitamin C (ascorbyl tetraisopalmitate) 3,65 mg, bisabolol 0,37 mg và vitamin E (tocopheryl acetate) 0,37 mg/viên nang dùng ngoài.",
     "indication": "Dưỡng da sáng và đều màu, giúp giảm thâm và kích ứng. Chỉ dùng ngoài da.",
     "spec": "",
-    "price": "302.500đ",
+    "price": "302.000đ",
     "image": "images/sheet/c2805d8d52a9b851a8be392da016e890.webp",
     "visible": true,
     "availability": "in_stock"
@@ -2698,7 +2698,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Thành phần chính: vitamin E thiên nhiên và dầu jojoba.",
     "indication": "Dưỡng ẩm da ban đêm, làm mềm da; giúp giảm biểu hiện nếp nhăn, đốm nâu và thâm quanh mắt. Chỉ dùng ngoài da.",
     "spec": "",
-    "price": "128.000đ",
+    "price": "127.600đ",
     "image": "images/sheet/ae6831007c5a2723ccea091b13329729.webp",
     "visible": true,
     "availability": "in_stock"
@@ -2714,7 +2714,7 @@ window.ANTIN_PRODUCTS = [
     "price": "61.900đ",
     "image": "images/sheet/7dcd937c146e9fbc551fdb477ada0c4c.webp",
     "visible": true,
-    "availability": "in_stock"
+    "availability": "out_of_stock"
   },
   {
     "productId": "10562",
@@ -2737,7 +2737,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Phức hợp sắt (III) hydroxid polymaltose, tương đương sắt nguyên tố 50 mg/5 ml.",
     "indication": "Phòng và điều trị thiếu sắt, thiếu máu do thiếu sắt theo hướng dẫn.",
     "spec": "",
-    "price": "77.700đ",
+    "price": "77.500đ",
     "image": "images/sheet/fbb7e5ece5fcbb278e401fc7f8d7266e.webp",
     "visible": true,
     "availability": "in_stock"
@@ -2802,7 +2802,7 @@ window.ANTIN_PRODUCTS = [
     "active": "",
     "indication": "",
     "spec": "",
-    "price": "37.500đ",
+    "price": "38.500đ",
     "image": "images/sheet/e7b3d6e212806e92113e5351e61aa033.webp",
     "visible": true,
     "availability": "in_stock"
@@ -3010,7 +3010,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Pantoprazol 40 mg/viên.",
     "indication": "Điều trị trào ngược dạ dày–thực quản, loét tiêu hóa và tăng tiết acid; dự phòng loét do thuốc chống viêm khi có chỉ định.",
     "spec": "",
-    "price": "41.900đ",
+    "price": "42.400đ",
     "image": "images/sheet/5d81b78ff1179a3f084ef8f002d722f9.webp",
     "visible": true,
     "availability": "in_stock"
@@ -3182,7 +3182,7 @@ window.ANTIN_PRODUCTS = [
     "price": "20.000đ",
     "image": "images/sheet/4a5db5897ec83c527fb49ea09965ed14.webp",
     "visible": true,
-    "availability": "in_stock"
+    "availability": "out_of_stock"
   },
   {
     "productId": "13001",
@@ -3569,7 +3569,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Methyl salicylat 105 mg + L-menthol 31,5 mg/miếng.",
     "indication": "Cao dán giảm đau và viêm tại chỗ trong đau cổ, vai, lưng, cơ, khớp, bầm tím hoặc bong gân.",
     "spec": "",
-    "price": "30.500đ",
+    "price": "30.700đ",
     "image": "images/sheet/39bef6d63345d280b9e76ee49037aa34.webp",
     "visible": true,
     "availability": "in_stock"
@@ -3725,7 +3725,7 @@ window.ANTIN_PRODUCTS = [
     "active": "",
     "indication": "",
     "spec": "",
-    "price": "4.700đ",
+    "price": "4.500đ",
     "image": "images/sheet/041faee6823f11ad3d88952d033f1d84.webp",
     "visible": true,
     "availability": "in_stock"
@@ -3777,7 +3777,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Amoxicilin 875 mg và acid clavulanic 125 mg/viên.",
     "indication": "Điều trị nhiễm khuẩn nhạy cảm ở đường hô hấp, tiết niệu, da và mô mềm theo đơn bác sĩ.",
     "spec": "",
-    "price": "63.700đ",
+    "price": "63.900đ",
     "image": "images/sheet/acad8ef93041a3e5f6316e73f9d4d70a.webp",
     "visible": true,
     "availability": "in_stock"
@@ -3819,7 +3819,7 @@ window.ANTIN_PRODUCTS = [
     "price": "131.000đ",
     "image": "images/sheet/33614c7197887625ffb83f5901f526c6.webp",
     "visible": true,
-    "availability": "in_stock"
+    "availability": "out_of_stock"
   },
   {
     "productId": "54444",
@@ -4050,7 +4050,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Losartan kali 50 mg/viên.",
     "indication": "Điều trị tăng huyết áp; một số trường hợp suy tim hoặc bệnh thận do đái tháo đường týp 2 theo đơn.",
     "spec": "",
-    "price": "63.400đ",
+    "price": "60.000đ",
     "image": "images/sheet/9ebb35acfa56d6cf18f892f64ff15e92.webp",
     "visible": true,
     "availability": "in_stock"
@@ -4092,7 +4092,7 @@ window.ANTIN_PRODUCTS = [
     "price": "21.900đ",
     "image": "images/sheet/8a2b20dd43ddb3131d076869662c0753.webp",
     "visible": true,
-    "availability": "in_stock"
+    "availability": "out_of_stock"
   },
   {
     "productId": "69087",
@@ -4183,7 +4183,7 @@ window.ANTIN_PRODUCTS = [
     "price": "53.500đ",
     "image": "images/sheet/4ce3db93e74bf678107c4bc587c0f1af.webp",
     "visible": true,
-    "availability": "in_stock"
+    "availability": "out_of_stock"
   },
   {
     "productId": "69858",
@@ -4573,7 +4573,7 @@ window.ANTIN_PRODUCTS = [
     "price": "45.700đ",
     "image": "images/sheet/72d4de0b5236ebf4e223f99b3ffe204e.webp",
     "visible": true,
-    "availability": "in_stock"
+    "availability": "out_of_stock"
   },
   {
     "productId": "81188",
@@ -4638,7 +4638,7 @@ window.ANTIN_PRODUCTS = [
     "price": "90.000đ",
     "image": "images/sheet/ac4a248c62ed9915ffeb2a8ef1b70e5c.webp",
     "visible": true,
-    "availability": "out_of_stock"
+    "availability": "in_stock"
   },
   {
     "productId": "84262",
@@ -4661,7 +4661,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Magiê 250 mg, canxi 450 mg và vitamin D3 10 microgam/viên.",
     "indication": "Bổ sung magiê, canxi và vitamin D3; hỗ trợ xương chắc khỏe. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
-    "price": "333.500đ",
+    "price": "333.000đ",
     "image": "images/sheet/b4c32426462710b8b13d9a2b0dc1539a.webp",
     "visible": true,
     "availability": "in_stock"
@@ -4674,7 +4674,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Vitamin A, B1, B2, B3, B5, B6, B7, B9, B12, C, D, E, K và các khoáng chất: canxi, magiê, crôm, sắt, iốt, kali, đồng, mangan, molybden, phospho, selen, kẽm.",
     "indication": "Bổ sung vitamin và khoáng chất; hỗ trợ tăng cường sức khỏe, sức đề kháng. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
-    "price": "346.100đ",
+    "price": "350.100đ",
     "image": "images/sheet/c9a5501404141bf3c164b045cd5d1944.webp",
     "visible": true,
     "availability": "in_stock"
@@ -4739,7 +4739,7 @@ window.ANTIN_PRODUCTS = [
     "active": "",
     "indication": "",
     "spec": "",
-    "price": "148.900đ",
+    "price": "148.800đ",
     "image": "images/sheet/ae94c0232bd8d94da1cb057b8fe927b0.webp",
     "visible": true,
     "availability": "in_stock"
@@ -4752,7 +4752,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Tobramycin 15 mg và dexamethason 5 mg/5 ml.",
     "indication": "Điều trị viêm mắt đáp ứng với corticosteroid kèm nhiễm khuẩn hoặc nguy cơ nhiễm khuẩn mắt, theo đơn.",
     "spec": "",
-    "price": "14.400đ",
+    "price": "14.300đ",
     "image": "images/sheet/4da73e179b2fc547cd3a7798df5f7e18.webp",
     "visible": true,
     "availability": "in_stock"
@@ -4986,7 +4986,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Thành phần chính: glycerin, niacinamide (vitamin B3), panthenol (tiền vitamin B5).",
     "indication": "Làm sạch dịu nhẹ, duy trì độ ẩm và bảo vệ hàng rào da; phù hợp da nhạy cảm.",
     "spec": "",
-    "price": "311.400đ",
+    "price": "309.900đ",
     "image": "images/sheet/d54bba4fdead7a78f42217d371fe4b8f.webp",
     "visible": true,
     "availability": "in_stock"
@@ -5025,7 +5025,7 @@ window.ANTIN_PRODUCTS = [
     "active": "",
     "indication": "",
     "spec": "",
-    "price": "65.300đ",
+    "price": "64.900đ",
     "image": "images/sheet/6ea6fe9373640c6b64f4ecdf3463b817.webp",
     "visible": true,
     "availability": "in_stock"
@@ -5129,7 +5129,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Mupirocin 2%.",
     "indication": "Điều trị nhiễm khuẩn ngoài da nguyên phát hoặc thứ phát do vi khuẩn nhạy cảm, theo đơn.",
     "spec": "",
-    "price": "33.000đ",
+    "price": "32.700đ",
     "image": "images/sheet/60692dc3644d8f9524ef7c92e64e3516.webp",
     "visible": true,
     "availability": "in_stock"
@@ -5220,7 +5220,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Hypromellose 0,3% trong dung dịch đệm đẳng trương.",
     "indication": "Bổ sung độ ẩm, bôi trơn bề mặt mắt, làm dịu khô mắt và cảm giác kích ứng, khó chịu do khô mắt.",
     "spec": "",
-    "price": "59.000đ",
+    "price": "57.500đ",
     "image": "images/sheet/fc2b61b8d7e5dcb9ed650bb54160524a.webp",
     "visible": true,
     "availability": "in_stock"
@@ -5272,7 +5272,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Muối natri clorid tinh khiết dùng pha dung dịch vệ sinh.",
     "indication": "Pha nước theo hướng dẫn để rửa mũi, loại bỏ dịch nhầy, bụi bẩn và tác nhân gây dị ứng.",
     "spec": "",
-    "price": "23.400đ",
+    "price": "23.200đ",
     "image": "images/sheet/e63188c49c9803f023992f1865cb5dad.webp",
     "visible": true,
     "availability": "in_stock"
@@ -5467,7 +5467,7 @@ window.ANTIN_PRODUCTS = [
     "active": "",
     "indication": "",
     "spec": "",
-    "price": "290.000đ",
+    "price": "288.400đ",
     "image": "images/sheet/d5a5a9bb1b71c2689de87ec86a9b10bb.webp",
     "visible": true,
     "availability": "out_of_stock"
@@ -5532,7 +5532,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Thành phần nổi bật: đạm sữa, chiết xuất gạo, vitamin và khoáng chất.",
     "indication": "Dưỡng ẩm, làm mềm da và giúp giảm khô, nứt nẻ cho da mặt, tay và cơ thể.",
     "spec": "",
-    "price": "56.100đ",
+    "price": "55.700đ",
     "image": "images/sheet/13be666fd3fac27bf3d2ea363a9d6f2c.webp",
     "visible": true,
     "availability": "in_stock"
@@ -5561,7 +5561,7 @@ window.ANTIN_PRODUCTS = [
     "price": "62.500đ",
     "image": "images/sheet/2ea29844574c081e4e87f70f5fb6e067.webp",
     "visible": true,
-    "availability": "in_stock"
+    "availability": "out_of_stock"
   },
   {
     "productId": "260189",
@@ -5662,7 +5662,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Tacrolimus 0,1% (1 mg/g).",
     "indication": "Điều trị viêm da cơ địa vừa đến nặng ở người lớn khi các điều trị thông thường không phù hợp hoặc không hiệu quả, theo đơn.",
     "spec": "",
-    "price": "107.000đ",
+    "price": "106.900đ",
     "image": "images/sheet/2266d7c68aa464f0b412c887654ffe72.webp",
     "visible": true,
     "availability": "in_stock"
@@ -5675,7 +5675,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Albendazol 400 mg/viên.",
     "indication": "Điều trị nhiễm giun đũa, giun kim, giun móc, giun tóc, giun lươn và một số nhiễm ký sinh trùng khác theo hướng dẫn thuốc.",
     "spec": "",
-    "price": "268.000đ",
+    "price": "266.900đ",
     "image": "images/sheet/9f8bc56c8454b0e6de79b0b648055224.webp",
     "visible": true,
     "availability": "in_stock"
@@ -5831,7 +5831,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Thành phần chính: menthol, tinh dầu khuynh diệp và các tinh dầu thơm.",
     "indication": "Hít qua mũi giúp làm dịu cảm giác nghẹt mũi, tạo cảm giác thông thoáng khi cảm lạnh.",
     "spec": "",
-    "price": "23.500đ",
+    "price": "21.800đ",
     "image": "images/sheet/3f0162f6a846401d47d87ffb31318480.webp",
     "visible": true,
     "availability": "in_stock"
@@ -6000,10 +6000,10 @@ window.ANTIN_PRODUCTS = [
     "active": "",
     "indication": "",
     "spec": "",
-    "price": "Liên hệ",
+    "price": "118.000đ",
     "image": "images/sheet/5eb356e11f2c7f28f71008d54bd4f807.webp",
     "visible": true,
-    "availability": "unknown"
+    "availability": "in_stock"
   },
   {
     "productId": "1234461",
@@ -6026,7 +6026,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Vitamin C 10 mg/viên.",
     "indication": "Bổ sung vitamin C và hỗ trợ sức đề kháng. Không phải thuốc.",
     "spec": "",
-    "price": "19.100đ",
+    "price": "20.000đ",
     "image": "images/sheet/2f873537f6a1a81abc82456e1a185855.webp",
     "visible": true,
     "availability": "in_stock"
@@ -6143,7 +6143,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Vitamin C 60 mg; B3 18 mg; B5 6 mg; B6 2 mg; B2 1,6 mg; B1 1,2 mg; acid folic 200 mcg; biotin 75 mcg/viên.",
     "indication": "Bổ sung vitamin, hỗ trợ sức đề kháng và phục hồi thể trạng khi mệt mỏi. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
-    "price": "258.000đ",
+    "price": "259.400đ",
     "image": "images/sheet/a0a82222a119ff4597a8a6251efaf07c.webp",
     "visible": true,
     "availability": "in_stock"
@@ -6338,10 +6338,10 @@ window.ANTIN_PRODUCTS = [
     "active": "Racecadotril 100 mg/viên.",
     "indication": "Giảm triệu chứng tiêu chảy cấp ở người trưởng thành.",
     "spec": "",
-    "price": "46.000đ",
+    "price": "Liên hệ",
     "image": "images/sheet/c9c5922d02d01dbd5dc7ee815ed4f8c7.webp",
     "visible": true,
-    "availability": "out_of_stock"
+    "availability": "unknown"
   },
   {
     "productId": "2013396",
@@ -6377,7 +6377,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Metformin hydroclorid 500 mg/viên.",
     "indication": "Kiểm soát đường huyết trong đái tháo đường típ 2 khi ăn uống và vận động chưa đủ hiệu quả.",
     "spec": "",
-    "price": "40.000đ",
+    "price": "40.200đ",
     "image": "images/sheet/cf08ef6dedf63c3268b27d32f313387e.webp",
     "visible": true,
     "availability": "in_stock"
@@ -6523,7 +6523,7 @@ window.ANTIN_PRODUCTS = [
     "price": "133.400đ",
     "image": "images/sheet/375c4d6d6c0b55742417824a5e337422.webp",
     "visible": true,
-    "availability": "in_stock"
+    "availability": "out_of_stock"
   },
   {
     "productId": "2017207",
@@ -6611,7 +6611,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Bacillus clausii 2 tỷ bào tử/ống 5 ml.",
     "indication": "Bổ sung lợi khuẩn, hỗ trợ tăng cường tiêu hóa và cân bằng hệ vi sinh đường ruột. Thực phẩm bảo vệ sức khỏe.",
     "spec": "",
-    "price": "173.500đ",
+    "price": "178.500đ",
     "image": "images/sheet/a5e47250e63c39b36dc73139f780b567.webp",
     "visible": true,
     "availability": "in_stock"
@@ -6637,7 +6637,7 @@ window.ANTIN_PRODUCTS = [
     "active": "",
     "indication": "",
     "spec": "",
-    "price": "154.400đ",
+    "price": "154.200đ",
     "image": "images/sheet/07390b1723dbf4d92687efe6a82af369.webp",
     "visible": true,
     "availability": "in_stock"
@@ -6689,7 +6689,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Polyethylen glycol 400 4 mg/ml + propylen glycol 3 mg/ml.",
     "indication": "Bôi trơn bề mặt mắt, giảm khô mắt và kích ứng do thiếu nước mắt.",
     "spec": "",
-    "price": "46.600đ",
+    "price": "46.500đ",
     "image": "images/sheet/792f799a1d46354e6e57319aeaddec94.webp",
     "visible": true,
     "availability": "in_stock"
@@ -6705,7 +6705,7 @@ window.ANTIN_PRODUCTS = [
     "price": "49.500đ",
     "image": "images/sheet/cab3116f84f82297914851000e40132b.webp",
     "visible": true,
-    "availability": "in_stock"
+    "availability": "out_of_stock"
   },
   {
     "productId": "2024889",
@@ -6949,7 +6949,7 @@ window.ANTIN_PRODUCTS = [
     "active": "Domperidon maleat 20 mg/viên nang.",
     "indication": "Điều trị triệu chứng buồn nôn và nôn; dùng theo đơn bác sĩ.",
     "spec": "",
-    "price": "30.000đ",
+    "price": "30.300đ",
     "image": "images/sheet/6380594992439027ef17458d049fd72b.webp",
     "visible": true,
     "availability": "in_stock"
@@ -6988,7 +6988,7 @@ window.ANTIN_PRODUCTS = [
     "active": "",
     "indication": "",
     "spec": "",
-    "price": "31.500đ",
+    "price": "31.700đ",
     "image": "",
     "visible": true,
     "availability": "out_of_stock"
@@ -7041,6 +7041,188 @@ window.ANTIN_PRODUCTS = [
     "indication": "",
     "spec": "",
     "price": "47.000đ",
+    "image": "",
+    "visible": true,
+    "availability": "out_of_stock"
+  },
+  {
+    "productId": "1574",
+    "name": "Lisonorm Gedeon Richter (h/30v)",
+    "brand": "Gedeon Richter",
+    "category": "Thuốc kê đơn",
+    "active": "",
+    "indication": "",
+    "spec": "",
+    "price": "177.173đ",
+    "image": "",
+    "visible": true,
+    "availability": "out_of_stock"
+  },
+  {
+    "productId": "3134",
+    "name": "Dermatix Ultra Medical (T/15g) (lớn)",
+    "brand": "Menarini",
+    "category": "Thiết bị và vật tư y tế",
+    "active": "",
+    "indication": "",
+    "spec": "",
+    "price": "400.000đ",
+    "image": "",
+    "visible": true,
+    "availability": "out_of_stock"
+  },
+  {
+    "productId": "3647",
+    "name": "Dimenhydrinat 50mg traphaco (h/100v)",
+    "brand": "Traphaco",
+    "category": "Thuốc không kê đơn",
+    "active": "",
+    "indication": "",
+    "spec": "",
+    "price": "35.000đ",
+    "image": "",
+    "visible": true,
+    "availability": "out_of_stock"
+  },
+  {
+    "productId": "5724",
+    "name": "Savi losartan 50mg savipharm (h/30v)",
+    "brand": "Savi Pharm",
+    "category": "Thuốc kê đơn",
+    "active": "",
+    "indication": "",
+    "spec": "",
+    "price": "38.700đ",
+    "image": "",
+    "visible": true,
+    "availability": "out_of_stock"
+  },
+  {
+    "productId": "12444",
+    "name": "Dafrazol omeprazol 20mg traphaco (c/14v)",
+    "brand": "Traphaco",
+    "category": "Thuốc kê đơn",
+    "active": "",
+    "indication": "",
+    "spec": "",
+    "price": "20.000đ",
+    "image": "",
+    "visible": true,
+    "availability": "out_of_stock"
+  },
+  {
+    "productId": "54445",
+    "name": "Ospexin 500mg sandoz (lốc/10 vỉ/10 viên nang)",
+    "brand": "Sandoz",
+    "category": "Thuốc kê đơn",
+    "active": "",
+    "indication": "",
+    "spec": "",
+    "price": "305.000đ",
+    "image": "",
+    "visible": true,
+    "availability": "out_of_stock"
+  },
+  {
+    "productId": "100034",
+    "name": "Cefimbrano cefixim 100mg vidipha (h/50g/2gr)",
+    "brand": "Vidipha",
+    "category": "Thuốc kê đơn",
+    "active": "",
+    "indication": "",
+    "spec": "",
+    "price": "74.800đ",
+    "image": "",
+    "visible": true,
+    "availability": "out_of_stock"
+  },
+  {
+    "productId": "102896",
+    "name": "Traflu ngày traphaco (h/60v)",
+    "brand": "Traphaco",
+    "category": "Thuốc kê đơn",
+    "active": "",
+    "indication": "",
+    "spec": "",
+    "price": "80.000đ",
+    "image": "",
+    "visible": true,
+    "availability": "out_of_stock"
+  },
+  {
+    "productId": "288180",
+    "name": "Sữa rửa mặt dưỡng ẩm và sáng da hatomugi cleansing & facial washing (t/130g)",
+    "brand": "Hatomugi",
+    "category": "Dược mỹ phẩm",
+    "active": "",
+    "indication": "",
+    "spec": "",
+    "price": "50.276đ",
+    "image": "",
+    "visible": true,
+    "availability": "in_stock"
+  },
+  {
+    "productId": "290243",
+    "name": "Hỗ trợ hoạt huyết whole herb ginkgo biloba mason natural (c/60v)",
+    "brand": "Mason Natural",
+    "category": "Thực phẩm chức năng",
+    "active": "",
+    "indication": "",
+    "spec": "",
+    "price": "400.000đ",
+    "image": "",
+    "visible": true,
+    "availability": "out_of_stock"
+  },
+  {
+    "productId": "338559",
+    "name": "Sữa rửa mặt trị mụn hatomugi cleansing & facial washing (t/130gr)",
+    "brand": "Hatomugi",
+    "category": "Dược mỹ phẩm",
+    "active": "",
+    "indication": "",
+    "spec": "",
+    "price": "49.100đ",
+    "image": "",
+    "visible": true,
+    "availability": "in_stock"
+  },
+  {
+    "productId": "395873",
+    "name": "Ovalax bisacodyl 5mg traphaco (h/100v)",
+    "brand": "Traphaco",
+    "category": "Thuốc không kê đơn",
+    "active": "",
+    "indication": "",
+    "spec": "",
+    "price": "71.000đ",
+    "image": "",
+    "visible": true,
+    "availability": "out_of_stock"
+  },
+  {
+    "productId": "2008226",
+    "name": "Kẹo Ngậm Tăng Đề Kháng Vị Cam Bạc Hà Star Immune Lozenge Organge Unique (H/20v)",
+    "brand": "Unique",
+    "category": "Thực phẩm chức năng",
+    "active": "",
+    "indication": "",
+    "spec": "",
+    "price": "29.000đ",
+    "image": "",
+    "visible": true,
+    "availability": "out_of_stock"
+  },
+  {
+    "productId": "2020703",
+    "name": "Cefimvid 200 Cefixim 200mg Vidipha (H/100v)",
+    "brand": "Vidipha",
+    "category": "Thuốc kê đơn",
+    "active": "",
+    "indication": "",
+    "spec": "",
+    "price": "200.000đ",
     "image": "",
     "visible": true,
     "availability": "out_of_stock"
