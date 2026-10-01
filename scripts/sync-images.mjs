@@ -38,15 +38,37 @@ export async function syncImages(root, products, values, fetchImpl = fetch) {
   const updated = products.map(p => ({...p}));
   const failures = [];
   let downloaded = 0;
+  let manifestChanged = false;
   const jobs = updated.filter(p => sources.has(String(p.productId)));
+  const imagePath = value => /^images\/sheet\/[a-f0-9]{32}\.(jpg|png|webp|gif|avif)$/.test(value || '');
+  async function saveVariant(input, size) {
+    const bytes = await sharp(input, {limitInputPixels:40000000}).rotate()
+      .resize(size,size,{fit:'inside',withoutEnlargement:true}).webp({quality:82}).toBuffer();
+    const path = `images/sheet/${createHash('sha256').update(bytes).digest('hex').slice(0,32)}.webp`;
+    await writeFile(resolve(root,path),bytes);
+    return path;
+  }
+  async function withThumbnails(entry) {
+    if(entry.thumbnails===1 && imagePath(entry.imageThumb) && imagePath(entry.imageRetina)) {
+      try { await Promise.all([entry.imageThumb,entry.imageRetina].map(path=>access(resolve(root,path)))); return entry; } catch {}
+    }
+    const input = await readFile(resolve(root,entry.image));
+    const [imageThumb,imageRetina] = await Promise.all([saveVariant(input,320),saveVariant(input,640)]);
+    manifestChanged = true;
+    return {...entry,imageThumb,imageRetina,thumbnails:1};
+  }
+  function applyImage(product,entry) {
+    Object.assign(product,{image:entry.image,imageThumb:entry.imageThumb,imageRetina:entry.imageRetina});
+  }
   async function saveImage(id, source, input) {
     imageExtension(input);
     const bytes = await sharp(input, {limitInputPixels:40000000}).rotate().resize(1000,1000,{fit:'inside',withoutEnlargement:true}).webp({quality:85}).toBuffer();
     const hash = createHash('sha256').update(bytes).digest('hex').slice(0,32);
     const image = `images/sheet/${hash}.webp`;
     await writeFile(resolve(root, image), bytes);
-    manifest[id] = {source,image,optimized:1}; downloaded++;
-    return image;
+    const entry = await withThumbnails({source,image,optimized:1});
+    manifest[id] = entry; downloaded++; manifestChanged = true;
+    return entry;
   }
   async function worker() {
     while (jobs.length) {
@@ -58,10 +80,11 @@ export async function syncImages(root, products, values, fetchImpl = fetch) {
         // Product-image CDN supplied in the backup; no credentials or arbitrary network targets.
         if (url.protocol !== 'https:' || url.hostname !== 'cdn-gcs.thuocsi.vn' || url.username || url.password || url.port) throw new Error('Unsupported image host');
         const cached = manifest[id];
-        if (cached?.source === source && /^images\/sheet\/[a-f0-9]{32}\.(jpg|png|webp|gif|avif)$/.test(cached.image)) {
+        if (cached?.source === source && imagePath(cached.image)) {
           try {
             await access(resolve(root, cached.image));
-            product.image = cached.optimized === 1 ? cached.image : await saveImage(id, source, await readFile(resolve(root,cached.image)));
+            const entry = cached.optimized === 1 ? await withThumbnails(cached) : await saveImage(id, source, await readFile(resolve(root,cached.image)));
+            manifest[id] = entry; applyImage(product,entry);
             continue;
           } catch {}
         }
@@ -71,11 +94,11 @@ export async function syncImages(root, products, values, fetchImpl = fetch) {
         if (Number(response.headers.get('content-length')) > limit) throw new Error('Image exceeds 10 MB');
         const chunks = []; let size = 0;
         for await (const chunk of response.body) { size += chunk.length; if (size > limit) throw new Error('Image exceeds 10 MB'); chunks.push(chunk); }
-        product.image = await saveImage(id,source,Buffer.concat(chunks));
+        applyImage(product,await saveImage(id,source,Buffer.concat(chunks)));
       } catch(error) { failures.push({productId:id, reason:error.message}); }
     }
   }
   await Promise.all(Array.from({length:6}, worker));
-  if (downloaded) await writeFile(manifestPath, JSON.stringify(manifest,null,2)+'\n');
+  if (manifestChanged) await writeFile(manifestPath, JSON.stringify(manifest,null,2)+'\n');
   return {products:updated,downloaded,failures};
 }

@@ -86,8 +86,11 @@ function totalLabel(rows){
   const summary=totals(rows);
   return summary.unknown===rows.length && rows.length ? 'Liên hệ' : money(summary.amount);
 }
-function productImage(p){
-  return p.image ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">`
+function productImage(p,priority=false){
+  const source=p.imageThumb||p.image;
+  const variants=p.imageThumb&&p.imageRetina?` srcset="${esc(p.imageThumb)} 1x, ${esc(p.imageRetina)} 2x"`:'';
+  const fallback=p.image&&source!==p.image?` data-full-src="${esc(p.image)}"`:'';
+  return source ? `<img src="${esc(source)}"${variants}${fallback} alt="${esc(p.name)}" loading="${priority?'eager':'lazy'}" decoding="async"${priority?' fetchpriority="high"':''}>`
     : '<span class="image-placeholder">Ảnh sản phẩm</span>';
 }
 function quantityControl(p){
@@ -391,9 +394,9 @@ function renderProducts(){
   document.getElementById('count').textContent=`${filtered.length} sản phẩm`;
   const grid=document.getElementById('productGrid');
   if(!filtered.length){grid.innerHTML='<div class="empty">Không tìm thấy sản phẩm phù hợp. Bạn có thể xóa bộ lọc hoặc thử từ khóa khác.</div>';return}
-  grid.innerHTML=filtered.map(p=>`<article class="card ${cart.has(productKey(p))?'in-cart':''}">
+  grid.innerHTML=filtered.map((p,index)=>`<article class="card ${cart.has(productKey(p))?'in-cart':''}">
     <div class="product-img">
-      ${productImage(p)}
+      ${productImage(p,index<5)}
       ${p.availability==='out_of_stock'?'<span class="stock-badge">Hết hàng</span>':''}
     </div>
     <div class="card-body">
@@ -428,7 +431,7 @@ function contact(name,channel){
 async function loadProducts(){
   // Only read the catalogue mirrored by the authenticated sync workflow.
   products=Array.isArray(window.ANTIN_PRODUCTS)?window.ANTIN_PRODUCTS.map(p=>({...p})):[];
-  rebuildCategories(); renderCategories(); renderGroups(); renderDepartments(); renderProducts();
+  rebuildCategories(); renderCategories(); renderGroups(); renderDepartments();
 }
 
 function closeFilterMenu(restoreFocus=false){
@@ -528,6 +531,13 @@ document.getElementById('searchForm').addEventListener('submit',event=>{
 document.getElementById('year').textContent=new Date().getFullYear();
 document.addEventListener('error',event=>{
   if(event.target.matches?.('.product-img img, .cart-image img')){
+    const original=event.target.dataset.fullSrc;
+    if(original){
+      delete event.target.dataset.fullSrc;
+      event.target.removeAttribute('srcset');
+      event.target.src=original;
+      return;
+    }
     const placeholder=document.createElement('span');
     placeholder.className='image-placeholder';
     placeholder.textContent='Ảnh đang cập nhật';

@@ -26,11 +26,29 @@ test('image sync matches southern IDs, caches downloaded files and keeps old ima
     assert.equal((await readFile(join(root,first.products[0].image))).subarray(8,12).toString(),'WEBP');
     const metadata = await sharp(await readFile(join(root,first.products[0].image))).metadata();
     assert.equal(metadata.width,1000); assert.equal(metadata.height,500);
+    for(const [field,width] of [['imageThumb',320],['imageRetina',640]]) {
+      const size=await sharp(await readFile(join(root,first.products[0][field]))).metadata();
+      assert.equal(size.width,width); assert.equal(size.height,width/2);
+    }
     const second = await syncImages(root, products, values, fetchImage);
     assert.equal(second.downloaded,0); assert.equal(calls,1);
+    assert.equal(second.products[0].imageThumb,first.products[0].imageThumb);
+    // A missing thumbnail is repaired from the cached master, without another CDN read.
+    await rm(join(root,first.products[0].imageThumb));
+    const repaired=await syncImages(root,first.products,values,fetchImage);
+    assert.equal(calls,1); assert.equal(repaired.failures.length,0);
+    await readFile(join(root,repaired.products[0].imageThumb));
+    // Upgrade the old manifest format locally; daily sync must preserve variants thereafter.
+    const manifestPath=join(root,'images/sheet/manifest.json');
+    const manifest=JSON.parse(await readFile(manifestPath,'utf8'));
+    for(const field of ['imageThumb','imageRetina','thumbnails'])delete manifest['1146'][field];
+    await writeFile(manifestPath,JSON.stringify(manifest));
+    const upgraded=await syncImages(root,products,values,fetchImage);
+    assert.equal(upgraded.products[0].imageThumb,first.products[0].imageThumb);assert.equal(calls,1);
     values[2][2] = 'https://cdn-gcs.thuocsi.vn/broken';
     const failed = await syncImages(root, first.products, values, async()=>new Response('<html>error</html>'));
     assert.equal(failed.failures.length,1); assert.equal(failed.products[0].image,first.products[0].image);
+    assert.equal(failed.products[0].imageThumb,first.products[0].imageThumb);
     values[2][2] = 'http://127.0.0.1/private';
     assert.equal((await syncImages(root,products,values,fetchImage)).failures.length,1);
     assert.equal(calls,1);

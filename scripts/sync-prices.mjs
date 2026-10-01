@@ -205,7 +205,7 @@ export function renderUpdate(source, html, result) {
 
 export async function validateAssets(root, html, products) {
   const references = [...html.matchAll(/(?:src|href)="([^"#]+)"/g)].map(m => m[1]);
-  references.push(...products.map(p => p.image).filter(Boolean));
+  references.push(...products.flatMap(p => [p.image,p.imageThumb,p.imageRetina]).filter(Boolean));
   for (const ref of references) {
     if (/^(?:https?:)?\/\//.test(ref)) continue;
     const file = resolve(root, ref.split(/[?#]/)[0]);
