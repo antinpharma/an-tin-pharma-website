@@ -34,15 +34,15 @@ Repository: `antinpharma/an-tin-pharma-website`.
 
 ### Email báo cáo hằng ngày
 
-Địa chỉ nhận/gửi: **nguyenphuockhaimkn@gmail.com**. Job `notify` chạy sau kết quả đồng bộ, triển khai và xác minh, kể cả khi bước trước lỗi. Lịch dự phòng được bỏ qua khi đã có bản nguồn mới trong ngày thì không gửi thêm email. Chạy thủ công/push cũng gửi báo cáo để kiểm chứng. Nguồn cũ hoặc website chưa xác minh được không được báo là cập nhật thành công.
+Địa chỉ nhận/gửi: **nguyenphuockhaimkn@gmail.com**. Email tập trung ở Worker `antin-price-scheduler`, **tối đa 2 lần/ngày theo giờ Việt Nam**: tối đa một cảnh báo khi chưa có nguồn hôm nay từ 12h, và tối đa một xác nhận khi website đã phục vụ nguồn hôm nay, đối chiếu SHA-256 và phiên bản trang thành công. Ngày hoạt động bình thường chỉ có một thư xác nhận. Nếu nguồn vẫn cũ cả ngày thì chỉ có một cảnh báo.
 
 Thiết lập một lần:
 
 1. Đăng nhập đúng Gmail trên, bật Xác minh 2 bước, tạo [Mật khẩu ứng dụng](https://myaccount.google.com/apppasswords) tên `An Tin daily prices`. Xem [hướng dẫn Google](https://support.google.com/mail/answer/185833). Không dùng mật khẩu đăng nhập Gmail thông thường.
-2. Mở [Repository Secrets](https://github.com/antinpharma/an-tin-pharma-website/settings/secrets/actions) → **New repository secret**. Tên **PRICE_REPORT_APP_PASSWORD**, giá trị là mật khẩu ứng dụng vừa tạo. Không gửi mã qua chat, commit hoặc ghi vào config.js.
-3. Chạy **Update prices and deploy website → Run workflow → main**. Job `notify` phải ghi `Gmail accepted the daily report for delivery`; kiểm tra cả thư rác. Đây là xác nhận Gmail nhận gửi, không phải biên nhận người dùng đã đọc.
+2. Mở Cloudflare → Workers & Pages → `antin-price-scheduler` → Settings → Variables and Secrets. Lưu mật khẩu ứng dụng vào Secret **PRICE_REPORT_APP_PASSWORD**. Không gửi mã qua chat, commit hoặc ghi vào config.js. Secret SMTP cũ trên GitHub không còn được workflow sử dụng.
+3. Kiểm tra `/health` của Worker: `emailConfigured`, `notificationLimit: 2`, `notificationDay`, `notificationAttempts` và `mail`. `smtp_accepted` xác nhận Gmail nhận gửi, không xác nhận thư đã vào Inbox; kiểm tra cả thư rác.
 
-Chưa có secret: Summary ghi rõ **Daily email NOT enabled**, đồng bộ giá vẫn chạy. Email được gửi bằng SMTP Gmail TLS, không ghi nội dung lỗi SMTP nhạy cảm vào log và không tự gửi lại khi kết quả gửi không rõ. Nếu mật khẩu ứng dụng bị thu hồi, thay secret. Nếu lịch GitHub hoàn toàn không được kích hoạt, job email cũng không chạy; cần hệ giám sát lịch độc lập nếu muốn bảo đảm phát hiện trường hợp này.
+GitHub job `notify` chỉ ghi báo cáo từng lượt vào **Actions Summary**, kể cả khi đồng bộ/triển khai/xác minh lỗi. Push, chạy thủ công và retry không gửi thêm email. Worker vẫn kiểm tra mỗi 10 phút và đồng bộ khi cần; giảm email không giảm việc giám sát. Hạn mức lưu trong Durable Object, giữ qua deploy/restart, reset theo ngày Việt Nam. Mọi lần thử SMTP đều tính vào hạn mức, kể cả thư kiểm tra quản trị và kết quả không rõ; không tự gửi lại. Chưa có secret thì `/health` ghi `emailConfigured: false`, không báo đã gửi. Email lỗi không làm mất catalogue đã triển khai.
 
 ### Bộ hẹn giờ và giám sát độc lập trên Cloudflare
 
@@ -51,10 +51,10 @@ Worker `antin-price-scheduler` dùng `workers/wrangler-price-scheduler.jsonc`, t
 - Khi ngày nguồn và ngày kiểm tra là hôm nay, chỉ coi hoàn tất sau khi SHA-256 catalogue và phiên bản cache trong index khớp status đang phục vụ.
 - Nếu chưa đạt, đọc danh sách lượt chạy trên nhánh `main`. Đang chờ/đang chạy thì không tạo lượt khác; lỗi API thì không gọi mù. Khi không có lượt đang chạy, gọi `workflow_dispatch` trên `main`.
 - Lưu thời điểm thử trước khi gọi, dùng lease trong Durable Object để tránh hai cron cùng xử lý. Ba lần đầu cách ít nhất 10 phút; sau đó cách ít nhất 30 phút để tránh liên tục chạy lại khi nguồn chưa đổi. Kiểm tra website vẫn mỗi 10 phút trong khung giờ trên.
-- Từ 12h nếu chưa xác minh được bản của hôm nay, gửi một email cảnh báo trực tiếp qua SMTP Gmail từ Cloudflare, không phụ thuộc job email trên GitHub. Khi xác minh được, gửi một thư xác nhận riêng. Tối đa một lần thử mỗi loại/ngày; kết quả SMTP không rõ thì không tự gửi lại, tránh trùng thư. `smtp_accepted` chỉ xác nhận máy chủ Gmail nhận thư, không xác nhận đã vào Inbox.
+- Từ 12h nếu chưa xác minh được bản của hôm nay, gửi một email cảnh báo trực tiếp qua SMTP Gmail từ Cloudflare. Khi xác minh được, gửi một thư xác nhận riêng. Tối đa một lần thử mỗi loại/ngày và tối đa **2 lần thử tổng/ngày**, gồm cả thư kiểm tra quản trị; kết quả SMTP không rõ cũng chiếm một lượt, không tự gửi lại. GitHub không gửi SMTP riêng. `smtp_accepted` chỉ xác nhận máy chủ Gmail nhận thư, không xác nhận đã vào Inbox.
 - `/health` chỉ đọc: trạng thái cấu hình, lần kiểm tra, lần cron thực tế (`lastCronAt`), lần yêu cầu cập nhật, kết quả xác minh và gửi mail. Các đường `/admin/check`, `/admin/dispatch-check`, `/admin/mail-check`, `/admin/test-mail` chỉ hoạt động với Bearer `SCHEDULER_ADMIN_KEY` riêng; không dùng GitHub token làm khóa quản trị. Khóa quản trị cục bộ nằm trong file bị Git bỏ qua `.env.price-scheduler-admin.local`.
 - Gửi SMTP từ Workers dùng socket TLS trực tiếp đến hostname `smtp.gmail.com:465`; tránh bước Nodemailer tự phân giải ra IP bị TCP proxy từ chối. HTTP fetch dùng `redirect: manual`, kiểm tra mã trả về; Workers không hỗ trợ `redirect: error`. Không theo chuyển hướng kèm token GitHub.
-- Kiểm tra quản trị có thể chạy ngoài khung giờ. `dispatch-check` yêu cầu chạy thật để kiểm chứng token kể cả website đã mới, vẫn tôn trọng lượt đang chạy và cooldown. `mail-check` chỉ xác thực Gmail; `test-mail` gửi thư nhãn kiểm tra riêng tối đa một lần/ngày, không tự gửi lại thư hằng ngày có kết quả không rõ.
+- Kiểm tra quản trị có thể chạy ngoài khung giờ. `dispatch-check` yêu cầu chạy thật để kiểm chứng token kể cả website đã mới, vẫn tôn trọng lượt đang chạy và cooldown. `mail-check` chỉ xác thực Gmail, không gửi thư; `test-mail` gửi thư nhãn kiểm tra riêng tối đa một lần/ngày khi còn hạn mức 2 thư, không tự gửi lại thư hằng ngày có kết quả không rõ.
 
 **Cần cấu hình hai Secret trước khi coi hệ thống sẵn sàng:** mở Cloudflare → Workers & Pages → `antin-price-scheduler` → Settings → Variables and Secrets → Add → Type **Secret** → Deploy.
 

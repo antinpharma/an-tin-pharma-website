@@ -3,6 +3,7 @@ import {createHash} from 'node:crypto';
 const site = 'https://antinpharma.github.io/an-tin-pharma-website/';
 const workflow = 'https://api.github.com/repos/antinpharma/an-tin-pharma-website/actions/workflows/daily-prices.yml';
 export const recipient = 'nguyenphuockhaimkn@gmail.com';
+export const MAX_DAILY_MAILS = 2;
 const day = value => Number.isFinite(Date.parse(value))
   ? new Date(Date.parse(value) + 7 * 3600000).toISOString().slice(0, 10) : null;
 
@@ -91,8 +92,9 @@ export async function runCheck({env, storage, now = new Date(), fetchImpl = fetc
   }
   const localHour = new Date(now.getTime() + 7 * 3600000).getUTCHours();
   const kind = manual && testMail ? 'test' : publication.verified ? 'verified' : localHour >= 12 ? 'warning' : null;
-  if (kind && state.emailConfigured && !state.mail[kind]) {
-    // At most one attempt per kind/day; do not duplicate an SMTP send after an uncertain result.
+  if (kind && state.emailConfigured && !state.mail[kind] && Object.keys(state.mail).length < MAX_DAILY_MAILS) {
+    // Count every reserved attempt, including admin tests and unconfirmed SMTP.
+    // Reservations survive retries, deployments and restarts; never send a third mail.
     state.mail[kind] = {at: now.toISOString(), outcome: 'pending'};
     await storage.put('state', state);
     const format = value => new Date(value).toLocaleString('vi-VN', {timeZone: 'Asia/Ho_Chi_Minh'});

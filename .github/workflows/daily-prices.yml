@@ -150,11 +150,10 @@ jobs:
         with:
           node-version: '24'
       - run: npm ci --ignore-scripts
-      - name: Email the result, including failed sync or deployment
+      - name: Record the result; daily emails are managed by Cloudflare
         env:
           SYNC_REPORT: ${{ needs.sync.outputs.report }}
           SYNC_RESULT: ${{ needs.sync.result }}
           DEPLOY_RESULT: ${{ needs.deploy.result }}
           VERIFY_RESULT: ${{ needs.verify.result }}
-          PRICE_REPORT_APP_PASSWORD: ${{ secrets.PRICE_REPORT_APP_PASSWORD }}
         run: node scripts/notify-prices.mjs

@@ -71,6 +71,51 @@ test('yesterday source dispatches, persists cooldown, and warns once after noon'
   assert.equal(f.calls.filter(c=>c.method==='POST').length,2);
   assert.equal(f.mails.length,1);
 });
+
+test('many retries and a recovery send at most one warning and one confirmation per Vietnam day', async () => {
+  const f=fixture({audit:stale});
+  for(let i=0;i<12;i++)await runCheck({...f,now:new Date(now.getTime()+i*10*60000)});
+  assert.equal(f.mails.length,1);
+  const recovered={...f,fetchImpl:fixture().fetchImpl,now:new Date(now.getTime()+2*3600000)};
+  for(let i=0;i<12;i++)await runCheck(recovered);
+  assert.equal(f.mails.length,2);
+  assert.match(f.mails[0].subject,/CẢNH BÁO/);
+  assert.match(f.mails[1].subject,/ĐÃ XÁC MINH/);
+  // A new run/isolate and explicit test cannot bypass persisted reservations.
+  await runCheck({...recovered,manual:true,testMail:true});
+  await runCheck({...f,manual:true});
+  assert.equal(f.mails.length,2);
+  assert.deepEqual(Object.keys((await f.storage.get('state')).mail).sort(),['verified','warning']);
+  const instance=new PriceScheduler({storage:f.storage},f.env);
+  const health=await (await instance.fetch(new Request('https://internal/health'))).json();
+  assert.equal(health.notificationLimit,2);
+  assert.equal(health.notificationAttempts,2);
+  assert.equal(health.notificationDay,'2026-09-30');
+});
+
+test('unconfirmed SMTP counts toward the two-mail limit; admin tests cannot create a third send', async () => {
+  const f=fixture({audit:stale,mailError:true});
+  await runCheck(f);
+  await runCheck({...f,manual:true,testMail:true});
+  await runCheck({...f,fetchImpl:fixture().fetchImpl});
+  assert.equal(f.mails.length,2);
+  const mail=(await f.storage.get('state')).mail;
+  assert.equal(mail.warning.outcome,'unconfirmed');
+  assert.equal(mail.test.outcome,'unconfirmed');
+  assert.equal(mail.verified,undefined);
+});
+
+test('notification quota resets at Vietnam midnight and never repeats in the new day', async () => {
+  const f=fixture({audit:stale});await runCheck(f);
+  await runCheck({...f,fetchImpl:fixture().fetchImpl});assert.equal(f.mails.length,2);
+  const nextDay=new Date('2026-09-30T17:07:00Z');
+  const options={...f,now:nextDay,manual:true,fetchImpl:fixture({audit:{...audit,
+    checkedAt:'2026-09-30T17:02:00Z',sourceUpdatedAt:'2026-09-30T17:00:00Z'}}).fetchImpl};
+  await runCheck(options);await runCheck(options);
+  assert.equal(f.mails.length,3);
+  const state=await f.storage.get('state');assert.equal(state.day,'2026-10-01');
+  assert.deepEqual(Object.keys(state.mail),['verified']);
+});
 test('queued/running workflow prevents duplicate, even when queue is delayed', async () => {
   const f=fixture({audit:stale,runs:[{id:1,head_branch:'main',status:'queued'}]});
   assert.equal((await runCheck(f)).outcome,'workflow_active');

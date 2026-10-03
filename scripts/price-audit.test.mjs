@@ -1,10 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+import {mkdtemp, readFile, rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {sourceTime, buildAudit, readSheetsJson} from './price-audit.mjs';
 import {syncDue} from './check-sync-window.mjs';
 import {verifyPublished} from './verify-published-prices.mjs';
-import {makePriceMail, sendPriceMail} from './notify-prices.mjs';
+import {makePriceReport} from './notify-prices.mjs';
 import {updateCatalogue} from './sync-prices.mjs';
 
 const now = new Date('2026-09-29T04:17:00Z');
@@ -81,24 +86,32 @@ test('live verification requires all three: catalogue bytes, index version and t
 test('reports never claim success after deployment/verification failure or stale source', () => {
   const args = {report: {status: 'checked', freshness: 'fresh', checkedAt: now.toISOString(), sourceUpdatedAt: now.toISOString(), total: 5, added: 0, priceChanged: 2, stockStatusChanged: 1, contactPrices: 0, imageFailures: 0},
     syncResult: 'success', deployResult: 'success', verifyResult: 'success', runUrl: 'https://github.com/antinpharma/an-tin-pharma-website/actions/runs/1'};
-  assert.match(makePriceMail(args).subject, /ĐÃ KIỂM TRA/);
-  assert.match(makePriceMail({...args, verifyResult: 'failure'}).subject, /LỖI/);
-  assert.match(makePriceMail({...args, report: {...args.report, freshness: 'stale'}}).subject, /CẢNH BÁO/);
-  assert.match(makePriceMail({...args, report: {...args.report, sourceUpdatedAt:'2026-09-28T03:00:00Z'}}).subject, /CẢNH BÁO/);
-  assert.match(makePriceMail({...args, report: {...args.report, checkedAt:'2026-09-29T17:30:00Z',sourceUpdatedAt:'2026-09-29T17:05:00Z'}}).subject, /ĐÃ KIỂM TRA/);
-  assert.match(makePriceMail({...args, report: null, syncResult: 'failure'}).text, /Chưa xác nhận/);
+  assert.match(makePriceReport(args).subject, /ĐÃ KIỂM TRA/);
+  assert.match(makePriceReport({...args, verifyResult: 'failure'}).subject, /LỖI/);
+  assert.match(makePriceReport({...args, report: {...args.report, freshness: 'stale'}}).subject, /CẢNH BÁO/);
+  assert.match(makePriceReport({...args, report: {...args.report, sourceUpdatedAt:'2026-09-28T03:00:00Z'}}).subject, /CẢNH BÁO/);
+  assert.match(makePriceReport({...args, report: {...args.report, checkedAt:'2026-09-29T17:30:00Z',sourceUpdatedAt:'2026-09-29T17:05:00Z'}}).subject, /ĐÃ KIỂM TRA/);
+  assert.match(makePriceReport({...args, report: null, syncResult: 'failure'}).text, /Chưa xác nhận/);
 });
 
-test('SMTP requires credentials and acceptance; no automatic retries or raw SMTP error disclosure', async () => {
-  assert.equal((await sendPriceMail({}, '')).reason, 'missing_credentials');
-  let calls = 0, closed = false;
-  const createTransport = options => {
-    assert.equal(options.secure, true); assert.equal(options.auth.pass, 'abcd');
-    return {sendMail: async () => { calls++; throw new Error('secret server info'); }, close: () => closed = true};
-  };
-  await assert.rejects(sendPriceMail({}, 'ab cd', createTransport), error => !error.message.includes('secret server info'));
-  assert.equal(calls, 1); assert.equal(closed, true);
-  assert.equal((await sendPriceMail({}, 'abcd', () => ({sendMail: async () => ({accepted: ['nguyenphuockhaimkn@gmail.com']}), close() {}}))).sent, true);
+test('repeated GitHub notifications only record reports even when an old SMTP secret is present', async () => {
+  const directory=await mkdtemp(join(tmpdir(),'antin-notification-'));
+  const summary=join(directory,'summary.md');
+  try {
+    for (let i=0;i<3;i++) {
+      const output=execFileSync(process.execPath,[fileURLToPath(new URL('./notify-prices.mjs',import.meta.url))],{
+        encoding:'utf8',timeout:5000,env:{...process.env,SYNC_REPORT:'null',SYNC_RESULT:'failure',
+          GITHUB_REPOSITORY:'antinpharma/an-tin-pharma-website',GITHUB_RUN_ID:String(i+1),
+          GITHUB_STEP_SUMMARY:summary,PRICE_REPORT_APP_PASSWORD:'obsolete-test-secret'}});
+      assert.match(output,/GitHub chỉ lưu báo cáo/);
+      assert.match(output,/LỖI/);
+      assert.ok(!output.includes('obsolete-test-secret'));
+      assert.ok(!output.includes('Gmail accepted'));
+    }
+    const text=await readFile(summary,'utf8');
+    assert.equal(text.match(/GitHub chỉ lưu báo cáo/g).length,3);
+    assert.match(text,/actions\/runs\/3/);
+  } finally {await rm(directory,{recursive:true,force:true});}
 });
 
 test('blank source text preserves known product data; new missing names use explicit placeholder', () => {

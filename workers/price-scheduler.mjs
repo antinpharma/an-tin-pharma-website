@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import {timingSafeEqual} from 'node:crypto';
 import {connect as connectTls} from 'node:tls';
-import {recipient, runCheck} from './price-scheduler-core.mjs';
+import {recipient, runCheck, MAX_DAILY_MAILS} from './price-scheduler-core.mjs';
 
 export async function sendSchedulerMail(mail, password, createTransport = nodemailer.createTransport) {
   const transport = createTransport({host: 'smtp.gmail.com', port: 465, secure: true,
@@ -44,6 +44,8 @@ export class PriceScheduler {
         lastCheckAt: state?.lastCheckAt || null, outcome: state?.outcome || 'not_checked',
         lastTrigger: state?.lastTrigger || null, lastCronAt: state?.lastCronAt || null,
         lastDispatchAt: state?.lastDispatchAt || null, publication: state?.publication || null,
+        notificationLimit: MAX_DAILY_MAILS, notificationDay: state?.day || null,
+        notificationAttempts: Object.keys(state?.mail || {}).length,
         mail: state?.mail || {}}, {headers: {'Cache-Control': 'no-store'}});
     }
     // Persisted lease protects against overlapping Cron invocations and isolate restarts.
