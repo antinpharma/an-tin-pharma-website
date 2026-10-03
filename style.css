@@ -105,6 +105,10 @@ h1 span{color:var(--orange)}
 .section-title p{margin:6px 0 0;color:var(--muted);font-size:14px}
 .section-title small{color:var(--muted)}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding-bottom:40px}
+.product-pagination{text-align:center;margin:0 0 32px}
+.product-pagination p{color:var(--muted);font-size:13px}
+.product-pagination .btn{min-height:44px;border:1px solid var(--line);background:var(--cream);color:var(--text);cursor:pointer}
+.product-pagination .btn[hidden]{display:none}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(80,40,10,.06);display:flex;flex-direction:column}
 .product-img{height:180px;background:linear-gradient(145deg,#fff9f2,#fff);display:flex;align-items:center;justify-content:center;padding:18px;border-bottom:1px solid var(--line)}
 .fake-box{width:78%;height:105px;border-radius:12px;background:linear-gradient(135deg,#fff,#f7efe7);border:1px solid #ead7c5;box-shadow:0 10px 25px rgba(80,40,10,.10);display:flex;align-items:center;justify-content:center;text-align:center;color:var(--orange);font-weight:800;padding:12px}

@@ -19,6 +19,10 @@ let cart = new Map();
 let orderSending=false;
 let orderSubmitted=false;
 let memoryOrderAttempt=null;
+const PRODUCT_BATCH_SIZE = 24;
+const productSearchTerms = new WeakMap();
+let matchingProducts = [];
+let renderedProductCount = 0;
 
 function stripAccents(s=''){
   return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D');
@@ -90,7 +94,7 @@ function productImage(p,priority=false){
   const source=p.imageThumb||p.image;
   const variants=p.imageThumb&&p.imageRetina?` srcset="${esc(p.imageThumb)} 1x, ${esc(p.imageRetina)} 2x"`:'';
   const fallback=p.image&&source!==p.image?` data-full-src="${esc(p.image)}"`:'';
-  return source ? `<img src="${esc(source)}"${variants}${fallback} alt="${esc(p.name)}" loading="${priority?'eager':'lazy'}" decoding="async"${priority?' fetchpriority="high"':''}>`
+  return source ? `<img src="${esc(source)}"${variants}${fallback} alt="${esc(p.name)}" width="320" height="320" loading="${priority?'eager':'lazy'}" decoding="async"${priority?' fetchpriority="high"':''}>`
     : '<span class="image-placeholder">Ảnh sản phẩm</span>';
 }
 function quantityControl(p){
@@ -380,12 +384,17 @@ async function copyOrder(){
   return copied;
 }
 function renderProducts(){
-  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  const q=document.getElementById('searchInput').value.trim();
+  const needle=stripAccents(q).toLowerCase();
   const candidates=products.filter(p=>{
     if(!p.visible) return false;
     const inCat=activeCategory==='Tất cả'||p.category===activeCategory;
-    const hay=stripAccents([p.name,p.brand,p.productId,p.active,p.spec,p.indication,p.category,GROUPS.groupFor(p).label].join(' ')).toLowerCase();
-    const needle=stripAccents(q).toLowerCase();
+    if(!inCat)return false;
+    let hay=productSearchTerms.get(p);
+    if(hay===undefined){
+      hay=stripAccents([p.name,p.brand,p.productId,p.active,p.spec,p.indication,p.category,GROUPS.groupFor(p).label].join(' ')).toLowerCase();
+      productSearchTerms.set(p,hay);
+    }
     return inCat&&(!needle||hay.includes(needle));
   });
   const filtered=candidates.filter(p=>GROUPS.matches(p,activeGroup)&&DEPARTMENTS.matches(p,activeDepartment));
@@ -393,10 +402,21 @@ function renderProducts(){
   refreshGroupFilters(candidates,filtered.length);
   document.getElementById('count').textContent=`${filtered.length} sản phẩm`;
   const grid=document.getElementById('productGrid');
+  matchingProducts=filtered;
+  renderedProductCount=0;
+  grid.innerHTML='';
+  document.getElementById('loadMoreProducts').hidden=!filtered.length;
+  document.getElementById('productProgress').textContent='';
   if(!filtered.length){grid.innerHTML='<div class="empty">Không tìm thấy sản phẩm phù hợp. Bạn có thể xóa bộ lọc hoặc thử từ khóa khác.</div>';return}
-  grid.innerHTML=filtered.map((p,index)=>`<article class="card ${cart.has(productKey(p))?'in-cart':''}">
+  appendProducts();
+}
+function appendProducts(){
+  const batch=matchingProducts.slice(renderedProductCount,renderedProductCount+PRODUCT_BATCH_SIZE);
+  if(!batch.length)return;
+  const eagerCount=window.matchMedia('(max-width:640px)').matches?2:4;
+  document.getElementById('productGrid').insertAdjacentHTML('beforeend',batch.map((p,index)=>`<article class="card ${cart.has(productKey(p))?'in-cart':''}">
     <div class="product-img">
-      ${productImage(p,index<5)}
+      ${productImage(p,renderedProductCount+index<eagerCount)}
       ${p.availability==='out_of_stock'?'<span class="stock-badge">Hết hàng</span>':''}
     </div>
     <div class="card-body">
@@ -415,7 +435,24 @@ function renderProducts(){
         <button class="btn fb" data-contact="Facebook" data-key="${esc(productKey(p))}">Facebook</button>
       </div>
     </div>
-  </article>`).join('');
+  </article>`).join(''));
+  renderedProductCount+=batch.length;
+  document.getElementById('loadMoreProducts').hidden=renderedProductCount>=matchingProducts.length;
+  document.getElementById('productProgress').textContent=`Đang hiển thị ${renderedProductCount} / ${matchingProducts.length} sản phẩm`;
+}
+const loadMoreProducts=document.getElementById('loadMoreProducts');
+loadMoreProducts.addEventListener('click',()=>{
+  const firstNewIndex=renderedProductCount;
+  appendProducts();
+  if(loadMoreProducts.hidden){
+    const card=document.querySelectorAll('#productGrid .card')[firstNewIndex];
+    if(card){card.tabIndex=-1;card.focus({preventScroll:true});}
+  }
+});
+if('IntersectionObserver' in window){
+  new IntersectionObserver(entries=>{
+    if(entries.some(entry=>entry.isIntersecting)&&!loadMoreProducts.hidden)appendProducts();
+  },{rootMargin:'600px 0px'}).observe(loadMoreProducts);
 }
 function contact(name,channel){
   if(channel==='Zalo' && CONFIG.ZALO_PHONE){
