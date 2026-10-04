@@ -36,6 +36,7 @@ function fixture(options = {}) {
   return {storage,calls,mails,env,fetchImpl,sendMail,now};
 }
 const stale = {...audit, sourceUpdatedAt: '2026-09-29T04:00:00Z'};
+const pending = {...stale, checkedAt:'2026-09-29T04:30:00Z'};
 
 test('VN schedule starts 11:17, stops 19:00, and handles UTC day boundaries', () => {
   assert.equal(inWindow(new Date('2026-09-30T04:16:00Z')),false);
@@ -44,24 +45,50 @@ test('VN schedule starts 11:17, stops 19:00, and handles UTC day boundaries', ()
   assert.equal(inWindow(new Date('2026-09-30T12:00:00Z')),false);
   assert.equal(inWindow(new Date('2026-09-30T17:17:00Z')),false);
 });
-test('verification rejects yesterday, future timestamps, wrong bytes and wrong cache version', async () => {
-  for (const options of [{audit:stale}, {audit:{...audit,checkedAt:'2026-09-30T08:00:00Z'}},
-    {audit:{...audit,sourceUpdatedAt:'2026-09-30T06:00:00Z'}}, {catalogue:'wrong'}, {version:'wrong'}]) {
+test('verification requires a sync after today’s schedule and matching public catalogue/index', async () => {
+  for (const options of [{audit:pending}, {audit:{...audit,checkedAt:'2026-09-30T04:16:59Z'}},
+    {audit:{...audit,checkedAt:'2026-09-30T08:00:00Z'}}, {audit:{...audit,catalogueSha256:'invalid'}}, {catalogue:'wrong'}, {version:'wrong'}]) {
     assert.equal((await inspectPublication(now,fixture(options).fetchImpl)).verified,false);
   }
   assert.equal((await inspectPublication(now,fixture().fetchImpl)).verified,true);
 });
-test('fresh verified site skips dispatch and sends one independent receipt each day', async () => {
+test('verified daily sync skips dispatch and sends one independent receipt each day', async () => {
   const f = fixture();
   assert.equal((await runCheck(f)).outcome,'verified');
   await runCheck(f);
   assert.equal(f.calls.filter(c=>c.url.includes('api.github')).length,0);
   assert.equal(f.mails.length,1);
-  assert.match(f.mails[0].subject,/ĐÃ XÁC MINH/);
+  assert.match(f.mails[0].subject,/ĐÃ ĐỒNG BỘ/);
   assert.equal((await f.storage.get('state')).mail.verified.outcome,'smtp_accepted');
 });
-test('yesterday source dispatches, persists cooldown, and warns once after noon', async () => {
-  const f=fixture({audit:stale});
+test('old source still completes the scheduled sync, sends an honest receipt and stops retries', async () => {
+  for(const freshness of ['fresh','stale']) {
+    const f=fixture({audit:{...stale,freshness,total:575,added:0,priceChanged:0}});
+    const first=await runCheck(f);
+    assert.equal(first.outcome,'verified');assert.equal(first.publication.sourceCurrent,false);
+    assert.equal(first.publication.sourceUpdatedAt,stale.sourceUpdatedAt);
+    for(let i=0;i<20;i++)await runCheck({...f,now:new Date(now.getTime()+i*10*60000)});
+    assert.equal(f.calls.filter(c=>c.url.includes('api.github')).length,0);
+    assert.equal(f.mails.length,1);assert.match(f.mails[0].subject,/ĐÃ ĐỒNG BỘ DATA SÀN/);
+    assert.match(f.mails[0].text,/29\/9\/2026/);
+    assert.match(f.mails[0].text,/Nguồn Data sàn chưa cập nhật ngày mới/);
+    assert.match(f.mails[0].text,/giá thay đổi: 0/);
+    assert.ok(!f.mails[0].subject.includes('CẢNH BÁO'));
+  }
+});
+test('unknown or future source dates do not invalidate a verified scheduled publication', async () => {
+  for(const sourceUpdatedAt of [null,'invalid','2026-09-30T06:00:00Z']) {
+    const f=fixture({audit:{...audit,sourceUpdatedAt,freshness:'unknown'}});
+    const result=await runCheck(f);
+    assert.equal(result.publication.verified,true);
+    assert.equal(result.publication.sourceCurrent,false);
+    assert.equal(result.publication.sourceReason,'source_date_unknown');
+    assert.equal(f.mails.length,1);assert.match(f.mails[0].text,/Chưa xác định ngày cập nhật hợp lệ/);
+    assert.ok(!f.mails[0].text.includes('Invalid Date'));
+  }
+});
+test('missing daily sync dispatches, persists cooldown, and warns once after noon', async () => {
+  const f=fixture({audit:pending});
   assert.equal((await runCheck(f)).outcome,'dispatch_accepted');
   assert.equal((await runCheck(f)).outcome,'retry_cooldown');
   assert.equal(f.calls.filter(c=>c.method==='POST').length,1);
@@ -73,14 +100,15 @@ test('yesterday source dispatches, persists cooldown, and warns once after noon'
 });
 
 test('many retries and a recovery send at most one warning and one confirmation per Vietnam day', async () => {
-  const f=fixture({audit:stale});
+  const f=fixture({audit:pending});
   for(let i=0;i<12;i++)await runCheck({...f,now:new Date(now.getTime()+i*10*60000)});
   assert.equal(f.mails.length,1);
-  const recovered={...f,fetchImpl:fixture().fetchImpl,now:new Date(now.getTime()+2*3600000)};
+  const recovered={...f,fetchImpl:fixture({audit:stale}).fetchImpl,now:new Date(now.getTime()+2*3600000)};
   for(let i=0;i<12;i++)await runCheck(recovered);
   assert.equal(f.mails.length,2);
   assert.match(f.mails[0].subject,/CẢNH BÁO/);
-  assert.match(f.mails[1].subject,/ĐÃ XÁC MINH/);
+  assert.match(f.mails[1].subject,/ĐÃ ĐỒNG BỘ/);
+  assert.match(f.mails[1].text,/Nguồn Data sàn chưa cập nhật ngày mới/);
   // A new run/isolate and explicit test cannot bypass persisted reservations.
   await runCheck({...recovered,manual:true,testMail:true});
   await runCheck({...f,manual:true});
@@ -94,7 +122,7 @@ test('many retries and a recovery send at most one warning and one confirmation 
 });
 
 test('unconfirmed SMTP counts toward the two-mail limit; admin tests cannot create a third send', async () => {
-  const f=fixture({audit:stale,mailError:true});
+  const f=fixture({audit:pending,mailError:true});
   await runCheck(f);
   await runCheck({...f,manual:true,testMail:true});
   await runCheck({...f,fetchImpl:fixture().fetchImpl});
@@ -105,26 +133,31 @@ test('unconfirmed SMTP counts toward the two-mail limit; admin tests cannot crea
   assert.equal(mail.verified,undefined);
 });
 
-test('notification quota resets at Vietnam midnight and never repeats in the new day', async () => {
-  const f=fixture({audit:stale});await runCheck(f);
+test('notification quota resets at Vietnam midnight and waits for the new daily sync', async () => {
+  const f=fixture({audit:pending});await runCheck(f);
   await runCheck({...f,fetchImpl:fixture().fetchImpl});assert.equal(f.mails.length,2);
   const nextDay=new Date('2026-09-30T17:07:00Z');
   const options={...f,now:nextDay,manual:true,fetchImpl:fixture({audit:{...audit,
     checkedAt:'2026-09-30T17:02:00Z',sourceUpdatedAt:'2026-09-30T17:00:00Z'}}).fetchImpl};
   await runCheck(options);await runCheck(options);
-  assert.equal(f.mails.length,3);
-  const state=await f.storage.get('state');assert.equal(state.day,'2026-10-01');
+  assert.equal(f.mails.length,2);
+  assert.equal((await f.storage.get('state')).day,'2026-10-01');
+  assert.deepEqual((await f.storage.get('state')).mail,{});
+  const scheduled={...options,now:new Date('2026-10-01T04:47:00Z'),fetchImpl:fixture({audit:{...audit,
+    checkedAt:'2026-10-01T04:30:00Z'}}).fetchImpl};
+  await runCheck(scheduled);await runCheck(scheduled);assert.equal(f.mails.length,3);
+  const state=await f.storage.get('state');
   assert.deepEqual(Object.keys(state.mail),['verified']);
 });
 test('queued/running workflow prevents duplicate, even when queue is delayed', async () => {
-  const f=fixture({audit:stale,runs:[{id:1,head_branch:'main',status:'queued'}]});
+  const f=fixture({audit:pending,runs:[{id:1,head_branch:'main',status:'queued'}]});
   assert.equal((await runCheck(f)).outcome,'workflow_active');
   assert.equal(f.calls.filter(c=>c.method==='POST').length,0);
   assert.equal(f.mails.length,1);
 });
 test('missing/denied GitHub credential still allows independent email; errors do not leak', async () => {
   for (const missing of [true,false]) {
-    const f=fixture({audit:stale,apiError:true});
+    const f=fixture({audit:pending,apiError:true});
     if(missing) delete f.env.GITHUB_SCHEDULER_TOKEN;
     const result=await runCheck(f);
     assert.equal(result.outcome,missing?'missing_github_token':'github_unavailable_or_denied');
@@ -134,7 +167,7 @@ test('missing/denied GitHub credential still allows independent email; errors do
   }
 });
 test('dispatch denial is not success and ambiguous SMTP is not retried or called accepted', async () => {
-  const f=fixture({audit:stale,dispatchStatus:403,mailError:true});
+  const f=fixture({audit:pending,dispatchStatus:403,mailError:true});
   const first=await runCheck(f);
   assert.equal(first.outcome,'github_unavailable_or_denied');
   assert.equal(first.lastDispatchAt,undefined);
@@ -152,7 +185,7 @@ test('missing mail credentials never mark sent; adding them enables one receipt'
   assert.equal(f.mails.length,1);
 });
 test('after three dispatch attempts retry spacing becomes 30 minutes', async () => {
-  const f=fixture({audit:stale});
+  const f=fixture({audit:pending});
   await f.storage.put('state',{day:'2026-09-30',attempts:3,lastAttemptAt:'2026-09-30T04:57:00Z',mail:{}});
   assert.equal((await runCheck(f)).outcome,'retry_cooldown');
   assert.equal(f.calls.filter(c=>c.method==='POST').length,0);

@@ -1,4 +1,5 @@
 import {createHash} from 'node:crypto';
+import {hasDailySync} from '../scripts/daily-sync-window.mjs';
 
 const site = 'https://antinpharma.github.io/an-tin-pharma-website/';
 const workflow = 'https://api.github.com/repos/antinpharma/an-tin-pharma-website/actions/workflows/daily-prices.yml';
@@ -24,17 +25,19 @@ export async function inspectPublication(now, fetchImpl = fetch) {
   };
   const status = await (await get('data/catalogue-status.json')).json();
   const today = day(now.toISOString());
-  if (status?.status !== 'checked' || status.freshness !== 'fresh' ||
-      day(status.checkedAt) !== today || day(status.sourceUpdatedAt) !== today ||
-      Date.parse(status.checkedAt) > now.getTime() ||
-      Date.parse(status.sourceUpdatedAt) > Date.parse(status.checkedAt) ||
-      !/^[a-f0-9]{64}$/.test(status.catalogueSha256 || '')) return {verified: false};
+  if (!hasDailySync(status, now)) return {verified: false, reason: 'daily_sync_pending'};
+  if (!/^[a-f0-9]{64}$/.test(status.catalogueSha256 || '')) return {verified: false, reason: 'invalid_catalogue_hash'};
   const [catalogue, home] = await Promise.all([
     get('catalogue.js').then(r => r.text()), get('index.html').then(r => r.text())
   ]);
   if (createHash('sha256').update(catalogue).digest('hex') !== status.catalogueSha256 ||
-      !home.includes(`catalogue.js?v=${status.catalogueSha256.slice(0, 12)}`)) return {verified: false};
-  return {verified: true, checkedAt: status.checkedAt, sourceUpdatedAt: status.sourceUpdatedAt};
+      !home.includes(`catalogue.js?v=${status.catalogueSha256.slice(0, 12)}`)) return {verified: false, reason: 'publication_mismatch'};
+  const source = Date.parse(status.sourceUpdatedAt);
+  const sourceValid = Number.isFinite(source) && source <= Date.parse(status.checkedAt);
+  const sourceCurrent = sourceValid && day(status.sourceUpdatedAt) === today && status.freshness === 'fresh';
+  const summary = Object.fromEntries(['total','added','priceChanged'].filter(key=>Number.isSafeInteger(status[key])&&status[key]>=0).map(key=>[key,status[key]]));
+  return {verified: true, checkedAt: status.checkedAt, sourceUpdatedAt: status.sourceUpdatedAt || null,
+    sourceCurrent, sourceReason: sourceCurrent ? 'current' : sourceValid ? 'source_not_updated_today' : 'source_date_unknown', summary};
 }
 
 export async function runCheck({env, storage, now = new Date(), fetchImpl = fetch, sendMail, manual = false, forceDispatch = false, testMail = false}) {
@@ -49,7 +52,7 @@ export async function runCheck({env, storage, now = new Date(), fetchImpl = fetc
   state.emailConfigured = Boolean(env.PRICE_REPORT_APP_PASSWORD?.trim());
   let publication;
   try { publication = await inspectPublication(now, fetchImpl); }
-  catch { publication = {verified: false}; }
+  catch { publication = {verified: false, reason: 'publication_unavailable'}; }
   state.publication = publication;
   state.outcome = publication.verified ? 'verified' : 'awaiting_update';
   if (!publication.verified || forceDispatch) {
@@ -97,15 +100,19 @@ export async function runCheck({env, storage, now = new Date(), fetchImpl = fetc
     // Reservations survive retries, deployments and restarts; never send a third mail.
     state.mail[kind] = {at: now.toISOString(), outcome: 'pending'};
     await storage.put('state', state);
-    const format = value => new Date(value).toLocaleString('vi-VN', {timeZone: 'Asia/Ho_Chi_Minh'});
-    const subject = `[An Tín Pharma] ${kind === 'test' ? 'KIỂM TRA BỘ HẸN GIỜ' : kind === 'verified' ? 'GIÁM SÁT: ĐÃ XÁC MINH WEBSITE' : 'CẢNH BÁO: CHƯA CẬP NHẬT HÔM NAY'} — ${today}`;
+    const format = value => Number.isFinite(Date.parse(value)) ? new Date(value).toLocaleString('vi-VN', {timeZone: 'Asia/Ho_Chi_Minh'}) : 'Chưa xác định';
+    const subject = `[An Tín Pharma] ${kind === 'test' ? 'KIỂM TRA BỘ HẸN GIỜ' : kind === 'verified' ? 'ĐÃ ĐỒNG BỘ DATA SÀN LÊN WEBSITE' : 'CẢNH BÁO: CHƯA HOÀN TẤT ĐỒNG BỘ WEBSITE'} — ${today}`;
     const text = [`Kiểm tra độc lập từ Cloudflare: ${format(now.toISOString())}.`,
       publication.verified
-        ? `Đã đối chiếu catalogue, phiên bản trang và ngày nguồn. Nguồn: ${format(publication.sourceUpdatedAt)}; đồng bộ: ${format(publication.checkedAt)}.`
-        : 'Chưa xác minh được website đã nhận nguồn của hôm nay. Bộ hẹn giờ tiếp tục kiểm tra trong khung 11:17–18:57; kiểm tra quyền GitHub, nguồn Sheet và nhật ký nếu tình trạng kéo dài.',
+        ? `Đã đồng bộ Data sàn lên website và đối chiếu dữ liệu đang phục vụ. Thời điểm đồng bộ: ${format(publication.checkedAt)}. Thời điểm nguồn Data sàn: ${format(publication.sourceUpdatedAt)}.`
+        : 'Chưa xác minh được lần đồng bộ theo lịch 11:17 hôm nay đã hoàn tất trên website. Bộ hẹn giờ tiếp tục kiểm tra trong khung 11:17–18:57; kiểm tra quyền GitHub, quyền đọc Sheet và nhật ký nếu tình trạng kéo dài.',
+      ...(publication.verified && !publication.sourceCurrent ? [publication.sourceReason === 'source_not_updated_today'
+        ? 'Nguồn Data sàn chưa cập nhật ngày mới. Website đã đồng bộ dữ liệu hiện có theo lịch, giữ nguyên ngày nguồn; không coi đây là giá mới của hôm nay.'
+        : 'Chưa xác định ngày cập nhật hợp lệ của nguồn Data sàn. Website đã đồng bộ dữ liệu hiện có; cần kiểm tra thời điểm nguồn ở A1.'] : []),
+      ...(publication.verified && Number.isSafeInteger(publication.summary?.total) ? [`Sản phẩm: ${publication.summary.total}; sản phẩm mới: ${publication.summary.added ?? 'chưa xác định'}; giá thay đổi: ${publication.summary.priceChanged ?? 'chưa xác định'}.`] : []),
       `Trạng thái kiểm tra: ${state.outcome}.`, `Website: ${site}`,
       'Nhật ký GitHub: https://github.com/antinpharma/an-tin-pharma-website/actions/workflows/daily-prices.yml',
-      'Đây là thư giám sát gửi trực tiếp từ Cloudflare, độc lập với email báo cáo của GitHub.'
+      'Thông báo tối đa 2 lần/ngày theo giờ Việt Nam. Báo cáo từng lượt đồng bộ lưu trong GitHub Actions.'
     ].join('\n\n');
     try {
       const accepted = await sendMail({to: recipient, subject, text}, env.PRICE_REPORT_APP_PASSWORD);

@@ -51,23 +51,26 @@ test('audit separates price changes, stock status changes and no-op checks witho
   assert.equal(Object.hasOwn(report, 'stock'), false);
 });
 
-test('backup runs only when a same-day fresh sync is not available; manual and primary always run', () => {
+test('backup waits for the daily scheduled sync regardless of source age; manual and primary always run', () => {
   const status = {status: 'checked', freshness: 'fresh', checkedAt: now.toISOString(), sourceUpdatedAt: '2026-09-29T03:00:00Z'};
   const options = {event: 'schedule', schedule: '47 8 * * *', now};
   assert.equal(syncDue(status, options), false);
-  assert.equal(syncDue({...status, freshness: 'stale'}, options), true);
+  assert.equal(syncDue({...status, freshness: 'stale'}, options), false);
   assert.equal(syncDue({...status, checkedAt: '2026-09-28T04:00:00Z'}, options), true);
-  // Yesterday's 10:00 source is only 29 hours old at the afternoon retry:
-  // the old 36-hour rule incorrectly skipped this run after a morning read.
+  // A boss-owned source can remain unchanged for days. A verified scheduled
+  // sync still completes today's job; only its check time gates backup runs.
   for (const schedule of ['47 4 * * *','17 5 * * *','47 8 * * *']) {
     const retry={...options,schedule,now:new Date('2026-09-29T08:47:00Z')};
-    assert.equal(syncDue({...status,sourceUpdatedAt:'2026-09-28T03:00:00Z'},retry),true);
+    assert.equal(syncDue({...status,sourceUpdatedAt:'2026-09-28T03:00:00Z'},retry),false);
     assert.equal(syncDue(status,retry),false);
-    assert.equal(syncDue({...status,sourceUpdatedAt:'invalid'},retry),true);
+    assert.equal(syncDue({...status,sourceUpdatedAt:'invalid'},retry),false);
+    assert.equal(syncDue({...status,checkedAt:'2026-09-29T04:16:59Z'},retry),true);
+    assert.equal(syncDue({...status,checkedAt:'2026-09-29T04:17:00Z'},retry),false);
+    assert.equal(syncDue({...status,checkedAt:'2026-09-30T04:17:00Z'},retry),true);
   }
   const midnight={...options,now:new Date('2026-09-29T17:30:00Z')};
   assert.equal(syncDue({...status,checkedAt:'2026-09-29T17:10:00Z'},midnight),true);
-  assert.equal(syncDue({...status,checkedAt:'2026-09-29T17:10:00Z',sourceUpdatedAt:'2026-09-29T17:05:00Z'},midnight),false);
+  assert.equal(syncDue({...status,checkedAt:'2026-09-29T17:10:00Z',sourceUpdatedAt:'2026-09-29T17:05:00Z'},midnight),true);
   assert.equal(syncDue(null, options), true);
   assert.equal(syncDue(status, {...options, event: 'workflow_dispatch'}), true);
   assert.equal(syncDue(status, {...options, schedule: '17 4 * * *'}), true);
@@ -83,14 +86,16 @@ test('live verification requires all three: catalogue bytes, index version and t
   assert.equal((await verifyPublished({hash, checkedAt: now.toISOString(), fetchImpl, sleep: async () => {}})).verified, true);
 });
 
-test('reports never claim success after deployment/verification failure or stale source', () => {
+test('reports distinguish successful sync of old source from deployment/verification failure', () => {
   const args = {report: {status: 'checked', freshness: 'fresh', checkedAt: now.toISOString(), sourceUpdatedAt: now.toISOString(), total: 5, added: 0, priceChanged: 2, stockStatusChanged: 1, contactPrices: 0, imageFailures: 0},
     syncResult: 'success', deployResult: 'success', verifyResult: 'success', runUrl: 'https://github.com/antinpharma/an-tin-pharma-website/actions/runs/1'};
-  assert.match(makePriceReport(args).subject, /ĐÃ KIỂM TRA/);
+  assert.match(makePriceReport(args).subject, /ĐÃ ĐỒNG BỘ/);
   assert.match(makePriceReport({...args, verifyResult: 'failure'}).subject, /LỖI/);
-  assert.match(makePriceReport({...args, report: {...args.report, freshness: 'stale'}}).subject, /CẢNH BÁO/);
-  assert.match(makePriceReport({...args, report: {...args.report, sourceUpdatedAt:'2026-09-28T03:00:00Z'}}).subject, /CẢNH BÁO/);
-  assert.match(makePriceReport({...args, report: {...args.report, checkedAt:'2026-09-29T17:30:00Z',sourceUpdatedAt:'2026-09-29T17:05:00Z'}}).subject, /ĐÃ KIỂM TRA/);
+  assert.match(makePriceReport({...args, report: {...args.report, freshness: 'stale'}}).subject, /ĐÃ ĐỒNG BỘ/);
+  const oldSource=makePriceReport({...args, report: {...args.report, sourceUpdatedAt:'2026-09-28T03:00:00Z'}});
+  assert.match(oldSource.subject, /ĐÃ ĐỒNG BỘ/);
+  assert.match(oldSource.text, /không coi là giá mới của hôm nay/);
+  assert.match(makePriceReport({...args, report: {...args.report, checkedAt:'2026-09-29T17:30:00Z',sourceUpdatedAt:'2026-09-29T17:05:00Z'}}).subject, /ĐÃ ĐỒNG BỘ/);
   assert.match(makePriceReport({...args, report: null, syncResult: 'failure'}).text, /Chưa xác nhận/);
 });
 

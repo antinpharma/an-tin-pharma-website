@@ -9,7 +9,7 @@ export function makePriceReport({report, syncResult, deployResult, verifyResult,
     ? new Date(Date.parse(value) + 7 * 3600000).toISOString().slice(0,10) : null;
   const fresh = report?.freshness === 'fresh' && day(report?.checkedAt) !== null
     && day(report?.sourceUpdatedAt) === day(report?.checkedAt);
-  const outcome = !verified ? 'LỖI / CHƯA XÁC MINH WEBSITE' : !fresh ? 'CẢNH BÁO NGUỒN DỮ LIỆU' : 'ĐÃ KIỂM TRA';
+  const outcome = !verified ? 'LỖI / CHƯA XÁC MINH WEBSITE' : 'ĐÃ ĐỒNG BỘ';
   const lines = [`An Tín Pharma — ${outcome}`, '',
     `Thời điểm kiểm tra: ${time(report?.checkedAt)}`,
     `Thời điểm nguồn Data sàn: ${time(report?.sourceUpdatedAt)}`,
@@ -19,7 +19,9 @@ export function makePriceReport({report, syncResult, deployResult, verifyResult,
     `Giá cần liên hệ: ${report.contactPrices}; ảnh tải lỗi (giữ ảnh cũ): ${report.imageFailures}.`);
   if (verified) lines.push('', 'Đã đối chiếu catalogue đang phục vụ trên website bằng SHA-256 và thời điểm kiểm tra.');
   else lines.push('', 'Chưa xác nhận website đã nhận dữ liệu lần này. Mở nhật ký bên dưới để kiểm tra; không coi báo cáo này là cập nhật giá thành công.');
-  if (!fresh) lines.push('Chưa xác nhận nguồn của đúng ngày kiểm tra theo giờ Việt Nam: nguồn khác ngày, quá 36 giờ, không nhận diện được thời điểm hoặc ở tương lai. Cần kiểm tra tab check của Data sàn.');
+  if (!fresh) lines.push(verified
+    ? 'Nguồn Data sàn chưa xác nhận ngày cập nhật mới. Ngày nguồn được giữ nguyên; đồng bộ dữ liệu hiện có thành công vẫn được tính là hoàn tất, không coi là giá mới của hôm nay.'
+    : 'Nguồn Data sàn chưa xác nhận ngày cập nhật mới. Ngày nguồn được giữ nguyên; lần đồng bộ này chưa được xác minh thành công.');
   lines.push('', 'Website: https://antinpharma.github.io/an-tin-pharma-website/', `Nhật ký: ${runUrl}`,
     '', 'Giá nguồn lấy theo Product ID + MIENNAM, hệ số ×1.000. Giá xác nhận riêng chỉ dùng khi thiếu dòng MIENNAM. Không đưa số lượng tồn vào báo cáo.');
   return {subject: `[An Tín Pharma] ${outcome} — ${time(report?.checkedAt)}`, text: lines.join('\n')};
