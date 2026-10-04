@@ -1,10 +1,10 @@
 {
   "version": 1,
   "status": "checked",
-  "checkedAt": "2026-10-03T13:56:04.654Z",
+  "checkedAt": "2026-10-04T04:17:38.335Z",
   "sourceUpdatedAt": "2026-10-02T04:00:00.000Z",
   "sourceLabel": "Update: 11h 02/10",
-  "freshness": "fresh",
+  "freshness": "stale",
   "lastChangedAt": "2026-10-03T10:57:38.519Z",
   "catalogueSha256": "e2eef9106360743f4b48d80aece9f3aa58d3ac6c419efa79fc963eca1639af3a",
   "total": 575,
