@@ -44,6 +44,10 @@ export class PriceScheduler {
         lastCheckAt: state?.lastCheckAt || null, outcome: state?.outcome || 'not_checked',
         lastTrigger: state?.lastTrigger || null, lastCronAt: state?.lastCronAt || null,
         lastDispatchAt: state?.lastDispatchAt || null, publication: state?.publication || null,
+        dailySyncVerified: state?.dailySyncVerified || false,
+        lastVerifiedAt: state?.lastVerifiedAt || null,
+        lastVerifiedPublication: state?.lastVerifiedPublication || null,
+        unavailableSince: state?.unavailableSince || null, unavailableChecks: state?.unavailableChecks || 0,
         notificationLimit: MAX_DAILY_MAILS, notificationDay: state?.day || null,
         notificationAttempts: Object.keys(state?.mail || {}).length,
         mail: state?.mail || {}}, {headers: {'Cache-Control': 'no-store'}});

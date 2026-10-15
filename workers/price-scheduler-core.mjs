@@ -51,11 +51,35 @@ export async function runCheck({env, storage, now = new Date(), fetchImpl = fetc
   state.githubConfigured = Boolean(env.GITHUB_SCHEDULER_TOKEN?.trim());
   state.emailConfigured = Boolean(env.PRICE_REPORT_APP_PASSWORD?.trim());
   let publication;
-  try { publication = await inspectPublication(now, fetchImpl); }
-  catch { publication = {verified: false, reason: 'publication_unavailable'}; }
+  // Retry the entire snapshot once: a deployment or transient network failure can
+  // otherwise turn a completed daily sync into a false failure notification.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try { publication = await inspectPublication(now, fetchImpl); }
+    catch { publication = {verified: false, reason: 'publication_unavailable'}; }
+    if (publication.verified || publication.reason === 'daily_sync_pending') break;
+  }
   state.publication = publication;
+  if (publication.verified) {
+    state.lastVerifiedPublication = publication;
+    state.lastVerifiedAt = now.toISOString();
+  }
+  // The existing daily receipt is also evidence from versions deployed before
+  // lastVerifiedPublication was stored. Never treat it as a live availability check.
+  const verifiedCheckedAt = state.lastVerifiedPublication?.checkedAt || state.mail.verified?.at;
+  state.dailySyncVerified = hasDailySync({status: 'checked', checkedAt: verifiedCheckedAt}, now);
+  const unavailable = publication.reason === 'publication_unavailable';
+  if (unavailable) {
+    state.unavailableSince ||= now.toISOString();
+    state.unavailableChecks = (state.unavailableChecks || 0) + 1;
+  } else {
+    delete state.unavailableSince;
+    delete state.unavailableChecks;
+  }
+  const persistentUnavailable = unavailable && state.unavailableChecks >= 3 &&
+    now.getTime() - Date.parse(state.unavailableSince) >= 20 * 60000;
   state.outcome = publication.verified ? 'verified' : 'awaiting_update';
-  if (!publication.verified || forceDispatch) {
+  if (unavailable && state.dailySyncVerified) state.outcome = 'publication_recheck_pending';
+  if ((!publication.verified && !(unavailable && state.dailySyncVerified)) || forceDispatch) {
     if (!state.githubConfigured) state.outcome = 'missing_github_token';
     else {
       const headers = {Authorization: `Bearer ${env.GITHUB_SCHEDULER_TOKEN.trim()}`,
@@ -94,18 +118,25 @@ export async function runCheck({env, storage, now = new Date(), fetchImpl = fetc
     }
   }
   const localHour = new Date(now.getTime() + 7 * 3600000).getUTCHours();
-  const kind = manual && testMail ? 'test' : publication.verified ? 'verified' : localHour >= 12 ? 'warning' : null;
+  const kind = manual && testMail ? 'test' : publication.verified ? 'verified' :
+    localHour >= 12 && (!unavailable || persistentUnavailable) ? 'warning' : null;
   if (kind && state.emailConfigured && !state.mail[kind] && Object.keys(state.mail).length < MAX_DAILY_MAILS) {
     // Count every reserved attempt, including admin tests and unconfirmed SMTP.
     // Reservations survive retries, deployments and restarts; never send a third mail.
     state.mail[kind] = {at: now.toISOString(), outcome: 'pending'};
     await storage.put('state', state);
     const format = value => Number.isFinite(Date.parse(value)) ? new Date(value).toLocaleString('vi-VN', {timeZone: 'Asia/Ho_Chi_Minh'}) : 'Chưa xác định';
-    const subject = `[An Tín Pharma] ${kind === 'test' ? 'KIỂM TRA BỘ HẸN GIỜ' : kind === 'verified' ? 'ĐÃ ĐỒNG BỘ DATA SÀN LÊN WEBSITE' : 'CẢNH BÁO: CHƯA HOÀN TẤT ĐỒNG BỘ WEBSITE'} — ${today}`;
+    const warningTitle = unavailable ? 'CẢNH BÁO: CHƯA KIỂM TRA LẠI ĐƯỢC WEBSITE' :
+      state.dailySyncVerified ? 'CẢNH BÁO: DỮ LIỆU WEBSITE CHƯA KHỚP' : 'CẢNH BÁO: CHƯA HOÀN TẤT ĐỒNG BỘ WEBSITE';
+    const subject = `[An Tín Pharma] ${kind === 'test' ? 'KIỂM TRA BỘ HẸN GIỜ' : kind === 'verified' ? 'ĐÃ ĐỒNG BỘ DATA SÀN LÊN WEBSITE' : warningTitle} — ${today}`;
     const text = [`Kiểm tra độc lập từ Cloudflare: ${format(now.toISOString())}.`,
       publication.verified
         ? `Đã đồng bộ Data sàn lên website và đối chiếu dữ liệu đang phục vụ. Thời điểm đồng bộ: ${format(publication.checkedAt)}. Thời điểm nguồn Data sàn: ${format(publication.sourceUpdatedAt)}.`
-        : 'Chưa xác minh được lần đồng bộ theo lịch 11:17 hôm nay đã hoàn tất trên website. Bộ hẹn giờ tiếp tục kiểm tra trong khung 11:17–18:57; kiểm tra quyền GitHub, quyền đọc Sheet và nhật ký nếu tình trạng kéo dài.',
+        : unavailable
+          ? `${state.dailySyncVerified ? 'Lần đồng bộ hôm nay đã được xác minh thành công trước đó. ' : ''}Bộ giám sát chưa đọc lại được website qua ít nhất 3 lượt kiểm tra trong 20 phút. Đây là lỗi kiểm tra truy cập; chưa thể kết luận đồng bộ thất bại.`
+          : state.dailySyncVerified
+            ? 'Lần đồng bộ hôm nay đã được xác minh thành công trước đó, nhưng dữ liệu website hiện tại chưa khớp. Bộ hẹn giờ tiếp tục kiểm tra và chạy lại đồng bộ trong khung 11:17–18:57.'
+            : 'Chưa xác minh được lần đồng bộ theo lịch 11:17 hôm nay đã hoàn tất trên website. Bộ hẹn giờ tiếp tục kiểm tra trong khung 11:17–18:57; kiểm tra quyền GitHub, quyền đọc Sheet và nhật ký nếu tình trạng kéo dài.',
       ...(publication.verified && !publication.sourceCurrent ? [publication.sourceReason === 'source_not_updated_today'
         ? 'Nguồn Data sàn chưa cập nhật ngày mới. Website đã đồng bộ dữ liệu hiện có theo lịch, giữ nguyên ngày nguồn; không coi đây là giá mới của hôm nay.'
         : 'Chưa xác định ngày cập nhật hợp lệ của nguồn Data sàn. Website đã đồng bộ dữ liệu hiện có; cần kiểm tra thời điểm nguồn ở A1.'] : []),

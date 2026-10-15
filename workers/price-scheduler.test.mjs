@@ -99,6 +99,83 @@ test('missing daily sync dispatches, persists cooldown, and warns once after noo
   assert.equal(f.mails.length,1);
 });
 
+test('a temporary fetch failure retries the full snapshot and still verifies', async () => {
+  const f = fixture(); let failed = false;
+  const fetchImpl = async (...args) => {
+    if (!failed) { failed = true; throw Error('network'); }
+    return f.fetchImpl(...args);
+  };
+  const result = await runCheck({...f, fetchImpl});
+  assert.equal(result.outcome, 'verified');
+  assert.equal(result.dailySyncVerified, true);
+  assert.equal(f.mails.length, 1);
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 0);
+});
+
+test('a completed daily sync survives a transient outage without another dispatch or false warning', async () => {
+  const f = fixture(); await runCheck(f);
+  const unavailable = async () => { throw Error('private-network-error'); };
+  const later = {...f, fetchImpl: unavailable, now: new Date(now.getTime() + 60000)};
+  const result = await runCheck(later);
+  assert.equal(result.publication.verified, false);
+  assert.equal(result.dailySyncVerified, true);
+  assert.equal(result.outcome, 'publication_recheck_pending');
+  assert.equal(result.lastVerifiedPublication.checkedAt, audit.checkedAt);
+  assert.equal(f.mails.length, 1);
+  assert.equal(f.calls.filter(c => c.method === 'POST').length, 0);
+  assert.ok(!JSON.stringify(result).includes('private-network-error'));
+  const recovered = await runCheck({...f, now: new Date(now.getTime() + 10 * 60000)});
+  assert.equal(recovered.outcome, 'verified');
+  assert.equal(recovered.unavailableChecks, undefined);
+  assert.equal(f.mails.length, 1);
+});
+
+test('deployment preserves existing receipt evidence even without the new verification fields', async () => {
+  const f = fixture();
+  await f.storage.put('state', {day:'2026-09-30', attempts:1,
+    mail:{verified:{at:audit.checkedAt, outcome:'smtp_accepted'}},
+    publication:{verified:false, reason:'publication_unavailable'}});
+  const result = await runCheck({...f, fetchImpl:async () => {throw Error('network');}});
+  assert.equal(result.dailySyncVerified, true);
+  assert.equal(result.publication.verified, false);
+  assert.equal(result.outcome, 'publication_recheck_pending');
+  assert.equal(f.mails.length, 0);
+  assert.equal(f.calls.length, 0);
+});
+
+test('persistent unavailability warns honestly after three checks over twenty minutes, without bypassing quota', async () => {
+  for (const verified of [true,false]) {
+    const f = fixture(); if (verified) await runCheck(f);
+    const fetchImpl = async (url, init) => {
+      if (!url.includes('api.github.com')) throw Error('network');
+      return f.fetchImpl(url, init);
+    };
+    for (let i = 0; i < 3; i++) {
+      await runCheck({...f, fetchImpl, now:new Date(now.getTime() + i * 10 * 60000)});
+      assert.equal(f.mails.length, (verified ? 1 : 0) + (i === 2 ? 1 : 0));
+    }
+    const mail = f.mails.at(-1);
+    assert.match(mail.subject, /CHƯA KIỂM TRA LẠI ĐƯỢC WEBSITE/);
+    assert.match(mail.text, /chưa thể kết luận đồng bộ thất bại/);
+    if (verified) {
+      assert.match(mail.text, /đã được xác minh thành công trước đó/);
+      assert.equal(f.calls.filter(c => c.method === 'POST').length, 0);
+    }
+    await runCheck({...f, fetchImpl, now:new Date(now.getTime() + 30 * 60000)});
+    assert.equal(f.mails.length, verified ? 2 : 1);
+  }
+});
+
+test('a real mismatch after verification still triggers repair and uses an accurate warning', async () => {
+  const f = fixture(); await runCheck(f);
+  const broken = fixture({catalogue:'wrong'});
+  const result = await runCheck({...f, fetchImpl:(url, init) =>
+    (url.includes('api.github.com') ? f : broken).fetchImpl(url, init)});
+  assert.equal(result.outcome, 'dispatch_accepted');
+  assert.equal(f.mails.length, 2);
+  assert.match(f.mails[1].subject, /DỮ LIỆU WEBSITE CHƯA KHỚP/);
+});
+
 test('many retries and a recovery send at most one warning and one confirmation per Vietnam day', async () => {
   const f=fixture({audit:pending});
   for(let i=0;i<12;i++)await runCheck({...f,now:new Date(now.getTime()+i*10*60000)});
