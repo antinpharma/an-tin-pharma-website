@@ -25,7 +25,7 @@ window.ANTIN_PRODUCTS = [
     "indication": "Người lớn: điều trị trào ngược dạ dày–thực quản (GERD), gồm làm lành viêm xước thực quản, kiểm soát triệu chứng và duy trì để tránh tái phát sau khi lành; phối hợp kháng sinh tiệt trừ Helicobacter pylori để chữa loét tá tràng và ngăn loét dạ dày–tá tràng tái phát; chữa loét dạ dày và dự phòng loét dạ dày–tá tràng ở người có nguy cơ phải dùng NSAID liên tục; tiếp tục điều trị sau liệu pháp đường tĩnh mạch ngăn tái xuất huyết do loét dạ dày–tá tràng; điều trị hội chứng Zollinger–Ellison. Trẻ vị thành niên từ 12 tuổi: điều trị GERD và phối hợp kháng sinh chữa loét tá tràng do H. pylori. Hàm lượng và liều dùng do bác sĩ lựa chọn theo từng chỉ định.",
     "image": "images/sheet/16d8d1aad1b86b0cc826c63b721729ff.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/48499f10c5b1ac302a51d0e531557edd.webp",
     "imageRetina": "images/sheet/6dd0b9db8ac1f2cc094111075cb60c1e.webp"
   },
@@ -265,7 +265,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/a0d4c7727be1d140b0bbffb9f22c5318.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/7f82da10fd78faa76ae63e624484cee6.webp",
     "imageRetina": "images/sheet/dc4105f83f70f89da757f5e25c8fd0d9.webp"
   },
@@ -505,7 +505,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/b59dd8d8619b5606a3a0ac8ec6d4d969.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/f9e99e071e26ced2f4f59b21aa676d71.webp",
     "imageRetina": "images/sheet/e5163ae53dcb7b65b377a02a0e31cbd6.webp"
   },
@@ -850,7 +850,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/c58c15581fd8bf7e58774687c95e1546.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/f05fab5e869fa15dab62c0a6b02a002c.webp",
     "imageRetina": "images/sheet/861395f0fa5a6bab7b9a09e437f14923.webp"
   },
@@ -880,7 +880,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/9dc4600557abcef0c8dca9bd0bb5065f.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/36a021b2e8192e40fe72494ad89e0eb7.webp",
     "imageRetina": "images/sheet/dd1b2ccc20cb4994c9bd1cb9f1256d0c.webp"
   },
@@ -910,7 +910,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/cfbb8d7a459a7e09ebdfc9b9500e3686.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/e7fd32ef70ac738a1aa56ecc153d1a49.webp",
     "imageRetina": "images/sheet/d6ae59ae7c4f8f3a3504b79e48d3263a.webp"
   },
@@ -1045,7 +1045,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/63cfd61c2ba77fddda5e1ee7a13421f1.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/59e7fb1ec8cc719f4c9a034f68fe0a2b.webp",
     "imageRetina": "images/sheet/dee80ac0b035ce8dfb7943a61c7b3623.webp"
   },
@@ -1270,7 +1270,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/eda14cfd78fe6fd3037abbd397a31e6d.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/3cf96ab0373da24c2e86ff9bac411b8b.webp",
     "imageRetina": "images/sheet/36d4c85d18060a0ef1d84ade6b2b83af.webp"
   },
@@ -1390,7 +1390,7 @@ window.ANTIN_PRODUCTS = [
     "price": "21.100đ",
     "image": "images/sheet/1f996b8eb5f972e408375549e8f4d3f6.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/a8521f8dbabad87cf40663a9d7f36203.webp",
     "imageRetina": "images/sheet/88f1ac38516d90cef0c00ad3a5521901.webp"
   },
@@ -1795,7 +1795,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/b8eef704dca2ff85e12205160f7d7394.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/5e4bf8ce2e5580e5923595cd14600e30.webp",
     "imageRetina": "images/sheet/4622304e3ce95e19fd2dcdd2bc6b1e53.webp"
   },
@@ -2080,7 +2080,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/f6752a6064134a05ce93e54dec57edf8.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/aea287876b1242539efc8ff4aea7282d.webp",
     "imageRetina": "images/sheet/c4172c6d9d64d5624eaa896bc0da9447.webp"
   },
@@ -2305,7 +2305,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/8e79cb75ba18261bce4d6b2c5e35fe03.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/040b95c1aed99d74302a4720bbffc6f1.webp",
     "imageRetina": "images/sheet/2fa3580d871bfae0b2a65b531e0f57ec.webp"
   },
@@ -2440,7 +2440,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/991a2eb6ee960a25ca6b9438084c0a31.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/5a10d9816a25ecd80cd16eb73ca58282.webp",
     "imageRetina": "images/sheet/56abae4c7c9425568d9d2b672123813b.webp"
   },
@@ -2755,7 +2755,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/d61c26c31b85cd1f06841edc25edaea7.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/6e1c61ca86105a434e73a247f3f2e800.webp",
     "imageRetina": "images/sheet/51a2a28f0c20a25097abc8e79b2b1706.webp"
   },
@@ -2830,7 +2830,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/3652ce1809d285228e1894381b85be02.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/6a4a0dbc5dbbc283088a0ffd83d8dd76.webp",
     "imageRetina": "images/sheet/9c97e88f335d397160b3177b4b1519a1.webp"
   },
@@ -2905,7 +2905,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/6630a40399c984171827ea2dddea90f2.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/f5178b3646592d6f1b978ee87c161916.webp",
     "imageRetina": "images/sheet/6b41c88a077f03af0786bf8ab0c9ef55.webp"
   },
@@ -2965,7 +2965,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/498e3c4038f9d27fd97295e68041e58a.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/b978d61606555c984cca4b94e4af8aa3.webp",
     "imageRetina": "images/sheet/bb980e744905fc3dc663a6a2b4333f5c.webp"
   },
@@ -3190,7 +3190,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/b4057fa923c0a94daff5b323d77e1ae1.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/a9e22448f118c35a6b005613863777bf.webp",
     "imageRetina": "images/sheet/2ffae97be3741c38c1cd9186d42d70c3.webp"
   },
@@ -3250,7 +3250,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/05fbceaf6fe06619ae14a1ae7c1e3240.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/23938a8a5707112afff44d1cf5ee4e23.webp",
     "imageRetina": "images/sheet/b430558446ab54880e4bea4f91093d1d.webp"
   },
@@ -3370,7 +3370,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/8b14fb311ee321cb37a284468479b5fd.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/3abef902aa8078f53978014d1ddaee37.webp",
     "imageRetina": "images/sheet/2e192a55ed07132e5e838e903c504d6e.webp"
   },
@@ -3385,7 +3385,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/eb0efe8fdab2ca14ee09ffd9c8b8229c.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/b1ffa6efa662766e601e2adbda779612.webp",
     "imageRetina": "images/sheet/556b8e097dbfda6d3e90f767e5f7b4b4.webp"
   },
@@ -3430,7 +3430,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/ca9fc07e6988f61609d1fb261c3ed35d.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/1c19d9cc15702fd647402a20719574d5.webp",
     "imageRetina": "images/sheet/ed8973cd073ea8e5810ca15c0a3aef16.webp"
   },
@@ -3445,7 +3445,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/9e87d12472a0c7d059e48d9b207f4ad9.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/47b9749dbe5cec6c28b697de5d61b64b.webp",
     "imageRetina": "images/sheet/f0ed8f4d112e1bbe6f9f06495e8caa97.webp"
   },
@@ -3460,7 +3460,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/4e7a59a618493be6daffe3e8e83834ba.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/9edf18ca96985070fca1cc224e84405c.webp",
     "imageRetina": "images/sheet/0c9545b2680f273cbbbbd2f703164491.webp"
   },
@@ -3760,7 +3760,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/df75aba89f6b1cdf16a7c6c4af59feac.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/53bbe90f38f5f2bb693f5cc144a3e2f4.webp",
     "imageRetina": "images/sheet/d72f9567effd46834b43f8b6da2d3c86.webp"
   },
@@ -3805,7 +3805,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/b1e3f44ab70b5d677afc2cc0d1b4acbc.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/ad70bea6c0b158d4dd11ef5144f7f9e9.webp",
     "imageRetina": "images/sheet/56d69ce7bf29cb480e9ca850738b0b81.webp"
   },
@@ -4195,7 +4195,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/6707c989ce4fef88e0605cdea86246b9.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/e4c03ecd9515b8aa8f9fdb175686d9be.webp",
     "imageRetina": "images/sheet/4528c3687420dc10473907d51de2736b.webp"
   },
@@ -4270,7 +4270,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/d131236fce609326cc35f5895ffeb74e.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/b0736c96065e06a2d145f4ef302dbce0.webp",
     "imageRetina": "images/sheet/e7f7791066a602f22e4c4299af6bd8dc.webp"
   },
@@ -4855,7 +4855,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/2c4372e0b86582bd652ddcf652af954a.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/ca266c4c78bafd00f0073b6b6740b95b.webp",
     "imageRetina": "images/sheet/4479abf7dc1f44301873cda1c3573206.webp"
   },
@@ -5005,7 +5005,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/f37d69a928c4d9ee864c308e64676db3.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/19f39bf42f3b7be0dc4d82d7cbe198ee.webp",
     "imageRetina": "images/sheet/14f89bc9aa6960b1856fd9a1927c891b.webp"
   },
@@ -5155,7 +5155,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/76a27f088b9545858abcbd46adcd1edc.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/c70169abfda122f1f384889a42d14737.webp",
     "imageRetina": "images/sheet/01b63d4e8b53665cef98f74fe0dfc1de.webp"
   },
@@ -5215,7 +5215,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/44e54a02d90b1bbe508dd2cc3d092aab.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/322223c074a45c57f4bf6759622f66cd.webp",
     "imageRetina": "images/sheet/faaec8fc7f9ed8eff62f222d1db068f2.webp"
   },
@@ -5425,7 +5425,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/6a615680955f438c53f4f8ff45b1164e.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/6ad777ead23810305535fbe429ce451c.webp",
     "imageRetina": "images/sheet/3e064f8bdf2ff1c7a20b5e22fa85e660.webp"
   },
@@ -5575,7 +5575,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/d5e3fec365dd02acf566d030123e1d68.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/d588775bd488b2409a4237c0eea70dcb.webp",
     "imageRetina": "images/sheet/bab01c3bf08ee2f62330205c6e3316cb.webp"
   },
@@ -5725,7 +5725,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/8f38f63c2f2c0ee133ed7661fce05aa2.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/166716ef8aaa877927f28bc3f4442cfb.webp",
     "imageRetina": "images/sheet/fe6b3169df557d96f909673bcc8cda7e.webp"
   },
@@ -5740,7 +5740,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/ab344d4bd703d46e2a8d53b0775ca6c0.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/f7e943875c3cf99a80b07fe89008f50e.webp",
     "imageRetina": "images/sheet/9c70e74b8849927c1cdb01b580604f5d.webp"
   },
@@ -5785,7 +5785,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/69affb1eb9c0d477e1c73084db804ca1.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/a3f0c5d44b1562429008fdfc4a88f926.webp",
     "imageRetina": "images/sheet/77e4e2a6f8d83568b0bc9c582a3abb94.webp"
   },
@@ -5890,7 +5890,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/5db2a850b222eb18755fac370a7ff26c.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/3dd1a219299015712d24dbfa1d45bf9f.webp",
     "imageRetina": "images/sheet/b758845b96419a269f0adc3739d76d90.webp"
   },
@@ -6445,7 +6445,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/5d4a95f937dde758f437218d1d1157ba.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/dc6add6d4140d3a6fa3f4a337ebe45a9.webp",
     "imageRetina": "images/sheet/501f3969445e824415aa6f3919f7c0fd.webp"
   },
@@ -6505,7 +6505,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/3248e0b78918835bc27b07e98f2370cf.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/fe40fe510fe20ba4ff4e098dc95113a5.webp",
     "imageRetina": "images/sheet/7203263b4b01931170a4f45612e341d9.webp"
   },
@@ -6805,7 +6805,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/c79943b88e0a906b44f4c0a0360db359.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/9081e2830e7c530d2ddfa0e465f31f26.webp",
     "imageRetina": "images/sheet/74011081d366c954edf7d2ac3fc96b04.webp"
   },
@@ -7060,7 +7060,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/9dfe7fcfba368e668bcdcb82145c1861.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/587673b31df7f82160ef7d6222f13c7d.webp",
     "imageRetina": "images/sheet/154f0a479fa35906d0a555fa68d38b1b.webp"
   },
@@ -7165,7 +7165,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/27945326c6c9cd2beae9a8648e493a3a.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/9e4dc14ac65f6af91212de1e6f5fdde0.webp",
     "imageRetina": "images/sheet/cbc8f3ba145dbbab2dd0c87a2e8a72f8.webp"
   },
@@ -7180,7 +7180,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/b7882fcc17971b23725734883b9e6759.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/a05c3adda20ff4af2682d8aedd496452.webp",
     "imageRetina": "images/sheet/2b8b6cff7796362a7154f1f76c2d3015.webp"
   },
@@ -7285,7 +7285,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/23d44d259aa67ebdcebc177c62ae25c7.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/c8eec1b93f95dd94f60238b005319b98.webp",
     "imageRetina": "images/sheet/a7901bfdfdcba31cf2f015dd934eb904.webp"
   },
@@ -7315,7 +7315,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/c9c5922d02d01dbd5dc7ee815ed4f8c7.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/2d65f92d42d441e8b62f035ad980cd14.webp",
     "imageRetina": "images/sheet/c4ee268b8adbe2f1dac915b1fc17ed10.webp"
   },
@@ -7600,7 +7600,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/4e9b377952275093a1b7df1025f1e245.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/d9dfbea1192336454400a51401ba6b55.webp",
     "imageRetina": "images/sheet/d4b457e0a3eb9097183af636ffc1cf79.webp"
   },
@@ -7975,7 +7975,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "images/sheet/e70408da8ba923679e1675a4440acd29.webp",
     "visible": true,
-    "availability": "unknown",
+    "availability": "out_of_stock",
     "imageThumb": "images/sheet/448f135728b532a020e83bd9c8510e71.webp",
     "imageRetina": "images/sheet/0b246dd525a127c3cfc07aee4011457c.webp"
   },
@@ -8710,7 +8710,7 @@ window.ANTIN_PRODUCTS = [
     "price": "Liên hệ",
     "image": "",
     "visible": true,
-    "availability": "unknown"
+    "availability": "out_of_stock"
   },
   {
     "productId": "2009263",

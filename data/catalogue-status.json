@@ -1,17 +1,17 @@
 {
   "version": 1,
   "status": "checked",
-  "checkedAt": "2026-10-15T09:07:46.242Z",
+  "checkedAt": "2026-10-15T11:25:18.790Z",
   "sourceUpdatedAt": "2026-10-15T03:00:00.000Z",
   "sourceLabel": "Update: 10h 15/10",
   "freshness": "fresh",
-  "lastChangedAt": "2026-10-15T04:17:58.292Z",
-  "catalogueSha256": "8fdd407ca40fbffb15fccb938b9b9c3c81cdc38d75acb4faad45ac5a1db81fc4",
+  "lastChangedAt": "2026-10-15T11:25:18.790Z",
+  "catalogueSha256": "f2170e304939e85644963269a9296e3e90202a9878ddd49ed64e1a7d2edf62cb",
   "total": 619,
-  "changed": 0,
+  "changed": 49,
   "added": 0,
   "priceChanged": 0,
-  "stockStatusChanged": 0,
+  "stockStatusChanged": 49,
   "contactPrices": 48,
   "imageFailures": 0
 }
