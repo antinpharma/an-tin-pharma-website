@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Script } from 'node:vm';
-import { updatePrices, updateCatalogue, updateAvailability, readProductDetails, updateProductDetails, validatePriceScale, renderUpdate, readWindow, syncPrices, validateAssets } from './sync-prices.mjs';
+import { updatePrices, updateCatalogue, updateAvailability, applyAvailabilityCheck, readProductDetails, updateProductDetails, validatePriceScale, renderUpdate, readWindow, syncPrices, validateAssets } from './sync-prices.mjs';
 import { syncImages, imageSources } from './sync-images.mjs';
 import sharp from 'sharp';
 
@@ -81,6 +81,35 @@ test('stock status uses only column G and exact southern IDs, with no leaked sto
   const restocked=updateAvailability(result,stockTable([...row(1146,'MIENNAM',113),2]));
   assert.equal(restocked[0].availability,'in_stock');
   assert.equal(updateCatalogue(result,values,1000).changes.length,0);
+});
+
+test('missing southern Check rows mark every absent product sold out without changing product data', () => {
+  const values = [[], ['', 'product_id', 'sales_region_code'],
+    ['unused', '1146', 'MIENNAM'], ['unused', '1505', 'MIENBAC']];
+  const original = products.map(p => ({...p, availability:'in_stock'}));
+  const result = applyAvailabilityCheck(original, values);
+  assert.equal(result.length, original.length);
+  assert.equal(result[0].availability, 'in_stock');
+  assert.deepEqual(result[1], {...original[1], availability:'out_of_stock'});
+  assert.deepEqual(applyAvailabilityCheck(original, [values[0],values[1],...values.slice(2).reverse()]), result);
+  assert.equal(original[1].availability, 'in_stock');
+  for (const availability of ['out_of_stock', 'unknown']) {
+    assert.equal(applyAvailabilityCheck([{...original[0],availability}],values)[0].availability, availability);
+  }
+  // After returning to Check, the next successful sync restores the source status.
+  const restocked = updateCatalogue(result, [[],[...headers,'Tồn khả dụng'],
+    [...row(1146,'MIENNAM',113),3],[...row(1505,'MIENNAM',322),2]],1000).products;
+  assert.equal(applyAvailabilityCheck(restocked,[...values,['unused','1505','MIENNAM']])[1].availability,'in_stock');
+});
+
+test('empty, malformed or failed Check reads cannot turn the whole catalogue into sold out', () => {
+  for (const values of [[],[[],['bad header']],
+    [[],['','product_id','sales_region_code']],
+    [[],['','product_id','sales_region_code'],['','1505','MIENBAC']],
+    [[],['','product_id','sales_region_code'],['','','MIENNAM']],
+    [[],['','product_id','sales_region_code'],['','#REF!','MIENNAM']]]) {
+    assert.throws(() => applyAvailabilityCheck(products, values));
+  }
 });
 
 test('Data san imports only A:G, ignores drifting H:J, keeps old images and uses dong directly', () => {
@@ -202,7 +231,7 @@ test('sync uses authenticated unformatted read; failure leaves files intact; rep
   try {
     const source = 'window.ANTIN_PRODUCTS = ' + JSON.stringify(products) + ';';
     const html = '<script src="config.js"></script><script src="catalogue.js?v=old"></script>';
-    const config = { PRICE_SOURCE_SHEET_URL: 'https://docs.google.com/spreadsheets/d/test-id/edit', PRICE_SHEET_NAME: 'check', PRICE_REGION: 'MIENNAM', PRICE_MULTIPLIER: 1000, DETAIL_SOURCE_SHEET_URL:'https://docs.google.com/spreadsheets/d/backup-id/edit', DETAIL_SHEET_NAME:'Sheet1' };
+    const config = { PRICE_SOURCE_SHEET_URL: 'https://docs.google.com/spreadsheets/d/test-id/edit', PRICE_SHEET_NAME: 'check', PRICE_REGION: 'MIENNAM', PRICE_MULTIPLIER: 1000, DETAIL_SOURCE_SHEET_URL:'https://docs.google.com/spreadsheets/d/backup-id/edit', DETAIL_SHEET_NAME:'Sheet1', AVAILABILITY_CHECK_SHEET_URL:'https://docs.google.com/spreadsheets/d/check-id/edit', AVAILABILITY_CHECK_SHEET_NAME:'Check' };
     await Promise.all(Object.entries({ 'catalogue.js': source, 'index.html': html, 'config.js': 'window.ANTIN_CONFIG = ' + JSON.stringify(config) + ';', 'app.js': '', 'logo.svg': '<svg/>' }).map(([name, text]) => writeFile(join(root, name), text)));
     for (const fetchImpl of [async () => ({ ok: false, status: 403 }), async () => { throw new Error('Network unavailable'); }, async () => ({ ok: true, json: async () => ({ values: [] }) })]) {
       await assert.rejects(syncPrices({ root, token: 'test-only', fetchImpl }));
@@ -213,6 +242,10 @@ test('sync uses authenticated unformatted read; failure leaves files intact; rep
       assert.equal(url.hostname, 'sheets.googleapis.com');
       assert.equal(url.searchParams.get('valueRenderOption'), 'UNFORMATTED_VALUE');
       assert.equal(options.headers.Authorization, 'Bearer test-only');
+      if (url.pathname.includes('/check-id/')) {
+        assert.match(decodeURIComponent(url.pathname), /'Check'!A1:C$/);
+        return {ok:true,json:async()=>({values:[[],['','product_id','sales_region_code'],['',1146,'MIENNAM']]})};
+      }
       if (url.pathname.includes('/backup-id/')) {
         assert.match(decodeURIComponent(url.pathname), /'Sheet1'!A1:J$/);
         return {ok:true,json:async()=>({values:[detailHeaders,[1146,'MIENNAM','','','']]})};
@@ -227,11 +260,18 @@ test('sync uses authenticated unformatted read; failure leaves files intact; rep
     assert.equal(status.priceChanged, 1);
     assert.equal(status.total, 2);
     assert.equal(readWindow(after, 'ANTIN_PRODUCTS')[0].price, '113.000đ');
+    assert.equal(readWindow(after, 'ANTIN_PRODUCTS')[1].availability, 'out_of_stock');
     assert.equal((await syncPrices({ root, token: 'test-only', fetchImpl })).changes.length, 0);
     assert.equal(await readFile(join(root, 'catalogue.js'), 'utf8'), after);
     // A backup-only failure must also leave the previous catalogue and cache intact.
     const afterHtml = await readFile(join(root,'index.html'),'utf8');
     const afterStatus = await readFile(join(root,'data/catalogue-status.json'),'utf8');
+    for (const checkResponse of [{ok:false,status:403},{ok:true,json:async()=>({values:[['bad header']]})}]) {
+      await assert.rejects(syncPrices({root,token:'test-only',fetchImpl:(url,options)=>url.pathname.includes('/check-id/')?Promise.resolve(checkResponse):fetchImpl(url,options)}));
+      assert.equal(await readFile(join(root,'catalogue.js'),'utf8'),after);
+      assert.equal(await readFile(join(root,'index.html'),'utf8'),afterHtml);
+      assert.equal(await readFile(join(root,'data/catalogue-status.json'),'utf8'),afterStatus);
+    }
     for (const backupResponse of [{ok:false,status:403},{ok:true,json:async()=>({values:[['bad header']]})}]) {
       await assert.rejects(syncPrices({root,token:'test-only',fetchImpl:(url,options)=>url.pathname.includes('/backup-id/')?Promise.resolve(backupResponse):fetchImpl(url,options)}));
       assert.equal(await readFile(join(root,'catalogue.js'),'utf8'),after);

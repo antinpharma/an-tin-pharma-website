@@ -69,7 +69,7 @@ jobs:
           token_format: access_token
           access_token_scopes: https://www.googleapis.com/auth/spreadsheets.readonly
           create_credentials_file: false
-      - name: Read Data san A-G and backup product details
+      - name: Read Data san A-G, Check availability and backup product details
         id: source
         env:
           GOOGLE_ACCESS_TOKEN: ${{ steps.google.outputs.access_token }}

@@ -116,6 +116,26 @@ export function updateAvailability(products,values){
   });
 }
 
+export function applyAvailabilityCheck(products, values) {
+  const headers = values?.[1]?.slice(0, 3);
+  const required = ['product_id', 'sales_region_code'];
+  if (!Array.isArray(headers) || required.some(h => headers.filter(v => v === h).length !== 1)) {
+    throw new Error('Expected unique Product ID and region headers in Check row 2. Catalogue was not changed.');
+  }
+  const [idCol, regionCol] = required.map(h => headers.indexOf(h));
+  const present = new Set();
+  for (const row of values.slice(2)) {
+    if (row[regionCol] !== 'MIENNAM') continue;
+    const id = String(row[idCol] ?? '').trim();
+    if (!/^\d+$/.test(id)) throw new Error('Invalid MIENNAM Product ID in Check. Catalogue was not changed.');
+    present.add(id);
+  }
+  if (!present.size) throw new Error('No MIENNAM products found in Check. Catalogue was not changed.');
+  // Presence alone does not prove stock: retain Data san's zero/unknown status.
+  return products.map(product => present.has(String(product.productId))
+    ? {...product} : {...product, availability: 'out_of_stock'});
+}
+
 export function readProductDetails(values) {
   // Backup Sheet1 has its header in row 1, unlike Data san's row 2.
   const headers = values?.[0]?.map(h => String(h).normalize('NFC').trim().toLowerCase());
@@ -193,6 +213,10 @@ export async function fetchDetailValues(config, token, fetchImpl = fetch) {
   return fetchSheetValues(config.DETAIL_SOURCE_SHEET_URL, config.DETAIL_SHEET_NAME, 'J', token, fetchImpl);
 }
 
+export async function fetchAvailabilityCheckValues(config, token, fetchImpl = fetch) {
+  return fetchSheetValues(config.AVAILABILITY_CHECK_SHEET_URL, config.AVAILABILITY_CHECK_SHEET_NAME, 'C', token, fetchImpl);
+}
+
 export function renderUpdate(source, html, result) {
   if (!result.changes.length) return { catalogue: source, html };
   const catalogue = 'window.ANTIN_PRODUCTS = ' + JSON.stringify(result.products, null, 2) + ';\n';
@@ -221,11 +245,13 @@ export async function syncPrices({ root = process.cwd(), token = process.env.GOO
   for (const text of [source, configSource, app]) new Script(text);
   const config = readWindow(configSource, 'ANTIN_CONFIG');
   const products = readWindow(source, 'ANTIN_PRODUCTS');
-  const [values, detailValues] = await Promise.all([
+  const [values, detailValues, checkValues] = await Promise.all([
     fetchPriceValues(config, token, fetchImpl), fetchDetailValues(config, token, fetchImpl),
+    fetchAvailabilityCheckValues(config, token, fetchImpl),
   ]);
   const details = readProductDetails(detailValues);
   const result = updateCatalogue(products, values, config.PRICE_MULTIPLIER, config.PRICE_FALLBACKS_VND);
+  result.products = applyAvailabilityCheck(result.products, checkValues);
   validatePriceScale(products, result.products);
   result.products = updateProductDetails(result.products, details);
   const imageValues = [[], ['product_id','sales_region_code','link ảnh URL'],

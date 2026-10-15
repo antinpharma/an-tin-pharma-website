@@ -16,6 +16,11 @@ window.ANTIN_CONFIG = {
   // Chỉ dùng khi không có dòng MIENNAM; không tự lấy giá từ miền khác.
   PRICE_FALLBACKS_VND: { "2986": 21100 },
 
+  // Vắng Product ID + MIENNAM trong Check thì hết hàng (xác nhận 15/10/2026).
+  // Chỉ đọc A:C để đối chiếu mã/miền; không lấy giá từ bảng này.
+  AVAILABILITY_CHECK_SHEET_URL: "https://docs.google.com/spreadsheets/d/1CpMm628mW660UZ3FY-fYL9iOaiB-KsddxJZ16XTQPMA/edit",
+  AVAILABILITY_CHECK_SHEET_NAME: "Check",
+
   // H:I:J chỉ đọc từ backup, ghép theo Product ID; tiêu đề ở dòng 1.
   DETAIL_SOURCE_SHEET_URL: "https://docs.google.com/spreadsheets/d/1AlreWSLbHiXHGP9BqdMH1WC_wVyEbV3pRREXVuD3r9k/edit",
   DETAIL_SHEET_NAME: "Sheet1",
