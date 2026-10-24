@@ -54,6 +54,8 @@ Khách hàng xem sản phẩm, giá, hoạt chất, chỉ định và liên hệ
 - catalogue.js: dữ liệu catalogue public
 - product-groups.js: nhóm duyệt sản phẩm theo Product ID, độc lập với product_category trong Sheet; mã chưa được rà soát vào “Chưa phân nhóm”. Khi thêm nhóm mới, cập nhật kiểm thử scripts/product-groups.test.mjs.
 - product-departments.js: gợi ý duyệt theo khoa, cho phép một Product ID ở nhiều khoa; dùng nhóm đã rà soát và danh sách ID được đối chiếu với catalogue. Không suy ra dùng cho trẻ em/phụ nữ mang thai từ tên, dạng bào chế hoặc từ khóa. Kiểm thử cùng scripts/product-groups.test.mjs; thêm file này vào gói GitHub Pages. Nhóm và khoa nằm dưới danh sách sản phẩm, có liên kết nhảy nhanh ở đầu.
+- Người dùng yêu cầu rà soát lại phân nhóm/chuyên khoa ngày 24/10/2026. Căn cứ và nguồn chính nằm ở `docs/product-filter-review.md`. Chỉ sửa phân loại duyệt; không ghi đè hoạt chất/chỉ định trong catalogue hay backup từ lượt rà soát này. Ưu tiên công dụng chính và đường dùng; không đưa mọi kháng sinh toàn thân vào Da liễu/Tai mũi họng chỉ vì chỉ định thứ cấp. Nhi ưu tiên sản phẩm dành cho trẻ được đối chiếu riêng, không lấy mọi thuốc người lớn có thêm liều vị thành niên. Mã mới vẫn cần rà soát theo Product ID.
+- Khoa và nhóm là hai bộ lọc kết hợp: đổi một lựa chọn phải giữ lựa chọn còn lại. Số đếm tính theo bộ lọc còn lại cùng từ khóa/danh mục, không báo số tổng không tương ứng với kết quả đang lọc. Kiểm thử `facetCounts` và thao tác kết hợp/xóa bộ lọc trên desktop/mobile.
 - images/: ảnh sản phẩm public
 
 ## Contact

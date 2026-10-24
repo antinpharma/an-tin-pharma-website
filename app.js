@@ -217,13 +217,8 @@ function renderDepartments(){
   document.querySelectorAll('[data-department-options]').forEach(element=>element.innerHTML=markup);
 }
 function refreshGroupFilters(candidates,resultCount){
-  const counts=new Map([['all',candidates.length]]);
-  for(const product of candidates){
-    const group=GROUPS.groupFor(product);
-    counts.set(group.id,(counts.get(group.id)||0)+1);
-    if(group.parent)counts.set(group.parent,(counts.get(group.parent)||0)+1);
-  }
-  document.querySelectorAll('[data-group-count]').forEach(el=>el.textContent=counts.get(el.dataset.groupCount)||0);
+  const {groupCounts,departmentCounts}=DEPARTMENTS.facetCounts(candidates,activeGroup,activeDepartment);
+  document.querySelectorAll('[data-group-count]').forEach(el=>el.textContent=groupCounts[el.dataset.groupCount]||0);
   document.querySelectorAll('[data-group]').forEach(button=>{
     const selected=button.dataset.group===activeGroup;
     button.classList.toggle('active',selected);
@@ -234,13 +229,7 @@ function refreshGroupFilters(candidates,resultCount){
     const section=GROUPS.sections.find(s=>s.id===el.dataset.section);
     el.classList.toggle('has-selection',activeGroup===section.id||section.children.some(g=>g.id===activeGroup));
   });
-  const departmentCounts=new Map([['all',candidates.length]]);
-  for(const product of candidates){
-    for(const department of DEPARTMENTS.departmentsFor(product)){
-      departmentCounts.set(department.id,(departmentCounts.get(department.id)||0)+1);
-    }
-  }
-  document.querySelectorAll('[data-department-count]').forEach(el=>el.textContent=departmentCounts.get(el.dataset.departmentCount)||0);
+  document.querySelectorAll('[data-department-count]').forEach(el=>el.textContent=departmentCounts[el.dataset.departmentCount]||0);
   document.querySelectorAll('[data-department]').forEach(button=>{
     const selected=button.dataset.department===activeDepartment;
     button.classList.toggle('active',selected);
@@ -524,8 +513,8 @@ document.addEventListener('keydown',event=>{
 document.querySelectorAll('[data-group-options], [data-department-options]').forEach(element=>element.addEventListener('click',event=>{
   const button=event.target.closest('[data-group], [data-department]');
   if(!button)return;
-  activeGroup=button.dataset.group||'all';
-  activeDepartment=button.dataset.department||'all';
+  if(button.dataset.group!==undefined)activeGroup=button.dataset.group;
+  if(button.dataset.department!==undefined)activeDepartment=button.dataset.department;
   closeFilterMenu();
   renderProducts();
   document.querySelector('.catalogue-results').focus({preventScroll:true});

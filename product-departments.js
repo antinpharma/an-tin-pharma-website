@@ -1,49 +1,75 @@
-// Browsing suggestions reviewed against catalogue.js and the exact-ID groups in
-// product-groups.js on 2026-09-29. These do not add indications or age approvals.
-// Never infer a department from a new product's name, dosage form or keywords.
+// Reviewed 2026-10-24; primary sources: docs/product-filter-review.md.
+// Use primary purpose and exact reviewed IDs, never keywords, pregnancy warnings
+// or every possible indication of a systemic antibiotic.
 (() => {
   const departments = [
     {
       id: 'paediatrics', label: 'Nhi', groups: ['baby-care'],
-      // Explicit child/adolescent use or child-care names in the existing catalogue.
-      // Age limits remain in each product's full information (e.g. Nexium: 12+).
-      productIds: '1505 5349 6268 10771 11734 12150 12567 13019 13762 54443 70499 82278 84166 84168 200262 2000529 2005518 899054',
+      // Dedicated child-care products and verified paediatric formulations.
+      // Not everything with an adolescent dose. Age/weight limits still apply.
+      productIds: '2683 4102 6268 7091 10554 10771 12144 12567 13762 54443 59485 59486 80945 84166 84168 88828 88829 9165 93679 102943 113280 113281 1270457 167518 167522 229802 229806 68684 899054 516455 1203336 2016446 94627 90100 157973 170938',
     },
     {
       id: 'obgyn', label: 'Sản phụ khoa', groups: ['gynaecology', 'tests', 'intimate-care'],
-      // Existing genital-infection, menstrual-pain or menstrual-support indications.
-      // This is NOT a list of products suitable during pregnancy.
-      productIds: '2522 3030 3513 7656 12944 13755 62586 70505 72112 86943 114514 2014877',
+      // Menstrual pain/support and the specific prenatal supplement.
+      // This does not approve use of other products during pregnancy.
+      productIds: '3513 3916 62586 86943 76928 2008',
     },
     {
-      id: 'ent', label: 'Tai mũi họng', groups: ['respiratory', 'support-respiratory', 'nasal-care', 'allergy'],
-      // Respiratory/ENT infection indications already recorded in the catalogue.
-      productIds: '1320 1323 1619 1829 2165 2631 2660 2780 2975 3102 3332 3720 3924 5497 6995 7656 7867 8463 9241 10769 11178 12925 12944 12999 13502 13755 15890 53581 54525 58031 63818 69531 69752 70502 70505 72112 84262 88994 114514',
+      id: 'ent', label: 'Tai mũi họng', groups: ['ent-local', 'respiratory', 'support-respiratory', 'nasal-care', 'allergy'],
+      productIds: '',
+    },
+    {
+      id: 'respiratory', label: 'Hô hấp', groups: ['respiratory', 'support-respiratory', 'asthma'], productIds: '',
     },
     {
       id: 'dermatology', label: 'Da liễu',
-      groups: ['skin', 'allergy', 'scar-device', 'face-cleanser', 'moisturiser', 'acne-scar', 'sun-care', 'body-hair', 'baby-care'],
-      // Additional products explicitly covering skin/soft-tissue infection.
-      productIds: '1320 1323 1829 2631 2660 2780 2975 3102 3332 3561 3924 5497 6995 8463 9241 11178 12925 12944 12999 13502 15890 53581 54525 63818 70502 70505 72112 84262 114514',
+      groups: ['skin', 'acne-medicines', 'antifungal-skin', 'scar-device', 'face-cleanser', 'moisturiser', 'acne-scar', 'sun-care', 'body-hair', 'baby-care'],
+      // Reviewed urticaria antihistamines; no automatic systemic antibiotics.
+      productIds: '5349 8375 10369 11602 13759 15191 15887 15896 69856 70499 57579 77294 368117 138701',
     },
     {
-      id: 'musculoskeletal', label: 'Cơ xương khớp', groups: ['joints', 'support-joints', 'balms'],
-      // Joint/muscle pain, osteoporosis, rickets or osteomalacia in existing indications.
-      productIds: '1113 1829 2522 3513 4131 5045 7127 7410 8229 8539 13761 13768 15675 16245 58888 62586 68505 72195 93759 212610 2014877',
+      id: 'musculoskeletal', label: 'Cơ xương khớp', groups: ['joints', 'support-joints', 'topical-pain'],
+      productIds: '1113 2315 1391 2522 3513 3916 4131 7127 7410 8539 11757 13761 13768 15675 16245 62586 68505 72195 93759 212610 2014877',
     },
     {
-      id: 'neurology', label: 'Thần kinh', groups: ['nerves', 'support-nerves'],
-      // Post-stroke spasticity and vitamin-related neuropathy already documented.
-      productIds: '1125 1126 1824 15084',
+      id: 'neurology', label: 'Thần kinh', groups: ['nerves', 'support-nerves', 'dizziness'],
+      productIds: '1125 1126 14073 1824 15084',
+    },
+    {
+      id: 'psychiatry', label: 'Tâm thần', groups: ['psychiatry'], productIds: '',
     },
     {
       id: 'ophthalmology', label: 'Mắt', groups: ['eyes', 'eye-care'],
-      // Vitamin-A-deficiency night blindness and ocular allergy in existing indications.
-      productIds: '5045 8229 70499',
+      productIds: '',
     },
     {
-      id: 'internal', label: 'Nội chung',
-      groups: ['diabetes', 'liver', 'blood', 'digestive', 'cardio', 'urinary', 'respiratory', 'allergy', 'pain', 'antimicrobial', 'med-vitamins', 'support-liver', 'support-blood', 'support-digestive', 'support-cardio', 'supp-vitamins', 'support-immunity'],
+      id: 'cardiology', label: 'Tim mạch', groups: ['cardio', 'lipids', 'veins', 'antithrombotic', 'support-cardio'], productIds: '',
+    },
+    {
+      id: 'gastroenterology', label: 'Tiêu hóa, gan mật',
+      groups: ['digestive', 'intestinal', 'motility', 'probiotic-medicines', 'haemorrhoids', 'liver', 'support-liver', 'support-digestive'], productIds: '',
+    },
+    {
+      id: 'endocrinology', label: 'Nội tiết, đái tháo đường', groups: ['diabetes'], productIds: '',
+    },
+    {
+      id: 'urology', label: 'Tiết niệu, Nam khoa', groups: ['urinary', 'hormones', 'sexual-health'], productIds: '2342 106596',
+    },
+    {
+      id: 'dentistry', label: 'Răng hàm mặt', groups: ['dental', 'oral-care', 'oral-devices'], productIds: '',
+    },
+    {
+      id: 'infectious', label: 'Truyền nhiễm', groups: ['antimicrobial', 'antiviral', 'antiparasitic'], productIds: '',
+    },
+    {
+      id: 'nutrition', label: 'Dinh dưỡng, vi chất',
+      groups: ['med-vitamins', 'supp-vitamins', 'support-blood', 'support-immunity'],
+      productIds: '1895 10704 70088 220989 10554 86215 102483 2002702 2010131 2012666',
+    },
+    {
+      id: 'internal', label: 'Nội tổng quát',
+      groups: ['pain', 'anti-oedema', 'corticosteroids', 'blood', 'med-vitamins', 'supp-vitamins'],
       productIds: '',
     },
   ];
@@ -62,5 +88,24 @@
   function labelFor(id) {
     return definitions.find(department => department.id === id)?.label || 'Tất cả khoa';
   }
-  window.ANTIN_DEPARTMENTS = {definitions, departmentsFor, matches, labelFor};
+  // Facet counts include the other active facet, so each option's count equals
+  // the result of selecting it, including zero. Search/category are applied first.
+  function facetCounts(products, selectedGroup = 'all', selectedDepartment = 'all') {
+    const groupCounts = {all: 0}, departmentCounts = {all: 0};
+    const add = (counts, id) => counts[id] = (counts[id] || 0) + 1;
+    for (const product of products) {
+      if (matches(product, selectedDepartment)) {
+        add(groupCounts, 'all');
+        const group = window.ANTIN_GROUPS.groupFor(product);
+        add(groupCounts, group.id);
+        if (group.parent) add(groupCounts, group.parent);
+      }
+      if (window.ANTIN_GROUPS.matches(product, selectedGroup)) {
+        add(departmentCounts, 'all');
+        for (const department of departmentsFor(product)) add(departmentCounts, department.id);
+      }
+    }
+    return {groupCounts, departmentCounts};
+  }
+  window.ANTIN_DEPARTMENTS = {definitions, departmentsFor, matches, facetCounts, labelFor};
 })();

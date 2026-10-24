@@ -13,6 +13,15 @@ Repository: `antinpharma/an-tin-pharma-website`.
 - Nút liên hệ Zalo / Facebook
 - Sẵn sàng deploy bằng GitHub Pages
 
+## Duyệt theo nhóm và chuyên khoa
+
+`product-groups.js` lưu một nhóm chính cho từng Product ID; `product-departments.js`
+liên kết sản phẩm với chuyên khoa phù hợp. Hai bộ lọc kết hợp với từ khóa và danh
+mục, giữ lựa chọn còn lại khi đổi khoa/nhóm; số đếm phản ánh đúng các điều kiện này.
+Mã mới chưa rà soát hiện ở “Chưa phân nhóm”. Không tự phân loại từ từ khóa hay
+suy ra dùng được cho trẻ em/thai phụ. Căn cứ lần rà soát 24/10/2026 và các nguồn
+chính được lưu tại [bản rà soát](docs/product-filter-review.md).
+
 ## Đồng bộ danh mục và giá tự động
 
 - Ảnh catalogue có bản thu nhỏ WebP 320px và 640px, tạo từ ảnh đã mirror; trình duyệt chọn theo mật độ màn hình. Giữ nguyên ảnh lớn, dùng làm dự phòng nếu bản thu nhỏ tải lỗi. Đồng bộ hằng ngày tự tạo bản thu nhỏ cho ảnh mới và sửa file thu nhỏ bị thiếu từ bản lưu, không tải lại CDN khi không cần. Năm ảnh đầu kết quả được tải ưu tiên; các ảnh sau tải khi gần vùng xem. Trang chỉ dựng danh sách một lần khi khởi tạo, vẫn giữ toàn bộ sản phẩm để tìm kiếm/lọc.
