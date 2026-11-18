@@ -59,7 +59,7 @@ Khách hàng xem sản phẩm, giá, hoạt chất, chỉ định và liên hệ
 - images/: ảnh sản phẩm public
 
 ## Contact
-- Zalo: 0905561550
+- Zalo OA An Tín Pharma: https://zalo.me/4421242006656427924 (thay Zalo cá nhân 0905561550 theo xác nhận ngày 18/11/2026).
 - Facebook: https://www.facebook.com/profile.php?id=61594629503087
 
 ## Rules for Codex

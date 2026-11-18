@@ -130,7 +130,7 @@
   document.querySelectorAll('[data-show-password]').forEach(input=>input.addEventListener('change',()=>{
     $(input.dataset.showPassword).querySelectorAll('input[autocomplete="current-password"],input[autocomplete="new-password"]').forEach(field=>field.type=input.checked?'text':'password');
   }));
-  document.querySelector('.forgot-password').href='https://zalo.me/'+window.ANTIN_CONFIG.ZALO_PHONE;
+  document.querySelector('.forgot-password').href=window.ANTIN_CONFIG.ZALO_URL;
   const initialToken=token;
   const ready=token?request('me').then(data=>{if(token===initialToken)accept(data);}).catch(()=>{ /* Invalid sessions are cleared; a failed connection must not clear a newer login. */ }):Promise.resolve();
   window.AntinAccount={open,ready,get profile(){return profile;},headers:()=>token?{Authorization:'Bearer '+token}:{},expire:clear};

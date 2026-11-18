@@ -444,8 +444,8 @@ if('IntersectionObserver' in window){
   },{rootMargin:'600px 0px'}).observe(loadMoreProducts);
 }
 function contact(name,channel){
-  if(channel==='Zalo' && CONFIG.ZALO_PHONE){
-    window.open(`https://zalo.me/${CONFIG.ZALO_PHONE}`,'_blank');
+  if(channel==='Zalo' && CONFIG.ZALO_URL){
+    window.open(CONFIG.ZALO_URL,'_blank','noopener,noreferrer');
     return;
   }
   if(channel==='Facebook' && CONFIG.FACEBOOK_URL){
@@ -638,13 +638,13 @@ document.getElementById('customerPhone').addEventListener('input',resetOrderFeed
 document.getElementById('checkoutCart').addEventListener('click',()=>{
   if(!cartRows(true).length) return;
   if(!window.AntinAccount?.profile){window.AntinAccount?.open('login');return;}
-  if(!CONFIG.ZALO_PHONE){
+  if(!CONFIG.ZALO_URL){
     document.getElementById('cartFeedback').textContent='Kênh Zalo chưa được cấu hình.';
     return;
   }
   // Open during the click gesture so browsers do not block the new tab after an await.
   void copyOrder();
-  window.open(`https://zalo.me/${CONFIG.ZALO_PHONE}`,'_blank','noopener,noreferrer');
+  window.open(CONFIG.ZALO_URL,'_blank','noopener,noreferrer');
 });
 loadProducts().then(()=>{
   cart=restoreCart();

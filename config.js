@@ -25,8 +25,8 @@ window.ANTIN_CONFIG = {
   DETAIL_SOURCE_SHEET_URL: "https://docs.google.com/spreadsheets/d/1AlreWSLbHiXHGP9BqdMH1WC_wVyEbV3pRREXVuD3r9k/edit",
   DETAIL_SHEET_NAME: "Sheet1",
 
-  // Liên hệ - điền sau.
-  ZALO_PHONE: "0905561550",
+  // Zalo OA An Tín Pharma, theo mã QR được xác nhận ngày 18/11/2026.
+  ZALO_URL: "https://zalo.me/4421242006656427924",
   // Chỉ bật sau khi Worker đã ghép đúng tài khoản nhận đơn. Không đặt Bot Token ở đây.
   ORDER_API_URL: "https://antin-orders.minhtran123hehe.workers.dev/orders",
   FACEBOOK_URL: "https://www.facebook.com/profile.php?id=61594629503087"
